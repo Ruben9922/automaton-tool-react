@@ -149,83 +149,87 @@ export default function Home() {
                 </FormControl>
                 <TextField id="alphabet" label="Alphabet" value={alphabet} onChange={handleAlphabetChange}/>
 
-                {states.map((state, index) => [
-                    <TextField
-                        id={`state-name-${index + 1}`}
-                        label={`State ${index + 1} name`}
-                        value={state}
-                        onChange={event => handleStateNameChange(event, index)}
-                    />,
-                    <FormControlLabel
-                        control={
-                            <Radio
-                                checked={initialStateIndex === index}
-                                onChange={event => handleInitialStateChange(event, index)}
-                            />
-                        }
-                        label="Initial"
-                    />,
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={finalStateIndices.includes(index)}
-                                onChange={event => handleFinalStateIndicesChange(event, index)}
-                                name={`state-${index + 1}-final`}
-                            />
-                        }
-                        label="Final"
-                    />,
-                    <Tooltip title={`Delete state ${index + 1}`}>
-                        <IconButton onClick={() => handleRemoveStateClick(index)} aria-label="delete">
-                            <DeleteIcon/>
-                        </IconButton>
-                    </Tooltip>,
-                ])}
+                {states.map((state, index) => (
+                    <React.Fragment key={index}>
+                        <TextField
+                            id={`state-name-${index + 1}`}
+                            label={`State ${index + 1} name`}
+                            value={state}
+                            onChange={event => handleStateNameChange(event, index)}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Radio
+                                    checked={initialStateIndex === index}
+                                    onChange={event => handleInitialStateChange(event, index)}
+                                />
+                            }
+                            label="Initial"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={finalStateIndices.includes(index)}
+                                    onChange={event => handleFinalStateIndicesChange(event, index)}
+                                    name={`state-${index + 1}-final`}
+                                />
+                            }
+                            label="Final"
+                        />
+                        <Tooltip title={`Delete state ${index + 1}`}>
+                            <IconButton onClick={() => handleRemoveStateClick(index)} aria-label="delete">
+                                <DeleteIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    </React.Fragment>
+                ))}
                 <Button onClick={handleAddStateClick} variant="contained">Add state</Button>
 
-                {transitions.map((transition, index) => [
-                    <FormControl className={classes.formControl}>
-                        <InputLabel id="transition-current-state-label">Current state</InputLabel>
-                        <Select
-                            labelId="transition-current-state-label"
-                            id="transition-current-state"
-                            value={transition.get("currentState")}
-                            onChange={event => handleTransitionChange(event, index, "currentState")}>
-                            {states.map((state, index) =>
-                                <MenuItem key={index} value={index}>{state}</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>,
-                    <FormControl className={classes.formControl}>
-                        <InputLabel id="transition-symbol-label">Symbol</InputLabel>
-                        <Select
-                            labelId="transition-symbol-label"
-                            id="transition-symbol"
-                            value={transition.get("symbol")}
-                            onChange={event => handleTransitionChange(event, index, "symbol")}>
-                            {alphabet.split("").map((symbol, index) =>
-                                <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>,
-                    <FormControl className={classes.formControl}>
-                        <InputLabel id="transition-next-state-label">Next state</InputLabel>
-                        <Select
-                            labelId="transition-next-state-label"
-                            id="transition-next-state"
-                            value={transition.get("nextState")}
-                            onChange={event => handleTransitionChange(event, index, "nextState")}>
-                            {states.map((state, index) =>
-                                <MenuItem key={index} value={index}>{state}</MenuItem>
-                            )}
-                        </Select>
-                    </FormControl>,
-                    <Tooltip title={`Delete transition ${index + 1}`}>
-                        <IconButton onClick={() => handleRemoveTransitionClick(index)} aria-label="delete">
-                            <DeleteIcon/>
-                        </IconButton>
-                    </Tooltip>,
-                ])}
+                {transitions.map((transition, index) => (
+                    <React.Fragment key={index}>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="transition-current-state-label">Current state</InputLabel>
+                            <Select
+                                labelId="transition-current-state-label"
+                                id="transition-current-state"
+                                value={transition.get("currentState")}
+                                onChange={event => handleTransitionChange(event, index, "currentState")}>
+                                {states.map((state, index) =>
+                                    <MenuItem key={index} value={index}>{state}</MenuItem>
+                                )}
+                            </Select>
+                        </FormControl>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="transition-symbol-label">Symbol</InputLabel>
+                            <Select
+                                labelId="transition-symbol-label"
+                                id="transition-symbol"
+                                value={transition.get("symbol")}
+                                onChange={event => handleTransitionChange(event, index, "symbol")}>
+                                {alphabet.split("").map((symbol, index) =>
+                                    <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
+                                )}
+                            </Select>
+                        </FormControl>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="transition-next-state-label">Next state</InputLabel>
+                            <Select
+                                labelId="transition-next-state-label"
+                                id="transition-next-state"
+                                value={transition.get("nextState")}
+                                onChange={event => handleTransitionChange(event, index, "nextState")}>
+                                {states.map((state, index) =>
+                                    <MenuItem key={index} value={index}>{state}</MenuItem>
+                                )}
+                            </Select>
+                        </FormControl>
+                        <Tooltip title={`Delete transition ${index + 1}`}>
+                            <IconButton onClick={() => handleRemoveTransitionClick(index)} aria-label="delete">
+                                <DeleteIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    </React.Fragment>
+                ))}
                 <Button onClick={handleAddTransitionClick} variant="contained">Add transition</Button>
             </form>
         </Container>

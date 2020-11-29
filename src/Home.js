@@ -117,9 +117,9 @@ export default function Home() {
 
     const handleAddTransitionClick = () => {
         setTransitions(prevTransitions => prevTransitions.push(Map({
-            currentState: -1,
+            currentState: "",
             symbol: "",
-            nextState: -1,
+            nextState: "",
         })));
     };
 

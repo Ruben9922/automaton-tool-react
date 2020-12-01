@@ -41,7 +41,6 @@ export default function Home() {
 
     const [activeStep, setActiveStep] = React.useState(0);
     const [completed, setCompleted] = React.useState(Set());
-    const [skipped, setSkipped] = React.useState(Set());
     const steps = ["Specify alphabet", "Specify states", "Specify transitions"];
 
     const getStepContent = (step) => {
@@ -79,11 +78,9 @@ export default function Home() {
 
     const totalSteps = () => steps.length;
 
-    const skippedSteps = () => skipped.count();
-
     const completedSteps = () => completed.count();
 
-    const allStepsCompleted = () => completedSteps() === totalSteps() - skippedSteps();
+    const allStepsCompleted = () => completedSteps() === totalSteps();
 
     const isLastStep = () => activeStep === totalSteps() - 1;
 
@@ -92,7 +89,7 @@ export default function Home() {
             isLastStep() && !allStepsCompleted()
                 ? // It's the last step, but not all steps have been completed
                   // find the first step that has been completed
-                steps.findIndex((step, i) => !completed.has(i))
+                steps.findIndex((step, i) => !completed.includes(i))
                 : activeStep + 1;
 
         setActiveStep(newActiveStep);
@@ -110,7 +107,7 @@ export default function Home() {
          * `if (!this.allStepsComplete())` however state is not set when we do this,
          * thus we have to resort to not being very DRY.
          */
-        if (completed.size !== totalSteps() - skippedSteps()) {
+        if (completed.count() !== totalSteps()) {
             handleNext();
         }
     };
@@ -118,12 +115,9 @@ export default function Home() {
     const handleReset = () => {
         setActiveStep(0);
         setCompleted(Set());
-        setSkipped(Set());
     };
 
-    const isStepSkipped = step => skipped.has(step);
-
-    const isStepComplete = step => completed.has(step);
+    const isStepComplete = step => completed.includes(step);
 
     return (
         <Container maxWidth="md">
@@ -131,9 +125,9 @@ export default function Home() {
                 <Stepper alternativeLabel nonLinear activeStep={activeStep}>
                     {steps.map((label, index) => {
                         const stepProps = {};
-                        if (isStepSkipped(index)) {
-                            stepProps.completed = false;
-                        }
+                        // if (isStepSkipped(index)) {
+                        //     stepProps.completed = false;
+                        // }
                         return (
                             <Step key={label} {...stepProps}>
                                 <StepButton
@@ -171,7 +165,7 @@ export default function Home() {
                                 </Button>
 
                                 {activeStep !== steps.length &&
-                                (completed.has(activeStep) ? (
+                                (completed.includes(activeStep) ? (
                                     <Typography variant="caption" className={classes.completed}>
                                         Step {activeStep + 1} already completed
                                     </Typography>

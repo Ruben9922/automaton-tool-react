@@ -3,7 +3,7 @@ import Container from "@material-ui/core/Container";
 import AlphabetInput from "./AlphabetInput";
 import StatesInput from "./StatesInput";
 import TransitionsInput from "./TransitionsInput";
-import {List, OrderedSet, Set} from "immutable";
+import {List, Map, OrderedSet, Set} from "immutable";
 import {makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -28,10 +28,29 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Input() {
-    const classes = useStyles();
+function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions) {
+    const transitionsToTransitionFunction = transitions => {
+        let transitionFunction = Map();
+        for (const transition of transitions) {
+            transitionFunction.set(new Map({
+                currentState: transition.currentState,
+                symbol: transition.symbol,
+            }), transition.nextState);
+        }
+        return transitionFunction;
+    }
 
-    const [automata, setAutomata] = React.useState([]);
+    return Map({
+        alphabet: OrderedSet(alphabet.split("")),
+        states: OrderedSet(states),
+        transitionFunction: transitionsToTransitionFunction(transitions),
+        initialState: states.get(initialStateIndex),
+        finalStates: states.filter((value, index, iter) => finalStateIndices.includes(index)),
+    })
+}
+
+export default function Input({onAutomatonChange}) {
+    const classes = useStyles();
 
     const [alphabet, setAlphabet] = React.useState("");
     const [states, setStates] = React.useState(List());
@@ -107,7 +126,10 @@ export default function Input() {
          * `if (!this.allStepsComplete())` however state is not set when we do this,
          * thus we have to resort to not being very DRY.
          */
-        if (completed.count() !== totalSteps()) {
+        if (completed.count() === totalSteps()) {
+            let automaton = createAutomaton();
+            onAutomatonChange(automaton);
+        } else {
             handleNext();
         }
     };
@@ -141,42 +163,33 @@ export default function Input() {
                     })}
                 </Stepper>
                 <div>
-                    {allStepsCompleted() ? (
+                    <div>
+                        {getStepContent(activeStep)}
                         <div>
-                            <Typography className={classes.instructions}>
-                                All steps completed - you&apos;re finished
-                            </Typography>
-                            <Button onClick={handleReset}>Reset</Button>
-                        </div>
-                    ) : (
-                        <div>
-                            {getStepContent(activeStep)}
-                            <div>
-                                <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                                    Back
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleNext}
-                                    className={classes.button}
-                                >
-                                    Next
-                                </Button>
+                            <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                                Back
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleNext}
+                                className={classes.button}
+                            >
+                                Next
+                            </Button>
 
-                                {activeStep !== steps.length &&
-                                (completed.includes(activeStep) ? (
-                                    <Typography variant="caption" className={classes.completed}>
-                                        Step {activeStep + 1} already completed
-                                    </Typography>
-                                ) : (
-                                    <Button variant="contained" color="primary" onClick={handleComplete}>
-                                        {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
-                                    </Button>
-                                ))}
-                            </div>
+                            {activeStep !== steps.length &&
+                            (completed.includes(activeStep) ? (
+                                <Typography variant="caption" className={classes.completed}>
+                                    Step {activeStep + 1} already completed
+                                </Typography>
+                            ) : (
+                                <Button variant="contained" color="primary" onClick={handleComplete}>
+                                    {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
+                                </Button>
+                            ))}
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </Container>

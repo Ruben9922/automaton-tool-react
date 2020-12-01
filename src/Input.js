@@ -134,11 +134,6 @@ export default function Input({onAutomatonChange}) {
         }
     };
 
-    const handleReset = () => {
-        setActiveStep(0);
-        setCompleted(Set());
-    };
-
     const isStepComplete = step => completed.includes(step);
 
     return (
@@ -147,9 +142,6 @@ export default function Input({onAutomatonChange}) {
                 <Stepper alternativeLabel nonLinear activeStep={activeStep}>
                     {steps.map((label, index) => {
                         const stepProps = {};
-                        // if (isStepSkipped(index)) {
-                        //     stepProps.completed = false;
-                        // }
                         return (
                             <Step key={label} {...stepProps}>
                                 <StepButton

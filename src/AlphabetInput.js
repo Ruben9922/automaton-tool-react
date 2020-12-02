@@ -21,15 +21,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AlphabetInput({alphabet, onAlphabetChange}) {
+export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPresetIndex, onAlphabetPresetIndexChange}) {
     const classes = useStyles();
-
-    const [alphabetPresetIndex, setAlphabetPresetIndex] = React.useState("");
-
+    
     const handleAlphabetPresetChange = event => {
         const updatedAlphabetPresetIndex = event.target.value;
 
-        setAlphabetPresetIndex(updatedAlphabetPresetIndex);
+        onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
         onAlphabetChange(alphabetPresets.get(updatedAlphabetPresetIndex).get("symbolsString"));
     };
 
@@ -45,7 +43,7 @@ export default function AlphabetInput({alphabet, onAlphabetChange}) {
         if (updatedAlphabetPresetIndex === -1) {
             updatedAlphabetPresetIndex = 5;
         }
-        setAlphabetPresetIndex(updatedAlphabetPresetIndex); // Ignore WebStorm warning
+        onAlphabetPresetIndexChange(updatedAlphabetPresetIndex); // Ignore WebStorm warning
     };
 
     const alphabetPresets = fromJS([

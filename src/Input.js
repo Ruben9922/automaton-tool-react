@@ -53,6 +53,7 @@ export default function Input({onAutomatonChange}) {
     const classes = useStyles();
 
     const [alphabet, setAlphabet] = React.useState("");
+    const [alphabetPresetIndex, setAlphabetPresetIndex] = React.useState("");
     const [states, setStates] = React.useState(List());
     const [initialStateIndex, setInitialStateIndex] = React.useState(-1);
     const [finalStateIndices, setFinalStateIndices] = React.useState(OrderedSet());
@@ -66,7 +67,12 @@ export default function Input({onAutomatonChange}) {
         switch (step) {
             case 0:
                 return (
-                    <AlphabetInput alphabet={alphabet} onAlphabetChange={setAlphabet}/>
+                    <AlphabetInput
+                        alphabet={alphabet}
+                        onAlphabetChange={setAlphabet}
+                        alphabetPresetIndex={alphabetPresetIndex}
+                        onAlphabetPresetIndexChange={setAlphabetPresetIndex}
+                    />
                 );
             case 1:
                 return (

@@ -25,34 +25,34 @@ export default function Home({automata}) {
 
     return (
         <>
-        {automata.isEmpty() ? (
-            <>
-                <Typography variant="h5" component="h1" gutterBottom>
-                    Welcome to Automaton Tool!
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                    No automata saved yet! Create an automaton and it will show up here.
-                </Typography>
-            </>
-        ) : (
-            <List>
-                {automata.map((automaton, index) => (
-                    <ListItem key={index}>
-                        <ListItemText
-                            primary={`Automaton ${index + 1}`}
-                            secondary={`${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-        )}
-        <Link to="/create">
-            <Tooltip title="Add automaton" className={classes.fab}>
-                <Fab color="primary" aria-label="add">
-                    <AddIcon />
-                </Fab>
-            </Tooltip>
-        </Link>
+            {automata.isEmpty() ? (
+                <>
+                    <Typography variant="h5" component="h1" gutterBottom>
+                        Welcome to Automaton Tool!
+                    </Typography>
+                    <Typography variant="subtitle1" gutterBottom>
+                        No automata saved yet! Create an automaton and it will show up here.
+                    </Typography>
+                </>
+            ) : (
+                <List>
+                    {automata.map((automaton, index) => (
+                        <ListItem key={index}>
+                            <ListItemText
+                                primary={`Automaton ${index + 1}`}
+                                secondary={`${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            )}
+            <Link to="/create">
+                <Tooltip title="Add automaton" className={classes.fab}>
+                    <Fab color="primary" aria-label="add">
+                        <AddIcon/>
+                    </Fab>
+                </Tooltip>
+            </Link>
         </>
     );
 }

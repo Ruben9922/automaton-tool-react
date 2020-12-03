@@ -25,14 +25,16 @@ export default function Home({automata}) {
 
     return (
         <>
-        {automata.isEmpty() ? [
-            <Typography variant="h5" component="h1" gutterBottom>
-                Welcome to Automaton Tool!
-            </Typography>,
-            <Typography variant="subtitle1" gutterBottom>
-                No automata saved yet! Create an automaton and it will show up here.
-            </Typography>
-        ] : (
+        {automata.isEmpty() ? (
+            <>
+                <Typography variant="h5" component="h1" gutterBottom>
+                    Welcome to Automaton Tool!
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                    No automata saved yet! Create an automaton and it will show up here.
+                </Typography>
+            </>
+        ) : (
             <List>
                 {automata.map((automaton, index) => (
                     <ListItem key={index}>

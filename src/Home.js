@@ -3,9 +3,54 @@ import Input from "./Input";
 import {List} from "immutable";
 import View from "./View";
 import Container from "@material-ui/core/Container";
+import Typography from "@material-ui/core/Typography";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from '@material-ui/icons/Add';
+import {makeStyles} from "@material-ui/core/styles";
+import {Link} from "react-router-dom";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import Tooltip from "@material-ui/core/Tooltip";
 
-export default function Home() {
+const useStyles = makeStyles((theme) => ({
+    fab: {
+        position: 'absolute',
+        bottom: theme.spacing(4),
+        right: theme.spacing(4),
+    },
+}));
+
+export default function Home({automata}) {
+    const classes = useStyles();
+
     return (
-            <p>Home</p>
+        <>
+        {automata.isEmpty() ? [
+            <Typography variant="h5" component="h1" gutterBottom>
+                Welcome to Automaton Tool!
+            </Typography>,
+            <Typography variant="subtitle1" gutterBottom>
+                No automata saved yet! Create an automaton and it will show up here.
+            </Typography>
+        ] : (
+            <List>
+                {automata.map((automaton, index) => (
+                    <ListItem key={index}>
+                        <ListItemText
+                            primary={`Automaton ${index + 1}`}
+                            secondary={`${automaton.get("states").count()} states, ${automaton.get("transitions").count()} transitions`}
+                        />
+                    </ListItem>
+                ))}
+            </List>
+        )}
+        <Link to="/create">
+            <Tooltip title="Add automaton" className={classes.fab}>
+                <Fab color="primary" aria-label="add">
+                    <AddIcon />
+                </Fab>
+            </Tooltip>
+        </Link>
+        </>
     );
 }

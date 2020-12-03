@@ -29,11 +29,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+// TODO: Maybe find a better way of doing this
 function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions) {
     const transitionsToTransitionFunction = transitions => {
         let transitionFunction = Map();
         for (const transition of transitions) {
-            transitionFunction.set(new Map({
+            transitionFunction = transitionFunction.set(new Map({
                 currentState: transition.currentState,
                 symbol: transition.symbol,
             }), transition.nextState);

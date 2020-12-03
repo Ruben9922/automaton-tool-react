@@ -1,11 +1,11 @@
 import React from "react";
 import Input from "./Input";
 import {List} from "immutable";
+import View from "./View";
+import Container from "@material-ui/core/Container";
 
 export default function Home() {
-    const [automata, setAutomata] = React.useState(List());
-
     return (
-        <Input onAutomatonChange={setAutomata}/>
+            <p>Home</p>
     );
 }

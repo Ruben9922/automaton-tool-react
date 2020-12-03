@@ -6,27 +6,32 @@ import {
     Route
 } from "react-router-dom";
 import Home from "./Home";
+import Container from "@material-ui/core/Container";
+import View from "./View";
+import Input from "./Input";
+import {List} from "immutable";
 
-function App() {
+export default function App() {
+    const [automata, setAutomata] = React.useState(List());
+
+    const addAutomaton = automaton => setAutomata(prevAutomata => prevAutomata.push(automaton));
+
     return (
         <Router>
             <Header/>
-            <Switch>
-                <Route exact path="/">
-                    <Home/>
-                </Route>
-                {/*<Route path="/view">*/}
-                {/*    <ViewAutomaton/>*/}
-                {/*</Route>*/}
-                {/*<Route path="/edit">*/}
-                {/*    <EditAutomaton/>*/}
-                {/*</Route>*/}
-                {/*<Route path="/delete">*/}
-                {/*    <DeleteAutomaton/>*/}
-                {/*</Route>*/}
-            </Switch>
+            <Container maxWidth="md">
+                <Switch>
+                    <Route exact path="/">
+                        <Home automata={automata}/>
+                    </Route>
+                    <Route path="/view">
+                        <View/>
+                    </Route>
+                    <Route path="/create">
+                        <Input onAutomatonChange={addAutomaton}/>
+                    </Route>
+                </Switch>
+            </Container>
         </Router>
     );
 }
-
-export default App;

@@ -143,53 +143,51 @@ export default function Input({onAutomatonChange}) {
     const isStepComplete = step => completed.includes(step);
 
     return (
-        <Container maxWidth="md">
-            <div className={classes.root}>
-                <Stepper alternativeLabel nonLinear activeStep={activeStep}>
-                    {steps.map((label, index) => {
-                        const stepProps = {};
-                        return (
-                            <Step key={label} {...stepProps}>
-                                <StepButton
-                                    onClick={handleStep(index)}
-                                    completed={isStepComplete(index)}
-                                >
-                                    {label}
-                                </StepButton>
-                            </Step>
-                        );
-                    })}
-                </Stepper>
-                <div>
-                    <div>
-                        {getStepContent(activeStep)}
-                        <div>
-                            <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                                Back
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleNext}
-                                className={classes.button}
+        <div className={classes.root}>
+            <Stepper alternativeLabel nonLinear activeStep={activeStep}>
+                {steps.map((label, index) => {
+                    const stepProps = {};
+                    return (
+                        <Step key={label} {...stepProps}>
+                            <StepButton
+                                onClick={handleStep(index)}
+                                completed={isStepComplete(index)}
                             >
-                                Next
-                            </Button>
+                                {label}
+                            </StepButton>
+                        </Step>
+                    );
+                })}
+            </Stepper>
+            <div>
+                <div>
+                    {getStepContent(activeStep)}
+                    <div>
+                        <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                            Back
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleNext}
+                            className={classes.button}
+                        >
+                            Next
+                        </Button>
 
-                            {activeStep !== steps.length &&
-                            (completed.includes(activeStep) ? (
-                                <Typography variant="caption" className={classes.completed}>
-                                    Step {activeStep + 1} already completed
-                                </Typography>
-                            ) : (
-                                <Button variant="contained" color="primary" onClick={handleComplete}>
-                                    {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
-                                </Button>
-                            ))}
-                        </div>
+                        {activeStep !== steps.length &&
+                        (completed.includes(activeStep) ? (
+                            <Typography variant="caption" className={classes.completed}>
+                                Step {activeStep + 1} already completed
+                            </Typography>
+                        ) : (
+                            <Button variant="contained" color="primary" onClick={handleComplete}>
+                                {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
+                            </Button>
+                        ))}
                     </div>
                 </div>
             </div>
-        </Container>
+        </div>
     );
 }

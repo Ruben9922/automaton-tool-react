@@ -49,7 +49,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
     })
 }
 
-export default function Input({onAutomatonChange}) {
+export default function Input({addAutomaton}) {
     const classes = useStyles();
 
     const [alphabet, setAlphabet] = React.useState("");
@@ -134,7 +134,7 @@ export default function Input({onAutomatonChange}) {
          */
         if (completed.count() === totalSteps()) {
             let automaton = createAutomaton();
-            onAutomatonChange(automaton);
+            addAutomaton(automaton);
         } else {
             handleNext();
         }

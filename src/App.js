@@ -28,7 +28,7 @@ export default function App() {
                         <View/>
                     </Route>
                     <Route path="/create">
-                        <Input onAutomatonChange={addAutomaton}/>
+                        <Input addAutomaton={addAutomaton}/>
                     </Route>
                 </Switch>
             </Container>

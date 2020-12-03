@@ -8,6 +8,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import {Step, StepButton, Stepper} from "@material-ui/core";
+import {useHistory} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -52,6 +53,8 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
 export default function Input({addAutomaton}) {
     const classes = useStyles();
 
+    const history = useHistory();
+
     const [alphabet, setAlphabet] = React.useState("");
     const [alphabetPresetIndex, setAlphabetPresetIndex] = React.useState("");
     const [states, setStates] = React.useState(List());
@@ -60,7 +63,7 @@ export default function Input({addAutomaton}) {
     const [transitions, setTransitions] = React.useState(List());
 
     const [activeStep, setActiveStep] = React.useState(0);
-    const [completed, setCompleted] = React.useState(Set());
+    const [completed, setCompleted] = React.useState(Set([0, 1, 2]));
     const steps = ["Specify alphabet", "Specify states", "Specify transitions"];
 
     const getStepContent = (step) => {
@@ -124,20 +127,10 @@ export default function Input({addAutomaton}) {
 
     const handleStep = step => () => setActiveStep(step);
 
-    const handleComplete = () => {
-        setCompleted(prevCompleted => prevCompleted.add(activeStep));
-
-        /**
-         * Sigh... it would be much nicer to replace the following if conditional with
-         * `if (!this.allStepsComplete())` however state is not set when we do this,
-         * thus we have to resort to not being very DRY.
-         */
-        if (completed.count() === totalSteps()) {
-            let automaton = createAutomaton();
-            addAutomaton(automaton);
-        } else {
-            handleNext();
-        }
+    const handleFinish = () => {
+        let automaton = createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions);
+        addAutomaton(automaton);
+        history.push("/");
     };
 
     const isStepComplete = step => completed.includes(step);
@@ -175,16 +168,9 @@ export default function Input({addAutomaton}) {
                             Next
                         </Button>
 
-                        {activeStep !== steps.length &&
-                        (completed.includes(activeStep) ? (
-                            <Typography variant="caption" className={classes.completed}>
-                                Step {activeStep + 1} already completed
-                            </Typography>
-                        ) : (
-                            <Button variant="contained" color="primary" onClick={handleComplete}>
-                                {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
-                            </Button>
-                        ))}
+                        <Button variant="contained" color="primary" onClick={handleFinish} disabled={!allStepsCompleted()}>
+                            Finish
+                        </Button>
                     </div>
                 </div>
             </div>

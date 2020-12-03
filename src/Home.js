@@ -1,6 +1,5 @@
 import React from "react";
 import Input from "./Input";
-import {List} from "immutable";
 import View from "./View";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
@@ -8,6 +7,7 @@ import Fab from "@material-ui/core/Fab";
 import AddIcon from '@material-ui/icons/Add';
 import {makeStyles} from "@material-ui/core/styles";
 import {Link} from "react-router-dom";
+import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -38,7 +38,7 @@ export default function Home({automata}) {
                     <ListItem key={index}>
                         <ListItemText
                             primary={`Automaton ${index + 1}`}
-                            secondary={`${automaton.get("states").count()} states, ${automaton.get("transitions").count()} transitions`}
+                            secondary={`${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
                         />
                     </ListItem>
                 ))}

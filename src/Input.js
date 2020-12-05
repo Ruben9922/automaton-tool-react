@@ -33,7 +33,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
     const transitionsToTransitionFunction = transitions => {
         let transitionFunction = Map();
         for (const transition of transitions) {
-            const key = new Map({
+            const key = Map({
                 currentState: transition.currentState,
                 symbol: transition.symbol,
             });

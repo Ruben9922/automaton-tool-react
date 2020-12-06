@@ -34,10 +34,10 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
         let transitionFunction = Map();
         for (const transition of transitions) {
             const key = Map({
-                currentState: transition.currentState,
-                symbol: transition.symbol,
+                currentState: transition.get("currentState"),
+                symbol: transition.get("symbol"),
             });
-            transitionFunction = transitionFunction.update(key, (prevStateSet = Set()) => prevStateSet.add(transition.nextState));
+            transitionFunction = transitionFunction.update(key, (prevStateSet = Set()) => prevStateSet.add(transition.get("nextState")));
         }
         return transitionFunction;
     }

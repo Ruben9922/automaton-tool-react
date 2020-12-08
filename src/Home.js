@@ -15,6 +15,12 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
     fab: {
@@ -28,10 +34,12 @@ export default function Home({automata, onAutomataChange}) {
     const classes = useStyles();
 
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [automatonDeleteIndex, setAutomatonDeleteIndex] = React.useState(null);
 
     const handleRemoveAutomatonClick = index => {
-        onAutomataChange(prevAutomata => prevAutomata.delete(index));
-        setSnackbarOpen(true);
+        setAutomatonDeleteIndex(index);
+        setDialogOpen(true);
     }
 
     const handleSnackbarClose = (event, reason) => {
@@ -40,6 +48,16 @@ export default function Home({automata, onAutomataChange}) {
         }
 
         setSnackbarOpen(false);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+
+    const handleDialogConfirmClick = () => {
+        onAutomataChange(prevAutomata => prevAutomata.delete(automatonDeleteIndex));
+        setSnackbarOpen(true);
+        setDialogOpen(false);
     };
 
     return (
@@ -84,6 +102,27 @@ export default function Home({automata, onAutomataChange}) {
                     Automaton deleted successfully!
                 </Alert>
             </Snackbar>
+            <Dialog
+                open={dialogOpen}
+                onClose={handleDialogClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Delete automaton?"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you wish to permanently delete Automaton {automatonDeleteIndex + 1}? This cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDialogConfirmClick} color="primary" autoFocus>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }

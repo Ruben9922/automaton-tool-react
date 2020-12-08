@@ -78,7 +78,7 @@ export default function Home({automata, onAutomataChange}) {
                         <ListItem key={index}>
                             <ListItemText
                                 primary={`Automaton ${index + 1}`}
-                                secondary={`${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
+                                secondary={`${automaton.get("alphabet").count()} symbols, ${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
                             />
                         </ListItem>
                         <Tooltip title={`Delete Automaton ${index + 1}`}>

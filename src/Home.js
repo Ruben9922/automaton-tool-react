@@ -13,6 +13,8 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
     fab: {
@@ -25,9 +27,20 @@ const useStyles = makeStyles((theme) => ({
 export default function Home({automata, onAutomataChange}) {
     const classes = useStyles();
 
+    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+
     const handleRemoveAutomatonClick = index => {
-        onAutomataChange(prevAutomata => prevAutomata.delete(index))
+        onAutomataChange(prevAutomata => prevAutomata.delete(index));
+        setSnackbarOpen(true);
     }
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setSnackbarOpen(false);
+    };
 
     return (
         <>
@@ -66,6 +79,11 @@ export default function Home({automata, onAutomataChange}) {
                     </Fab>
                 </Tooltip>
             </Link>
+            <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={handleSnackbarClose}>
+                <Alert elevation={6} variant="filled" onClose={handleSnackbarClose} severity="success">
+                    Automaton deleted successfully!
+                </Alert>
+            </Snackbar>
         </>
     );
 }

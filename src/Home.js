@@ -11,6 +11,8 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles((theme) => ({
     fab: {
@@ -20,8 +22,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Home({automata}) {
+export default function Home({automata, onAutomataChange}) {
     const classes = useStyles();
+
+    const handleRemoveAutomatonClick = index => {
+        onAutomataChange(prevAutomata => prevAutomata.delete(index))
+    }
 
     return (
         <>
@@ -37,12 +43,19 @@ export default function Home({automata}) {
             ) : (
                 <List>
                     {automata.map((automaton, index) => (
+                        <React.Fragment key={index}>
                         <ListItem key={index}>
                             <ListItemText
                                 primary={`Automaton ${index + 1}`}
                                 secondary={`${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
                             />
                         </ListItem>
+                        <Tooltip title={`Delete Automaton ${index + 1}`}>
+                            <IconButton onClick={() => handleRemoveAutomatonClick(index)} aria-label="delete">
+                                <DeleteIcon/>
+                            </IconButton>
+                        </Tooltip>
+                        </React.Fragment>
                     ))}
                 </List>
             )}

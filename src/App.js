@@ -22,7 +22,7 @@ export default function App() {
             <Container maxWidth="md">
                 <Switch>
                     <Route exact path="/">
-                        <Home automata={automata}/>
+                        <Home automata={automata} onAutomataChange={setAutomata}/>
                     </Route>
                     <Route path="/view">
                         <View/>

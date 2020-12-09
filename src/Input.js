@@ -9,6 +9,8 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import {Step, StepButton, Stepper} from "@material-ui/core";
 import {useHistory} from "react-router-dom";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -65,6 +67,7 @@ export default function Input({addAutomaton}) {
 
     const [activeStep, setActiveStep] = React.useState(0);
     const [completed, setCompleted] = React.useState(Set([0, 1, 2]));
+    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
     const steps = ["Specify alphabet", "Specify states", "Specify transitions"];
 
     const getStepContent = (step) => {
@@ -132,9 +135,18 @@ export default function Input({addAutomaton}) {
         let automaton = createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions);
         addAutomaton(automaton);
         history.push("/");
+        setSnackbarOpen(true);
     };
 
     const isStepComplete = step => completed.includes(step);
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setSnackbarOpen(false);
+    };
 
     return (
         <div className={classes.root}>
@@ -175,6 +187,11 @@ export default function Input({addAutomaton}) {
                     </div>
                 </div>
             </div>
+            <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={handleSnackbarClose}>
+                <Alert elevation={6} variant="filled" onClose={handleSnackbarClose} severity="success">
+                    Automaton created successfully!
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

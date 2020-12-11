@@ -30,10 +30,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Home({automata, onAutomataChange}) {
+export default function Home({automata, onAutomataChange, onSnackbarOpenChange}) {
     const classes = useStyles();
 
-    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [automatonDeleteIndex, setAutomatonDeleteIndex] = React.useState(null);
 
@@ -47,7 +46,7 @@ export default function Home({automata, onAutomataChange}) {
             return;
         }
 
-        setSnackbarOpen(false);
+        onSnackbarOpenChange(false);
     };
 
     const handleDialogClose = () => {
@@ -56,7 +55,7 @@ export default function Home({automata, onAutomataChange}) {
 
     const handleDialogConfirmClick = () => {
         onAutomataChange(prevAutomata => prevAutomata.delete(automatonDeleteIndex));
-        setSnackbarOpen(true);
+        onSnackbarOpenChange(true);
         setDialogOpen(false);
     };
 
@@ -97,11 +96,6 @@ export default function Home({automata, onAutomataChange}) {
                     </Fab>
                 </Tooltip>
             </Link>
-            <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={handleSnackbarClose}>
-                <Alert elevation={6} variant="filled" onClose={handleSnackbarClose} severity="success">
-                    Automaton deleted successfully!
-                </Alert>
-            </Snackbar>
             <Dialog
                 open={dialogOpen}
                 onClose={handleDialogClose}

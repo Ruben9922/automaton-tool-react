@@ -53,7 +53,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
     })
 }
 
-export default function Input({addAutomaton}) {
+export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const classes = useStyles();
 
     const history = useHistory();
@@ -67,7 +67,6 @@ export default function Input({addAutomaton}) {
 
     const [activeStep, setActiveStep] = React.useState(0);
     const [completed, setCompleted] = React.useState(Set([0, 1, 2]));
-    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
     const steps = ["Specify alphabet", "Specify states", "Specify transitions"];
 
     const getStepContent = (step) => {
@@ -135,18 +134,10 @@ export default function Input({addAutomaton}) {
         let automaton = createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions);
         addAutomaton(automaton);
         history.push("/");
-        setSnackbarOpen(true);
+        onSnackbarOpenChange(true);
     };
 
     const isStepComplete = step => completed.includes(step);
-
-    const handleSnackbarClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setSnackbarOpen(false);
-    };
 
     return (
         <div className={classes.root}>
@@ -187,11 +178,6 @@ export default function Input({addAutomaton}) {
                     </div>
                 </div>
             </div>
-            <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={handleSnackbarClose}>
-                <Alert elevation={6} variant="filled" onClose={handleSnackbarClose} severity="success">
-                    Automaton created successfully!
-                </Alert>
-            </Snackbar>
         </div>
     );
 }

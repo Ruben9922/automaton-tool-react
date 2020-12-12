@@ -1,5 +1,5 @@
 import React from "react";
-import {fromJS, Set} from "immutable";
+import {fromJS, OrderedSet, Set} from "immutable";
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -28,48 +28,52 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
         const updatedAlphabetPresetIndex = event.target.value;
 
         onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
-        onAlphabetChange(alphabetPresets.get(updatedAlphabetPresetIndex).get("symbolsString"));
+        onAlphabetChange(alphabetPresets.get(updatedAlphabetPresetIndex).get("alphabet"));
     };
 
+    const alphabetToAlphabetString = alphabet => alphabet.join("");
+    const alphabetStringToAlphabet = alphabetString => OrderedSet(alphabetString.split(""));
+
     const handleAlphabetChange = event => {
-        const updatedAlphabet = event.target.value;
+        const updatedAlphabetString = event.target.value;
+        const updatedAlphabet = alphabetStringToAlphabet(updatedAlphabetString);
 
         onAlphabetChange(updatedAlphabet);
 
         // Check if the entered alphabet matches the alphabet of a preset
         // If so, select this preset
-        // (Ignoring order, hence sorting both values)
-        let updatedAlphabetPresetIndex = alphabetPresets.findIndex((ap) => Set(ap.get("symbolsString").split("")).equals(Set(updatedAlphabet.split(""))));
+        // (Ignoring order, hence converting both to Sets)
+        let updatedAlphabetPresetIndex = alphabetPresets.findIndex((ap) => Set(ap.get("alphabet")).equals(Set(updatedAlphabet)));
         if (updatedAlphabetPresetIndex === -1) {
             updatedAlphabetPresetIndex = 5;
         }
-        onAlphabetPresetIndexChange(updatedAlphabetPresetIndex); // Ignore WebStorm warning
+        onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
     };
 
     const alphabetPresets = fromJS([
         {
             name: "Binary digits (0-1)",
-            symbolsString: "01",
+            alphabet: alphabetStringToAlphabet("01"),
         },
         {
             name: "Decimal digits (0-9)",
-            symbolsString: "0123456789",
+            alphabet: alphabetStringToAlphabet("0123456789"),
         },
         {
             name: "Upper-case letters (A-Z)",
-            symbolsString: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
         },
         {
             name: "Lower-case letters (a-z)",
-            symbolsString: "abcdefghijklmnopqrstuvwxyz",
+            alphabet: alphabetStringToAlphabet("abcdefghijklmnopqrstuvwxyz"),
         },
         {
             name: "Upper- & lower-case letters (A-Z, a-z)",
-            symbolsString: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+            alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
         },
         {
             name: "Custom",
-            symbolsString: "",
+            alphabet: alphabetStringToAlphabet(""),
         },
     ]);
 
@@ -87,7 +91,12 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
                     )}
                 </Select>
             </FormControl>
-            <TextField id="alphabet" label="Alphabet" value={alphabet} onChange={handleAlphabetChange}/>
+            <TextField
+                id="alphabet"
+                label="Alphabet"
+                value={alphabetToAlphabetString(alphabet)}
+                onChange={handleAlphabetChange}
+            />
         </form>
     );
 }

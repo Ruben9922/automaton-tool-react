@@ -45,7 +45,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
     }
 
     return Map({
-        alphabet: OrderedSet(alphabet.split("")),
+        alphabet: alphabet,
         states: OrderedSet(states),
         transitionFunction: transitionsToTransitionFunction(transitions),
         initialState: states.get(initialStateIndex),
@@ -58,7 +58,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
 
     const history = useHistory();
 
-    const [alphabet, setAlphabet] = React.useState("");
+    const [alphabet, setAlphabet] = React.useState(OrderedSet());
     const [alphabetPresetIndex, setAlphabetPresetIndex] = React.useState("");
     const [states, setStates] = React.useState(List());
     const [initialStateIndex, setInitialStateIndex] = React.useState(-1);

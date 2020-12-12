@@ -67,7 +67,7 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                             id="transition-symbol"
                             value={transition.get("symbol")}
                             onChange={event => handleTransitionChange(event, index, "symbol")}>
-                            {alphabet.split("").map((symbol, index) =>
+                            {alphabet.map((symbol, index) =>
                                 <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
                             )}
                         </Select>

@@ -1,6 +1,6 @@
 import React from "react";
-import {List, Map} from "immutable";
-import {makeStyles} from "@material-ui/core/styles";
+import {Set, Map} from "immutable";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -10,6 +10,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
+import Chip from "@material-ui/core/Chip";
+import Input from "@material-ui/core/Input";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,16 +24,31 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
         minWidth: 120,
     },
+    chips: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    chip: {
+        margin: 2,
+    },
 }));
+
+const getStyles = (state, transition, theme) => ({
+    fontWeight:
+        transition.get("nextStates").includes(state)
+            ? theme.typography.fontWeightMedium
+            : theme.typography.fontWeightRegular,
+});
 
 export default function TransitionsInput({transitions, onTransitionsChange, alphabet, states}) {
     const classes = useStyles();
+    const theme = useTheme();
 
     const handleAddTransitionClick = () => {
         onTransitionsChange(prevTransitions => prevTransitions.push(Map({
             currentState: "",
             symbol: "",
-            nextState: "",
+            nextStates: Set(),
         })));
     };
 
@@ -39,9 +56,19 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
         onTransitionsChange(prevTransitions => prevTransitions.delete(index));
     }
 
-    const handleTransitionChange = (event, index, key) => {
-        const updatedTransitionValue = event.target.value;
-        onTransitionsChange(prevTransitions => prevTransitions.setIn([index, key], updatedTransitionValue));
+    const handleCurrentStateChange = (event, index) => {
+        const updatedCurrentState = event.target.value;
+        onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "currentState"], updatedCurrentState));
+    }
+
+    const handleSymbolChange = (event, index) => {
+        const updatedSymbol = event.target.value;
+        onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "symbol"], updatedSymbol));
+    }
+
+    const handleNextStatesChange = (event, index) => {
+        const updatedNextStates = event.target.value;
+        onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "nextStates"], Set(updatedNextStates)));
     }
 
     return (
@@ -54,7 +81,7 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                             labelId="transition-current-state-label"
                             id="transition-current-state"
                             value={transition.get("currentState")}
-                            onChange={event => handleTransitionChange(event, index, "currentState")}>
+                            onChange={event => handleCurrentStateChange(event, index)}>
                             {states.map((state, index) =>
                                 <MenuItem key={index} value={index}>{state}</MenuItem>
                             )}
@@ -66,22 +93,34 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                             labelId="transition-symbol-label"
                             id="transition-symbol"
                             value={transition.get("symbol")}
-                            onChange={event => handleTransitionChange(event, index, "symbol")}>
+                            onChange={event => handleSymbolChange(event, index)}>
                             {alphabet.map((symbol, index) =>
                                 <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
                             )}
                         </Select>
                     </FormControl>
                     <FormControl className={classes.formControl}>
-                        <InputLabel id="transition-next-state-label">Next state</InputLabel>
+                        <InputLabel id="transition-next-states-label">Next states</InputLabel>
                         <Select
-                            labelId="transition-next-state-label"
-                            id="transition-next-state"
-                            value={transition.get("nextState")}
-                            onChange={event => handleTransitionChange(event, index, "nextState")}>
-                            {states.map((state, index) =>
-                                <MenuItem key={index} value={index}>{state}</MenuItem>
+                            labelId="transition-next-states-label"
+                            id="transition-next-states-label"
+                            multiple
+                            value={transition.get("nextStates").toArray()}
+                            onChange={event => handleNextStatesChange(event, index)}
+                            input={<Input id="transition-next-states-select"/>}
+                            renderValue={selected => (
+                                <div className={classes.chips}>
+                                    {selected.map((value, index) => (
+                                        <Chip key={index} label={states.get(value)} className={classes.chip}/>
+                                    ))}
+                                </div>
                             )}
+                        >
+                            {states.map((state, index) => (
+                                <MenuItem key={index} value={index} style={getStyles(state, transition, theme)}>
+                                    {state}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                     <Tooltip title={`Delete transition ${index + 1}`}>

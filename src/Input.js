@@ -39,7 +39,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
                 currentState: transition.get("currentState"),
                 symbol: transition.get("symbol"),
             });
-            transitionFunction = transitionFunction.update(key, (prevStateSet = Set()) => prevStateSet.add(transition.get("nextState")));
+            transitionFunction = transitionFunction.set(key, transition.get("nextStates"));
         }
         return transitionFunction;
     }

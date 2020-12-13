@@ -105,7 +105,7 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                             labelId="transition-next-states-label"
                             id="transition-next-states-label"
                             multiple
-                            value={transition.get("nextStates").toArray()}
+                            value={transition.get("nextStates").sort().toArray()}
                             onChange={event => handleNextStatesChange(event, index)}
                             input={<Input id="transition-next-states-select"/>}
                             renderValue={selected => (

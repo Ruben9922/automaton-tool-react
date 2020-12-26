@@ -32,7 +32,7 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
     const errors = Map({
         isNonEmpty: !states.isEmpty(),
         areStateNamesNonEmpty: states.map(name => !!name),
-        areStateNamesUnique: states.map((state, index) => states.indexOf(state) === index),
+        areStateNamesUnique: states.map(state1 => states.count(state2 => state1 === state2) === 1),
         exactlyOneInitialState: initialStateIndex >= 0 && initialStateIndex < states.count(),
     });
 

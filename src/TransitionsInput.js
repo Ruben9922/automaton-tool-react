@@ -57,10 +57,10 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
         areNextStatesValid: transitions.map(transition => transition.get("nextStates").every(state =>
             state >= 0 && state < states.count()
         )),
-        areTransitionsUnique: transitions.map((transition1, index) => transitions.findIndex(transition2 =>
+        areTransitionsUnique: transitions.map(transition1 => transitions.count(transition2 =>
             transition1.get("currentState") === transition2.get("currentState")
             && transition1.get("symbol") === transition2.get("symbol")
-        ) === index),
+        ) === 1),
     });
 
     const errorMessages = Map({

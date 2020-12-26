@@ -43,6 +43,12 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
         exactlyOneInitialState: "A state must be selected as the initial state"
     })
 
+    const errorState = Map({
+        stateName: errors.get("areStateNamesNonEmpty")
+            .zipWith((x, y) => x && y, errors.get("areStateNamesUnique"))
+            .map(x => !x),
+    });
+
     const helperText = Map({
         stateName: errors.get("areStateNamesNonEmpty").map(x => x || errorMessages.get("areStateNamesNonEmpty"))
             .zipWith((x, y) => x === true ? y : x,
@@ -91,7 +97,7 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
                             label={`State ${index + 1} name`}
                             value={state}
                             onChange={event => handleStateNameChange(event, index)}
-                            error={helperText.getIn(["stateName", index]) !== true}
+                            error={errorState.getIn(["stateName", index])}
                             helperText={helperText.getIn(["stateName", index])}
                         />
                         <FormControlLabel

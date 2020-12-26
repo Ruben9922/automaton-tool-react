@@ -118,22 +118,22 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
 
     const handleRemoveTransitionClick = index => {
         onTransitionsChange(prevTransitions => prevTransitions.delete(index));
-    }
+    };
 
     const handleCurrentStateChange = (event, index) => {
         const updatedCurrentState = event.target.value;
         onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "currentState"], updatedCurrentState));
-    }
+    };
 
     const handleSymbolChange = (event, index) => {
         const updatedSymbol = event.target.value;
         onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "symbol"], updatedSymbol));
-    }
+    };
 
     const handleNextStatesChange = (event, index) => {
         const updatedNextStates = event.target.value;
         onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "nextStates"], Set(updatedNextStates)));
-    }
+    };
 
     return (
         <form className={classes.root} autoComplete="off">

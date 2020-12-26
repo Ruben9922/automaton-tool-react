@@ -41,7 +41,7 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
         areStateNamesNonEmpty: "State name cannot be left blank",
         areStateNamesUnique: "State name must be unique",
         exactlyOneInitialState: "A state must be selected as the initial state"
-    })
+    });
 
     const errorState = Map({
         stateName: errors.get("areStateNamesNonEmpty")
@@ -67,16 +67,16 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
 
     const handleRemoveStateClick = index => {
         onStatesChange(prevStates => prevStates.delete(index));
-    }
+    };
 
     const handleStateNameChange = (event, index) => {
         const updatedStateName = event.target.value;
         onStatesChange(prevStates => prevStates.set(index, updatedStateName));
-    }
+    };
 
     const handleInitialStateChange = (event, index) => {
         onInitialStateIndexChange(index);
-    }
+    };
 
     const handleFinalStateIndicesChange = (event, index) => {
         const isFinal = event.target.checked;
@@ -85,7 +85,7 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
         } else {
             onFinalStateIndicesChange(prevFinalStates => prevFinalStates.delete(index));
         }
-    }
+    };
 
     return (
         <>

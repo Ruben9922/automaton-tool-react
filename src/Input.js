@@ -64,6 +64,21 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const [initialStateIndex, setInitialStateIndex] = React.useState(-1);
     const [finalStateIndices, setFinalStateIndices] = React.useState(OrderedSet());
     const [transitions, setTransitions] = React.useState(List());
+    const [errors, setErrors] = React.useState(Map({
+        alphabet: Map({
+            isNonEmpty: true,
+        }),
+        states: Map({
+            isNonEmpty: true,
+            areStateNamesNonEmpty: true,
+            areStateNamesUnique: true,
+            exactlyOneInitialState: true,
+        }),
+        transitions: Map({
+            areTransitionsNonEmpty: true,
+            areTransitionsUnique: true,
+        }),
+    }));
 
     const [activeStep, setActiveStep] = React.useState(0);
     const [completed, setCompleted] = React.useState(Set([0, 1, 2]));
@@ -78,6 +93,8 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                         onAlphabetChange={setAlphabet}
                         alphabetPresetIndex={alphabetPresetIndex}
                         onAlphabetPresetIndexChange={setAlphabetPresetIndex}
+                        // alphabetErrors={errors.get("alphabet")}
+                        // onAlphabetErrorsChange={alphabetErrors => setErrors(prevErrors => prevErrors.update("alphabet", ))}
                     />
                 );
             case 1:

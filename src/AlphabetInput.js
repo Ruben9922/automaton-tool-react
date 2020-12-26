@@ -1,5 +1,5 @@
 import React from "react";
-import {fromJS, OrderedSet, Set} from "immutable";
+import {fromJS, OrderedSet, Set, Map} from "immutable";
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -33,6 +33,14 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
 
     const alphabetToAlphabetString = alphabet => alphabet.join("");
     const alphabetStringToAlphabet = alphabetString => OrderedSet(alphabetString.split(""));
+
+    const errors = Map({
+        isNonEmpty: !alphabet.isEmpty(),
+    });
+
+    const helperText = Map({
+        alphabet: errors.get("isNonEmpty") || "Alphabet cannot be empty",
+    });
 
     const handleAlphabetChange = event => {
         const updatedAlphabetString = event.target.value;
@@ -96,6 +104,8 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
                 label="Alphabet"
                 value={alphabetToAlphabetString(alphabet)}
                 onChange={handleAlphabetChange}
+                error={errors.every(value => value === false)}
+                helperText={helperText.get("alphabet")}
             />
         </form>
     );

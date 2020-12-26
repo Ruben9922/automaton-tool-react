@@ -36,11 +36,19 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
         exactlyOneInitialState: initialStateIndex >= 0 && initialStateIndex < states.count(),
     });
 
+    const warnings = Map({
+        atLeastOneFinalState: !finalStateIndices.isEmpty(),
+    });
+
     const errorMessages = Map({
         isNonEmpty: "At least one state is required",
         areStateNamesNonEmpty: "State name cannot be left blank",
         areStateNamesUnique: "State name must be unique",
         exactlyOneInitialState: "A state must be selected as the initial state"
+    });
+
+    const warningMessages = Map({
+        atLeastOneFinalState: "No state is selected as the final state, so all strings will be rejected by the automaton",
     });
 
     const errorState = Map({
@@ -56,9 +64,13 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
             ),
     });
 
-    const alertText = List([
+    const errorAlertText = List([
         errors.get("isNonEmpty") || errorMessages.get("isNonEmpty"),
         errors.get("exactlyOneInitialState") || errorMessages.get("exactlyOneInitialState"),
+    ]).filter(x => x !== true);
+
+    const warningAlertText = List([
+        warnings.get("atLeastOneFinalState") || warningMessages.get("atLeastOneFinalState"),
     ]).filter(x => x !== true);
 
     const handleAddStateClick = () => {
@@ -128,11 +140,21 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
                 ))}
                 <Button onClick={handleAddStateClick} variant="contained">Add state</Button>
             </form>
-            {alertText.isEmpty() || (
+            {errorAlertText.isEmpty() || (
                 <Alert severity="error">
-                    <AlertTitle>Error</AlertTitle>
+                    <AlertTitle>{errorAlertText.count() === 1 ? "Error" : "Errors"}</AlertTitle>
                     <ul>
-                        {alertText.map((message, index) => (
+                        {errorAlertText.map((message, index) => (
+                            <li key={index}>{message}</li>
+                        ))}
+                    </ul>
+                </Alert>
+            )}
+            {warningAlertText.isEmpty() || (
+                <Alert severity="warning">
+                    <AlertTitle>{warningAlertText.count() === 1 ? "Warning" : "Warnings"}</AlertTitle>
+                    <ul>
+                        {warningAlertText.map((message, index) => (
                             <li key={index}>{message}</li>
                         ))}
                     </ul>

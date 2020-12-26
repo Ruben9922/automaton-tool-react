@@ -38,8 +38,16 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
         isNonEmpty: !alphabet.isEmpty(),
     });
 
+    const errorMessages = Map({
+        isNonEmpty: "Alphabet cannot be empty",
+    });
+
+    const errorState = Map({
+        alphabet: !errors.get("isNonEmpty"),
+    });
+
     const helperText = Map({
-        alphabet: errors.get("isNonEmpty") || "Alphabet cannot be empty",
+        alphabet: errors.get("isNonEmpty") || errorMessages.get("isNonEmpty"),
     });
 
     const handleAlphabetChange = event => {
@@ -104,7 +112,7 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
                 label="Alphabet"
                 value={alphabetToAlphabetString(alphabet)}
                 onChange={handleAlphabetChange}
-                error={errors.every(value => value === false)}
+                error={errorState.get("alphabet")}
                 helperText={helperText.get("alphabet")}
             />
         </form>

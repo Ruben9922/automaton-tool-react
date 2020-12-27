@@ -158,7 +158,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
 
     return (
         <div className={classes.root}>
-            <Stepper alternativeLabel nonLinear activeStep={activeStep}>
+            <Stepper alternativeLabel nonLinear activeStep={activeStep} style={{ backgroundColor: "transparent" }}>
                 {steps.map((label, index) => {
                     const stepProps = {};
                     return (

@@ -66,11 +66,11 @@ export default function StatesInput({states, onStatesChange, initialStateIndex, 
 
     const errorAlertText = List([
         errors.get("isNonEmpty") || errorMessages.get("isNonEmpty"),
-        errors.get("exactlyOneInitialState") || errorMessages.get("exactlyOneInitialState"),
+        !errors.get("isNonEmpty") || errors.get("exactlyOneInitialState") || errorMessages.get("exactlyOneInitialState"),
     ]).filter(x => x !== true);
 
     const warningAlertText = List([
-        warnings.get("atLeastOneFinalState") || warningMessages.get("atLeastOneFinalState"),
+        !errors.get("isNonEmpty") || warnings.get("atLeastOneFinalState") || warningMessages.get("atLeastOneFinalState"),
     ]).filter(x => x !== true);
 
     const handleAddStateClick = () => {

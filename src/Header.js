@@ -6,6 +6,8 @@ import Button from "@material-ui/core/Button";
 import AppBar from "@material-ui/core/AppBar";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
+import GitHubIcon from "@material-ui/icons/GitHub";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,6 +34,11 @@ export default function Header() {
                     Automaton Tool
                 </Typography>
                 {/*<Button color="inherit">Login</Button>*/}
+                <Tooltip title="GitHub repository">
+                    <IconButton aria-label="GitHub" href="https://github.com/Ruben9922/automaton-tool-react" color="inherit">
+                        <GitHubIcon/>
+                    </IconButton>
+                </Tooltip>
             </Toolbar>
         </AppBar>
     );

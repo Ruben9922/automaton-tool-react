@@ -362,7 +362,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                             color="primary"
                             onClick={handleNext}
                             className={classes.button}
-                            disabled={allStepsCompleted()}
+                            disabled={activeStepIndex === steps.count() - 1 && allStepsCompleted()}
                         >
                             Next
                         </Button>

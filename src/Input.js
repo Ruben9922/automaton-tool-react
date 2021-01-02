@@ -293,6 +293,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
             label: "Specify states",
             completed: countErrors("states") === 0,
             errorCount: countErrors("states"),
+            warningCount: warningAlertText.get("states").count(),
         }),
         Map({
             label: "Specify transitions",
@@ -334,11 +335,15 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                         <StepButton
                             onClick={handleStep(index)}
                             completed={step.get("completed")}
-                            optional={step.get("errorCount") > 0 && (
+                            optional={(step.get("errorCount") > 0 && (
                                 <Typography variant="caption" color="error">
                                     {step.get("errorCount")} {step.get("errorCount") === 1 ? "error" : "errors"}
                                 </Typography>
-                            )}
+                            )) || (step.has("warningCount") && step.get("warningCount") > 0 && (
+                                <Typography variant="caption">
+                                    {step.get("warningCount")} {step.get("warningCount") === 1 ? "warning" : "warnings"}
+                                </Typography>
+                            ))}
                         >
                             <StepLabel error={step.get("errorCount") > 0}>{step.get("label")}</StepLabel>
                         </StepButton>

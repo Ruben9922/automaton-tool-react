@@ -306,14 +306,14 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const allStepsCompleted = () => steps.every(step => step.get("completed") === true);
 
     const handleNext = () => {
-        const newActiveStep =
+        const updatedActiveStepIndex =
             activeStepIndex === steps.count() - 1 && !allStepsCompleted()
                 ? // It's the last step, but not all steps have been completed
                   // find the first step that has not been completed
                 steps.findIndex(step => step.get("completed") === false)
                 : activeStepIndex + 1;
 
-        setActiveStepIndex(newActiveStep);
+        setActiveStepIndex(updatedActiveStepIndex);
     };
 
     const handleBack = () => setActiveStepIndex(prevActiveStep => prevActiveStep - 1);

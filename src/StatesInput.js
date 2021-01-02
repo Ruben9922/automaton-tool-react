@@ -1,5 +1,5 @@
 import React from "react";
-import {List, OrderedSet, Map,is} from "immutable";
+import {List, OrderedSet, Map, is} from "immutable";
 import Container from "@material-ui/core/Container";
 import {makeStyles} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -26,52 +26,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function StatesInput({states, onStatesChange, initialStateIndex, onInitialStateIndexChange, finalStateIndices, onFinalStateIndicesChange}) {
+export default function StatesInput({
+                                        states,
+                                        onStatesChange,
+                                        initialStateIndex,
+                                        onInitialStateIndexChange,
+                                        finalStateIndices,
+                                        onFinalStateIndicesChange,
+                                        errorState,
+                                        helperText,
+                                        errorAlertText,
+                                        warningAlertText,
+                                    }) {
     const classes = useStyles();
-
-    const errors = Map({
-        isNonEmpty: !states.isEmpty(),
-        areStateNamesNonEmpty: states.map(name => !!name),
-        areStateNamesUnique: states.map(state1 => states.count(state2 => state1 === state2) === 1),
-        exactlyOneInitialState: initialStateIndex >= 0 && initialStateIndex < states.count(),
-    });
-
-    const warnings = Map({
-        atLeastOneFinalState: !finalStateIndices.isEmpty(),
-    });
-
-    const errorMessages = Map({
-        isNonEmpty: "At least one state is required",
-        areStateNamesNonEmpty: "State name cannot be left blank",
-        areStateNamesUnique: "State name must be unique",
-        exactlyOneInitialState: "A state must be selected as the initial state"
-    });
-
-    const warningMessages = Map({
-        atLeastOneFinalState: "No state is selected as the final state, so all strings will be rejected by the automaton",
-    });
-
-    const errorState = Map({
-        stateName: errors.get("areStateNamesNonEmpty")
-            .zipWith((x, y) => x && y, errors.get("areStateNamesUnique"))
-            .map(x => !x),
-    });
-
-    const helperText = Map({
-        stateName: errors.get("areStateNamesNonEmpty").map(x => x || errorMessages.get("areStateNamesNonEmpty"))
-            .zipWith((x, y) => x === true ? y : x,
-                errors.get("areStateNamesUnique").map(y => y || errorMessages.get("areStateNamesUnique"))
-            ),
-    });
-
-    const errorAlertText = List([
-        errors.get("isNonEmpty") || errorMessages.get("isNonEmpty"),
-        !errors.get("isNonEmpty") || errors.get("exactlyOneInitialState") || errorMessages.get("exactlyOneInitialState"),
-    ]).filter(x => x !== true);
-
-    const warningAlertText = List([
-        !errors.get("isNonEmpty") || warnings.get("atLeastOneFinalState") || warningMessages.get("atLeastOneFinalState"),
-    ]).filter(x => x !== true);
 
     const handleAddStateClick = () => {
         onStatesChange(prevStates => prevStates.push(""));

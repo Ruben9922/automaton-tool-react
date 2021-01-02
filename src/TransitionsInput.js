@@ -41,72 +41,9 @@ const getStyles = (state, transition, theme) => ({
             : theme.typography.fontWeightRegular,
 });
 
-export default function TransitionsInput({transitions, onTransitionsChange, alphabet, states}) {
+export default function TransitionsInput({transitions, onTransitionsChange, alphabet, states, errorState, helperText}) {
     const classes = useStyles();
     const theme = useTheme();
-
-    // TODO: Use Map on inside and List on outside so can use reduce() instead of zipWith()
-    const errors = Map({
-        areCurrentStatesNonEmpty: transitions.map(transition => transition.get("currentState") !== ""),
-        areCurrentStatesValid: transitions.map(transition =>
-            transition.get("currentState") >= 0 && transition.get("currentState") < states.count()
-        ),
-        areSymbolsNonEmpty: transitions.map(transition => transition.get("symbol") !== ""),
-        areSymbolsValid: transitions.map(transition => alphabet.includes(transition.get("symbol"))),
-        areNextStatesNonEmpty: transitions.map(transition => !transition.get("nextStates").isEmpty()),
-        areNextStatesValid: transitions.map(transition => transition.get("nextStates").every(state =>
-            state >= 0 && state < states.count()
-        )),
-        areTransitionsUnique: transitions.map(transition1 => transitions.count(transition2 =>
-            transition1.get("currentState") === transition2.get("currentState")
-            && transition1.get("symbol") === transition2.get("symbol")
-        ) === 1),
-    });
-
-    const errorMessages = Map({
-        areCurrentStatesNonEmpty: "Current state cannot be left blank",
-        areCurrentStatesValid: "State does not exist",
-        areSymbolsNonEmpty: "Symbol cannot be left blank",
-        areSymbolsValid: "Symbol does not exist in alphabet",
-        areNextStatesNonEmpty: "Next states cannot be empty",
-        areNextStatesValid: "One or more states do not exist",
-        areTransitionsUnique: "Transition must be unique",
-    });
-
-    const errorState = Map({
-        currentState: errors.get("areCurrentStatesNonEmpty")
-            .zipWith((x, y) => x && y, errors.get("areCurrentStatesValid"))
-            .zipWith((x, y) => x && y, errors.get("areTransitionsUnique"))
-            .map(x => !x),
-        symbol: errors.get("areSymbolsNonEmpty")
-            .zipWith((x, y) => x && y, errors.get("areSymbolsValid"))
-            .zipWith((x, y) => x && y, errors.get("areTransitionsUnique"))
-            .map(x => !x),
-        nextStates: errors.get("areNextStatesNonEmpty")
-            .zipWith((x, y) => x && y, errors.get("areNextStatesValid"))
-            .map(x => !x),
-    });
-
-    const helperText = Map({
-        currentState: errors.get("areCurrentStatesNonEmpty").map(x => x || errorMessages.get("areCurrentStatesNonEmpty"))
-            .zipWith((x, y) => x === true ? y : x,
-                errors.get("areCurrentStatesValid").map(x => x || errorMessages.get("areCurrentStatesValid"))
-            )
-            .zipWith((x, y) => x === true ? y : x,
-                errors.get("areTransitionsUnique").map(x => x || errorMessages.get("areTransitionsUnique"))
-            ),
-        symbol: errors.get("areSymbolsNonEmpty").map(x => x || errorMessages.get("areSymbolsNonEmpty"))
-            .zipWith((x, y) => x === true ? y : x,
-                errors.get("areSymbolsValid").map(x => x || errorMessages.get("areSymbolsValid"))
-            )
-            .zipWith((x, y) => x === true ? y : x,
-                errors.get("areTransitionsUnique").map(x => x || errorMessages.get("areTransitionsUnique"))
-            ),
-        nextStates: errors.get("areNextStatesNonEmpty").map(x => x || errorMessages.get("areNextStatesNonEmpty"))
-            .zipWith((x, y) => x === true ? y : x,
-                errors.get("areNextStatesValid").map(x => x || errorMessages.get("areNextStatesValid"))
-            ),
-    });
 
     const handleAddTransitionClick = () => {
         onTransitionsChange(prevTransitions => prevTransitions.push(Map({

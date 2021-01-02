@@ -21,9 +21,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPresetIndex, onAlphabetPresetIndexChange}) {
+export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPresetIndex, onAlphabetPresetIndexChange, errorState, helperText}) {
     const classes = useStyles();
-    
+
     const handleAlphabetPresetChange = event => {
         const updatedAlphabetPresetIndex = event.target.value;
 
@@ -33,22 +33,6 @@ export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPrese
 
     const alphabetToAlphabetString = alphabet => alphabet.join("");
     const alphabetStringToAlphabet = alphabetString => OrderedSet(alphabetString.split(""));
-
-    const errors = Map({
-        isNonEmpty: !alphabet.isEmpty(),
-    });
-
-    const errorMessages = Map({
-        isNonEmpty: "Alphabet cannot be empty",
-    });
-
-    const errorState = Map({
-        alphabet: !errors.get("isNonEmpty"),
-    });
-
-    const helperText = Map({
-        alphabet: errors.get("isNonEmpty") || errorMessages.get("isNonEmpty"),
-    });
 
     const handleAlphabetChange = event => {
         const updatedAlphabetString = event.target.value;

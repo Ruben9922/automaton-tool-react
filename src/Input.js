@@ -1,16 +1,16 @@
 import React from 'react';
-import Container from "@material-ui/core/Container";
 import AlphabetInput from "./AlphabetInput";
 import StatesInput from "./StatesInput";
 import TransitionsInput from "./TransitionsInput";
-import {List, Map, OrderedSet, Set} from "immutable";
+import {List, Map, OrderedSet} from "immutable";
 import {makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import {Step, StepButton, Stepper} from "@material-ui/core";
+import Step from "@material-ui/core/Step";
+import StepButton from "@material-ui/core/StepButton";
+import Stepper from "@material-ui/core/Stepper";
 import {useHistory} from "react-router-dom";
-import Snackbar from "@material-ui/core/Snackbar";
-import Alert from "@material-ui/lab/Alert";
+import {StepLabel} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,88 +64,260 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const [initialStateIndex, setInitialStateIndex] = React.useState(-1);
     const [finalStateIndices, setFinalStateIndices] = React.useState(OrderedSet());
     const [transitions, setTransitions] = React.useState(List());
-    const [errors, setErrors] = React.useState(Map({
+
+    // Error checks to be performed
+    // Values may be a single boolean value or a List of boolean values, depending on the nature of the check
+    // For example, a check that is performed on the list of states will be a list of boolean values of the same length
+    // TODO: Currently `true` means valid which is counterintuitive; might change this
+    const errors = Map({
         alphabet: Map({
-            isNonEmpty: true,
+            isNonEmpty: !alphabet.isEmpty(),
         }),
         states: Map({
-            isNonEmpty: true,
-            areStateNamesNonEmpty: true,
-            areStateNamesUnique: true,
-            exactlyOneInitialState: true,
+            isNonEmpty: !states.isEmpty(),
+            areStateNamesNonEmpty: states.map(name => !!name),
+            areStateNamesUnique: states.map(state1 => states.count(state2 => state1 === state2) === 1),
+            exactlyOneInitialState: initialStateIndex >= 0 && initialStateIndex < states.count(),
         }),
         transitions: Map({
-            areTransitionsNonEmpty: true,
-            areTransitionsUnique: true,
+            areCurrentStatesNonEmpty: transitions.map(transition => transition.get("currentState") !== ""),
+            areCurrentStatesValid: transitions.map(transition =>
+                transition.get("currentState") >= 0 && transition.get("currentState") < states.count()
+            ),
+            areSymbolsNonEmpty: transitions.map(transition => transition.get("symbol") !== ""),
+            areSymbolsValid: transitions.map(transition => alphabet.includes(transition.get("symbol"))),
+            areNextStatesNonEmpty: transitions.map(transition => !transition.get("nextStates").isEmpty()),
+            areNextStatesValid: transitions.map(transition => transition.get("nextStates").every(state =>
+                state >= 0 && state < states.count()
+            )),
+            areTransitionsUnique: transitions.map(transition1 => transitions.count(transition2 =>
+                transition1.get("currentState") === transition2.get("currentState")
+                && transition1.get("symbol") === transition2.get("symbol")
+            ) === 1),
         }),
-    }));
+    });
 
-    const [activeStep, setActiveStep] = React.useState(0);
-    const [completed, setCompleted] = React.useState(Set([0, 1, 2]));
-    const steps = ["Specify alphabet", "Specify states", "Specify transitions"];
+    // Warning checks to be performed
+    // Similar to `errors` but for warnings (issues where the input is still valid)
+    const warnings = Map({
+        states: Map({
+            atLeastOneFinalState: !finalStateIndices.isEmpty(),
+        }),
+    });
 
-    const getStepContent = (step) => {
-        switch (step) {
-            case 0:
-                return (
-                    <AlphabetInput
-                        alphabet={alphabet}
-                        onAlphabetChange={setAlphabet}
-                        alphabetPresetIndex={alphabetPresetIndex}
-                        onAlphabetPresetIndexChange={setAlphabetPresetIndex}
-                        // alphabetErrors={errors.get("alphabet")}
-                        // onAlphabetErrorsChange={alphabetErrors => setErrors(prevErrors => prevErrors.update("alphabet", ))}
-                    />
-                );
-            case 1:
-                return (
-                    <StatesInput
-                        states={states}
-                        onStatesChange={setStates}
-                        initialStateIndex={initialStateIndex}
-                        onInitialStateIndexChange={setInitialStateIndex}
-                        finalStateIndices={finalStateIndices}
-                        onFinalStateIndicesChange={setFinalStateIndices}
-                    />
-                );
-            case 2:
-                return (
-                    <TransitionsInput
-                        transitions={transitions}
-                        onTransitionsChange={setTransitions}
-                        alphabet={alphabet}
-                        states={states}
-                    />
-                );
-            default:
-                return (
-                    <p>Unknown step</p>
-                );
+    // Messages for each of the error checks
+    const errorMessages = Map({
+        alphabet: Map({
+            isNonEmpty: "Alphabet cannot be empty",
+        }),
+        states: Map({
+            isNonEmpty: "At least one state is required",
+            areStateNamesNonEmpty: "State name cannot be left blank",
+            areStateNamesUnique: "State name must be unique",
+            exactlyOneInitialState: "A state must be selected as the initial state"
+        }),
+        transitions: Map({
+            areCurrentStatesNonEmpty: "Current state cannot be left blank",
+            areCurrentStatesValid: "State does not exist",
+            areSymbolsNonEmpty: "Symbol cannot be left blank",
+            areSymbolsValid: "Symbol does not exist in alphabet",
+            areNextStatesNonEmpty: "Next states cannot be empty",
+            areNextStatesValid: "One or more states do not exist",
+            areTransitionsUnique: "Transition must be unique",
+        }),
+    });
+
+    // Messages for each of the warning checks
+    const warningMessages = Map({
+        states: Map({
+            atLeastOneFinalState: "No state is selected as the final state, so all strings will be rejected by the automaton",
+        }),
+    });
+
+    // For single boolean values, can compute error state by doing !(x1 && ... && xn) (each xi is a check)
+    // For lists, need to repeat this for each item in the lists
+    const createErrorStateList = errors => {
+        let l = errors[0];
+        for (let i = 1; i < errors.length; i++) {
+            l = l.zipWith((x, y) => x && y, errors[i]);
         }
+        l = l.map(x => !x);
+        return l;
     }
 
-    const totalSteps = () => steps.length;
+    // Error state for each input
+    // Some inputs may be associated with more than one check - e.g. check state name is non-empty AND unique
+    // Hence need to combine error checks into a boolean value for each input
+    // Could just check whether helper text is non-empty but may want to display helper text not for an error
+    const errorState = Map({
+        alphabet: Map({
+            alphabet: !errors.getIn(["alphabet", "isNonEmpty"]),
+        }),
+        states: Map({
+            stateName: createErrorStateList([
+                errors.getIn(["states", "areStateNamesNonEmpty"]),
+                errors.getIn(["states", "areStateNamesUnique"]),
+            ])
+        }),
+        transitions: Map({
+            currentState: createErrorStateList([
+                errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
+                errors.getIn(["transitions", "areCurrentStatesValid"]),
+                errors.getIn(["transitions", "areTransitionsUnique"]),
+            ]),
+            symbol: createErrorStateList([
+                errors.getIn(["transitions", "areSymbolsNonEmpty"]),
+                errors.getIn(["transitions", "areSymbolsValid"]),
+                errors.getIn(["transitions", "areTransitionsUnique"]),
+            ]),
+            nextStates: createErrorStateList([
+                errors.getIn(["transitions", "areNextStatesNonEmpty"]),
+                errors.getIn(["transitions", "areNextStatesValid"]),
+            ]),
+        }),
+    });
 
-    const completedSteps = () => completed.count();
+    // Same idea as `createErrorStateList`
+    const createHelperTextList = (errors, errorMessages) => {
+        let l = errors[0].map(x => x || errorMessages[0]);
+        for (let i = 1; i < errors.length; i++) {
+            l = l.zipWith((x, y) => x === true ? y : x,
+                errors[i].map(y => y || errorMessages[i])
+            );
+        }
+        return l;
+    };
 
-    const allStepsCompleted = () => completedSteps() === totalSteps();
+    // Helper text for each input
+    // Same idea as `errorState`
+    const helperText = Map({
+        alphabet: Map({
+            alphabet: errors.getIn(["alphabet", "isNonEmpty"]) || errorMessages.getIn(["alphabet", "isNonEmpty"]),
+        }),
+        states: Map({
+            stateName: createHelperTextList([
+                errors.getIn(["states", "areStateNamesNonEmpty"]),
+                errors.getIn(["states", "areStateNamesUnique"]),
+            ], [
+                errorMessages.getIn(["states", "areStateNamesNonEmpty"]),
+                errorMessages.getIn(["states", "areStateNamesUnique"]),
+            ]),
+        }),
+        transitions: Map({
+            currentState: createHelperTextList([
+                errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
+                errors.getIn(["transitions", "areCurrentStatesValid"]),
+                errors.getIn(["transitions", "areTransitionsUnique"]),
+            ], [
+                errorMessages.getIn(["transitions", "areCurrentStatesNonEmpty"]),
+                errorMessages.getIn(["transitions", "areCurrentStatesValid"]),
+                errorMessages.getIn(["transitions", "areTransitionsUnique"]),
+            ]),
+            symbol: createHelperTextList([
+                errors.getIn(["transitions", "areSymbolsNonEmpty"]),
+                errors.getIn(["transitions", "areSymbolsValid"]),
+                errors.getIn(["transitions", "areTransitionsUnique"]),
+            ], [
+                errorMessages.getIn(["transitions", "areSymbolsNonEmpty"]),
+                errorMessages.getIn(["transitions", "areSymbolsValid"]),
+                errorMessages.getIn(["transitions", "areTransitionsUnique"]),
+            ]),
+            nextStates: createHelperTextList([
+                errors.getIn(["transitions", "areNextStatesNonEmpty"]),
+                errors.getIn(["transitions", "areNextStatesValid"]),
+            ], [
+                errorMessages.getIn(["transitions", "areNextStatesNonEmpty"]),
+                errorMessages.getIn(["transitions", "areNextStatesValid"]),
+            ]),
+        }),
+    });
 
-    const isLastStep = () => activeStep === totalSteps() - 1;
+    // List of error messages to display in an alert
+    // Some errors can't be associated with an input - e.g. states or transitions list being empty
+    // Hence these are displayed in an alert
+    const errorAlertText = Map({
+        states: List([
+            errors.getIn(["states", "isNonEmpty"]) || errorMessages.getIn(["states", "isNonEmpty"]),
+            !errors.getIn(["states", "isNonEmpty"]) || errors.getIn(["states", "exactlyOneInitialState"]) || errorMessages.getIn(["states", "exactlyOneInitialState"]),
+        ]).filter(x => x !== true)
+    });
+
+    // List of warning messages to display in an alert
+    const warningAlertText = Map({
+        states: List([
+            !errors.getIn(["states", "isNonEmpty"]) || warnings.getIn(["states", "atLeastOneFinalState"]) || warningMessages.getIn(["states", "atLeastOneFinalState"]),
+        ]).filter(x => x !== true)
+    });
+
+    const stepContent = [
+        <AlphabetInput
+            alphabet={alphabet}
+            onAlphabetChange={setAlphabet}
+            alphabetPresetIndex={alphabetPresetIndex}
+            onAlphabetPresetIndexChange={setAlphabetPresetIndex}
+            errorState={errorState.get("alphabet")}
+            helperText={helperText.get("alphabet")}
+        />,
+        <StatesInput
+            states={states}
+            onStatesChange={setStates}
+            initialStateIndex={initialStateIndex}
+            onInitialStateIndexChange={setInitialStateIndex}
+            finalStateIndices={finalStateIndices}
+            onFinalStateIndicesChange={setFinalStateIndices}
+            errorState={errorState.get("states")}
+            helperText={helperText.get("states")}
+            errorAlertText={errorAlertText.get("states")}
+            warningAlertText={warningAlertText.get("states")}
+        />,
+        <TransitionsInput
+            transitions={transitions}
+            onTransitionsChange={setTransitions}
+            alphabet={alphabet}
+            states={states}
+            errorState={errorState.get("transitions")}
+            helperText={helperText.get("transitions")}
+        />,
+    ];
+
+    const countErrors = key => errorState.get(key).toList().flatten().count(x => x === true)
+        + (errorAlertText.has(key) ? errorAlertText.get(key).count() : 0);
+
+    const steps = List([
+        Map({
+            label: "Specify alphabet",
+            completed: countErrors("alphabet") === 0,
+            errorCount: countErrors("alphabet"),
+        }),
+        Map({
+            label: "Specify states",
+            completed: countErrors("states") === 0,
+            errorCount: countErrors("states"),
+        }),
+        Map({
+            label: "Specify transitions",
+            completed: countErrors("transitions") === 0,
+            errorCount: countErrors("transitions"),
+        }),
+    ]);
+    const [activeStepIndex, setActiveStepIndex] = React.useState(0);
+
+    const allStepsCompleted = () => steps.every(step => step.get("completed") === true);
 
     const handleNext = () => {
         const newActiveStep =
-            isLastStep() && !allStepsCompleted()
+            activeStepIndex === steps.count() - 1 && !allStepsCompleted()
                 ? // It's the last step, but not all steps have been completed
-                  // find the first step that has been completed
-                steps.findIndex((step, i) => !completed.includes(i))
-                : activeStep + 1;
+                  // find the first step that has not been completed
+                steps.find(step => step.get("completed") === true)
+                : activeStepIndex + 1;
 
-        setActiveStep(newActiveStep);
+        setActiveStepIndex(newActiveStep);
     };
 
-    const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    const handleBack = () => setActiveStepIndex(prevActiveStep => prevActiveStep - 1);
 
-    const handleStep = step => () => setActiveStep(step);
+    const handleStep = stepIndex => () => setActiveStepIndex(stepIndex);
 
     const handleFinish = () => {
         let automaton = createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions);
@@ -154,30 +326,30 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         onSnackbarOpenChange(true);
     };
 
-    const isStepComplete = step => completed.includes(step);
-
     return (
         <div className={classes.root}>
-            <Stepper alternativeLabel nonLinear activeStep={activeStep} style={{ backgroundColor: "transparent" }}>
-                {steps.map((label, index) => {
-                    const stepProps = {};
-                    return (
-                        <Step key={label} {...stepProps}>
-                            <StepButton
-                                onClick={handleStep(index)}
-                                completed={isStepComplete(index)}
-                            >
-                                {label}
-                            </StepButton>
-                        </Step>
-                    );
-                })}
+            <Stepper alternativeLabel nonLinear activeStep={activeStepIndex} style={{ backgroundColor: "transparent" }}>
+                {steps.map((step, index) => (
+                    <Step key={index}>
+                        <StepButton
+                            onClick={handleStep(index)}
+                            completed={step.get("completed")}
+                            optional={step.get("errorCount") > 0 && (
+                                <Typography variant="caption" color="error">
+                                    {step.get("errorCount")} {step.get("errorCount") === 1 ? "error" : "errors"}
+                                </Typography>
+                            )}
+                        >
+                            <StepLabel error={step.get("errorCount") > 0}>{step.get("label")}</StepLabel>
+                        </StepButton>
+                    </Step>
+                ))}
             </Stepper>
             <div>
                 <div>
-                    {getStepContent(activeStep)}
+                    {stepContent[activeStepIndex]}
                     <div>
-                        <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                        <Button disabled={activeStepIndex === 0} onClick={handleBack} className={classes.button}>
                             Back
                         </Button>
                         <Button
@@ -185,6 +357,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                             color="primary"
                             onClick={handleNext}
                             className={classes.button}
+                            disabled={allStepsCompleted()}
                         >
                             Next
                         </Button>

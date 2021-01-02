@@ -98,7 +98,7 @@ export default function StatesInput({
                             }
                             label="Final"
                         />
-                        <Tooltip title={`Delete state ${index + 1}`}>
+                        <Tooltip title={`Delete State ${index + 1}`}>
                             <IconButton onClick={() => handleRemoveStateClick(index)} aria-label="delete">
                                 <DeleteIcon/>
                             </IconButton>

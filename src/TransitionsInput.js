@@ -127,7 +127,7 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                         </Select>
                         <FormHelperText>{helperText.getIn(["nextStates", index])}</FormHelperText>
                     </FormControl>
-                    <Tooltip title={`Delete transition ${index + 1}`}>
+                    <Tooltip title={`Delete Transition ${index + 1}`}>
                         <IconButton onClick={() => handleRemoveTransitionClick(index)} aria-label="delete">
                             <DeleteIcon/>
                         </IconButton>

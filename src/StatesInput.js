@@ -53,7 +53,7 @@ export default function StatesInput({
         onStatesChange(prevStates => prevStates.set(index, updatedStateName));
     };
 
-    const handleInitialStateChange = (event, index) => {
+    const handleInitialStateIndexChange = (event, index) => {
         onInitialStateIndexChange(index);
     };
 
@@ -83,7 +83,7 @@ export default function StatesInput({
                             control={
                                 <Radio
                                     checked={initialStateIndex === index}
-                                    onChange={event => handleInitialStateChange(event, index)}
+                                    onChange={event => handleInitialStateIndexChange(event, index)}
                                 />
                             }
                             label="Initial"

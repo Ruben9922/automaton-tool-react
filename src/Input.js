@@ -10,7 +10,7 @@ import Step from "@material-ui/core/Step";
 import StepButton from "@material-ui/core/StepButton";
 import Stepper from "@material-ui/core/Stepper";
 import {useHistory} from "react-router-dom";
-import {StepLabel} from "@material-ui/core";
+import {StepLabel, Tooltip} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -280,25 +280,28 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         />,
     ];
 
+    const isValid = key => countErrors(key) === 0;
+
     const countErrors = key => errorState.get(key).toList().flatten().count(x => x === true)
         + (errorAlertText.has(key) ? errorAlertText.get(key).count() : 0);
 
     const steps = List([
         Map({
             label: "Specify alphabet",
-            completed: countErrors("alphabet") === 0,
+            completed: isValid("alphabet"),
             errorCount: countErrors("alphabet"),
         }),
         Map({
             label: "Specify states",
-            completed: countErrors("states") === 0,
+            completed: isValid("states"),
             errorCount: countErrors("states"),
             warningCount: warningAlertText.get("states").count(),
         }),
         Map({
             label: "Specify transitions",
-            completed: countErrors("transitions") === 0,
+            completed: isValid("transitions"),
             errorCount: countErrors("transitions"),
+            disabled: !isValid("alphabet") || !isValid("states"),
         }),
     ]);
     const [activeStepIndex, setActiveStepIndex] = React.useState(0);
@@ -344,6 +347,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                                     {step.get("warningCount")} {step.get("warningCount") === 1 ? "warning" : "warnings"}
                                 </Typography>
                             ))}
+                            disabled={step.has("disabled") && step.get("disabled")}
                         >
                             <StepLabel error={step.get("errorCount") > 0}>{step.get("label")}</StepLabel>
                         </StepButton>

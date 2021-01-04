@@ -11,6 +11,7 @@ import StepButton from "@material-ui/core/StepButton";
 import Stepper from "@material-ui/core/Stepper";
 import {useHistory} from "react-router-dom";
 import {StepLabel} from "@material-ui/core";
+import {NIL} from "uuid";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -61,35 +62,34 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const [alphabet, setAlphabet] = React.useState(OrderedSet());
     const [alphabetPresetIndex, setAlphabetPresetIndex] = React.useState("");
     const [states, setStates] = React.useState(List());
-    const [initialStateIndex, setInitialStateIndex] = React.useState(-1);
-    const [finalStateIndices, setFinalStateIndices] = React.useState(OrderedSet());
+    const [initialStateId, setInitialStateId] = React.useState(NIL);
+    const [finalStateIds, setFinalStateIds] = React.useState(OrderedSet());
     const [transitions, setTransitions] = React.useState(List());
 
     // Error checks to be performed
     // Values may be a single boolean value or a List of boolean values, depending on the nature of the check
     // For example, a check that is performed on the list of states will be a list of boolean values of the same length
     // TODO: Currently `true` means valid which is counterintuitive; might change this
+    const stateIds = states.map(state => state.get("id"));
     const errors = Map({
         alphabet: Map({
             isNonEmpty: !alphabet.isEmpty(),
         }),
         states: Map({
             isNonEmpty: !states.isEmpty(),
-            areStateNamesNonEmpty: states.map(name => !!name),
-            areStateNamesUnique: states.map(state1 => states.count(state2 => state1 === state2) === 1),
-            exactlyOneInitialState: initialStateIndex >= 0 && initialStateIndex < states.count(),
+            areStateNamesNonEmpty: states.map(state => !!state.get("name")),
+            areStateNamesUnique: states.map(state1 =>
+                states.count(state2 => state2.get("name") === state1.get("name")) === 1
+            ),
+            exactlyOneInitialState: initialStateId !== NIL,
         }),
         transitions: Map({
             areCurrentStatesNonEmpty: transitions.map(transition => transition.get("currentState") !== ""),
-            areCurrentStatesValid: transitions.map(transition =>
-                transition.get("currentState") >= 0 && transition.get("currentState") < states.count()
-            ),
+            areCurrentStatesValid: transitions.map(transition => stateIds.includes(transition.get("currentState"))),
             areSymbolsNonEmpty: transitions.map(transition => transition.get("symbol") !== ""),
             areSymbolsValid: transitions.map(transition => alphabet.includes(transition.get("symbol"))),
             areNextStatesNonEmpty: transitions.map(transition => !transition.get("nextStates").isEmpty()),
-            areNextStatesValid: transitions.map(transition => transition.get("nextStates").every(state =>
-                state >= 0 && state < states.count()
-            )),
+            areNextStatesValid: transitions.map(transition => transition.get("nextStates").isSubset(stateIds)),
             areTransitionsUnique: transitions.map(transition1 => transitions.count(transition2 =>
                 transition1.get("currentState") === transition2.get("currentState")
                 && transition1.get("symbol") === transition2.get("symbol")
@@ -101,7 +101,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     // Similar to `errors` but for warnings (issues where the input is still valid)
     const warnings = Map({
         states: Map({
-            atLeastOneFinalState: !finalStateIndices.isEmpty(),
+            atLeastOneFinalState: !finalStateIds.isEmpty(),
         }),
     });
 
@@ -261,10 +261,10 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         <StatesInput
             states={states}
             onStatesChange={setStates}
-            initialStateIndex={initialStateIndex}
-            onInitialStateIndexChange={setInitialStateIndex}
-            finalStateIndices={finalStateIndices}
-            onFinalStateIndicesChange={setFinalStateIndices}
+            initialStateId={initialStateId}
+            onInitialStateIdChange={setInitialStateId}
+            finalStateIds={finalStateIds}
+            onFinalStateIdsChange={setFinalStateIds}
             errorState={errorState.get("states")}
             helperText={helperText.get("states")}
             errorAlertText={errorAlertText.get("states")}
@@ -321,7 +321,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const handleStep = stepIndex => () => setActiveStepIndex(stepIndex);
 
     const handleFinish = () => {
-        let automaton = createAutomaton(alphabet, states, initialStateIndex, finalStateIndices, transitions);
+        let automaton = createAutomaton(alphabet, states, initialStateId, finalStateIds, transitions);
         addAutomaton(automaton);
         history.push("/");
         onSnackbarOpenChange(true);

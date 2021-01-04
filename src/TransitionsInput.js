@@ -1,5 +1,5 @@
 import React from "react";
-import {Set, Map, List} from "immutable";
+import {Set, Map, List, Record} from "immutable";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
@@ -13,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
 import {FormHelperText} from "@material-ui/core";
+import {NIL} from "uuid";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -45,12 +46,14 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
     const classes = useStyles();
     const theme = useTheme();
 
+    const Transition = Record({
+        currentState: "",
+        symbol: "",
+        nextStates: Set(),
+    });
+
     const handleAddTransitionClick = () => {
-        onTransitionsChange(prevTransitions => prevTransitions.push(Map({
-            currentState: "",
-            symbol: "",
-            nextStates: Set(),
-        })));
+        onTransitionsChange(prevTransitions => prevTransitions.push(Transition()));
     };
 
     const handleRemoveTransitionClick = index => {
@@ -84,7 +87,7 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                             value={transition.get("currentState")}
                             onChange={event => handleCurrentStateChange(event, index)}>
                             {states.map((state, index) =>
-                                <MenuItem key={index} value={index}>{state}</MenuItem>
+                                <MenuItem key={index} value={state.get("id")}>{state.get("name")}</MenuItem>
                             )}
                         </Select>
                         <FormHelperText>{helperText.getIn(["currentState", index])}</FormHelperText>
@@ -111,17 +114,27 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                             value={transition.get("nextStates").sort().toArray()}
                             onChange={event => handleNextStatesChange(event, index)}
                             input={<Input id="transition-next-states-select"/>}
-                            renderValue={selected => (
+                            renderValue={nextStateIds => (
                                 <div className={classes.chips}>
-                                    {selected.map((value, index) => (
-                                        <Chip key={index} label={states.get(value)} className={classes.chip}/>
+                                    {nextStateIds.map((nextStateId, index) => (
+                                        <Chip
+                                            key={index}
+                                            label={states.some(state => state.get("id") === nextStateId)
+                                                ? states.find(state => state.get("id") === nextStateId).get("name")
+                                                : "[Invalid]"}
+                                            className={classes.chip}
+                                        />
                                     ))}
                                 </div>
                             )}
                         >
                             {states.map((state, index) => (
-                                <MenuItem key={index} value={index} style={getStyles(state, transition, theme)}>
-                                    {state}
+                                <MenuItem
+                                    key={index}
+                                    value={state.get("id")}
+                                    style={getStyles(state, transition, theme)}
+                                >
+                                    {state.get("name")}
                                 </MenuItem>
                             ))}
                         </Select>

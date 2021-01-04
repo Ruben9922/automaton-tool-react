@@ -1,5 +1,5 @@
 import React from "react";
-import {List, OrderedSet, Map, is} from "immutable";
+import {List, OrderedSet, Map, is, Record} from "immutable";
 import Container from "@material-ui/core/Container";
 import {makeStyles} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -12,6 +12,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import {v4 as uuidv4} from "uuid";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,10 +30,10 @@ const useStyles = makeStyles((theme) => ({
 export default function StatesInput({
                                         states,
                                         onStatesChange,
-                                        initialStateIndex,
-                                        onInitialStateIndexChange,
-                                        finalStateIndices,
-                                        onFinalStateIndicesChange,
+                                        initialStateId,
+                                        onInitialStateIdChange,
+                                        finalStateIds,
+                                        onFinalStateIdsChange,
                                         errorState,
                                         helperText,
                                         errorAlertText,
@@ -40,29 +41,35 @@ export default function StatesInput({
                                     }) {
     const classes = useStyles();
 
+    const State = Record({
+        id: uuidv4(),
+        name: "",
+    });
+
     const handleAddStateClick = () => {
-        onStatesChange(prevStates => prevStates.push(""));
+        onStatesChange(prevStates => prevStates.push(State()));
     };
 
     const handleRemoveStateClick = index => {
         onStatesChange(prevStates => prevStates.delete(index));
     };
 
-    const handleStateNameChange = (event, index) => {
-        const updatedStateName = event.target.value;
-        onStatesChange(prevStates => prevStates.set(index, updatedStateName));
+    const handleNameChange = (event, index) => {
+        const updatedName = event.target.value;
+        onStatesChange(prevStates => prevStates.setIn([index, "name"], updatedName));
     };
 
-    const handleInitialStateIndexChange = (event, index) => {
-        onInitialStateIndexChange(index);
+    const handleInitialStateIdChange = event => {
+        const updatedInitialStateId = event.target.value;
+        onInitialStateIdChange(updatedInitialStateId);
     };
 
-    const handleFinalStateIndicesChange = (event, index) => {
+    const handleFinalStateIdsChange = (event, state) => {
         const isFinal = event.target.checked;
         if (isFinal) {
-            onFinalStateIndicesChange(prevFinalStates => prevFinalStates.add(index));
+            onFinalStateIdsChange(prevFinalStateIds => prevFinalStateIds.add(state.get("id")));
         } else {
-            onFinalStateIndicesChange(prevFinalStates => prevFinalStates.delete(index));
+            onFinalStateIdsChange(prevFinalStateIds => prevFinalStateIds.delete(state.get("id")));
         }
     };
 
@@ -74,16 +81,17 @@ export default function StatesInput({
                         <TextField
                             id={`state-name-${index + 1}`}
                             label={`State ${index + 1} name`}
-                            value={state}
-                            onChange={event => handleStateNameChange(event, index)}
+                            value={state.get("name")}
+                            onChange={event => handleNameChange(event, index)}
                             error={errorState.getIn(["stateName", index])}
                             helperText={helperText.getIn(["stateName", index])}
                         />
                         <FormControlLabel
                             control={
                                 <Radio
-                                    checked={initialStateIndex === index}
-                                    onChange={event => handleInitialStateIndexChange(event, index)}
+                                    checked={initialStateId === state.get("id")}
+                                    value={state.get("id")}
+                                    onChange={event => handleInitialStateIdChange(event)}
                                 />
                             }
                             label="Initial"
@@ -91,8 +99,8 @@ export default function StatesInput({
                         <FormControlLabel
                             control={
                                 <Checkbox
-                                    checked={finalStateIndices.includes(index)}
-                                    onChange={event => handleFinalStateIndicesChange(event, index)}
+                                    checked={finalStateIds.includes(state.get("id"))}
+                                    onChange={event => handleFinalStateIdsChange(event, state)}
                                     name={`state-${index + 1}-final`}
                                 />
                             }

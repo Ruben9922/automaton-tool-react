@@ -249,6 +249,21 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         ]).filter(x => x !== true)
     });
 
+    const fixTransitionCurrentStates = () => {
+        setTransitions(prevTransitions => prevTransitions.map(transition =>
+            transition.update("currentState", currentState => stateIds.includes(currentState) ? currentState : "")
+        ));
+    };
+
+    const fixTransitionNextStates = () => {
+        setTransitions(prevTransitions => prevTransitions.map(transition =>
+            transition.update("nextStates", nextStates => nextStates.intersect(stateIds))
+        ));
+    };
+
+    React.useEffect(fixTransitionCurrentStates, [stateIds]);
+    React.useEffect(fixTransitionNextStates, [stateIds]);
+
     const stepContent = [
         <AlphabetInput
             alphabet={alphabet}

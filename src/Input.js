@@ -124,6 +124,8 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
             areNextStatesNonEmpty: "Next states cannot be empty",
             areNextStatesValid: "One or more states do not exist",
             areTransitionsUnique: "Transition must be unique",
+            statesIsNonEmpty: "There are no states",
+            alphabetIsNonEmpty: "Alphabet is empty",
         }),
     });
 
@@ -160,20 +162,23 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
             ])
         }),
         transitions: Map({
-            currentState: createErrorStateList([
-                errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
-                errors.getIn(["transitions", "areCurrentStatesValid"]),
-                errors.getIn(["transitions", "areTransitionsUnique"]),
-            ]),
-            symbol: createErrorStateList([
-                errors.getIn(["transitions", "areSymbolsNonEmpty"]),
-                errors.getIn(["transitions", "areSymbolsValid"]),
-                errors.getIn(["transitions", "areTransitionsUnique"]),
-            ]),
-            nextStates: createErrorStateList([
-                errors.getIn(["transitions", "areNextStatesNonEmpty"]),
-                errors.getIn(["transitions", "areNextStatesValid"]),
-            ]),
+            currentState: transitions.map(() => errors.getIn(["states", "isNonEmpty"]))
+                .zipWith((x, y) => x && y, createErrorStateList([
+                    errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
+                    errors.getIn(["transitions", "areCurrentStatesValid"]),
+                    errors.getIn(["transitions", "areTransitionsUnique"]),
+                ])),
+            symbol: transitions.map(() => errors.getIn(["alphabet", "isNonEmpty"]))
+                .zipWith((x, y) => x && y, createErrorStateList([
+                    errors.getIn(["transitions", "areSymbolsNonEmpty"]),
+                    errors.getIn(["transitions", "areSymbolsValid"]),
+                    errors.getIn(["transitions", "areTransitionsUnique"]),
+                ])),
+            nextStates: transitions.map(() => errors.getIn(["states", "isNonEmpty"]))
+                .zipWith((x, y) => x && y, createErrorStateList([
+                    errors.getIn(["transitions", "areNextStatesNonEmpty"]),
+                    errors.getIn(["transitions", "areNextStatesValid"]),
+                ])),
         }),
     });
 
@@ -205,27 +210,33 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         }),
         transitions: Map({
             currentState: createHelperTextList([
+                transitions.map(() => errors.getIn(["states", "isNonEmpty"])),
                 errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
                 errors.getIn(["transitions", "areCurrentStatesValid"]),
                 errors.getIn(["transitions", "areTransitionsUnique"]),
             ], [
+                transitions.map(() => errorMessages.getIn(["transitions", "statesIsNonEmpty"])),
                 errorMessages.getIn(["transitions", "areCurrentStatesNonEmpty"]),
                 errorMessages.getIn(["transitions", "areCurrentStatesValid"]),
                 errorMessages.getIn(["transitions", "areTransitionsUnique"]),
             ]),
             symbol: createHelperTextList([
+                transitions.map(() => errors.getIn(["alphabet", "isNonEmpty"])),
                 errors.getIn(["transitions", "areSymbolsNonEmpty"]),
                 errors.getIn(["transitions", "areSymbolsValid"]),
                 errors.getIn(["transitions", "areTransitionsUnique"]),
             ], [
+                transitions.map(() => errorMessages.getIn(["transitions", "alphabetIsNonEmpty"])),
                 errorMessages.getIn(["transitions", "areSymbolsNonEmpty"]),
                 errorMessages.getIn(["transitions", "areSymbolsValid"]),
                 errorMessages.getIn(["transitions", "areTransitionsUnique"]),
             ]),
             nextStates: createHelperTextList([
+                transitions.map(() => errors.getIn(["states", "isNonEmpty"])),
                 errors.getIn(["transitions", "areNextStatesNonEmpty"]),
                 errors.getIn(["transitions", "areNextStatesValid"]),
             ], [
+                transitions.map(() => errorMessages.getIn(["transitions", "statesIsNonEmpty"])),
                 errorMessages.getIn(["transitions", "areNextStatesNonEmpty"]),
                 errorMessages.getIn(["transitions", "areNextStatesValid"]),
             ]),

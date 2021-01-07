@@ -79,7 +79,11 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
         <form className={classes.root} autoComplete="off">
             {transitions.map((transition, index) => (
                 <React.Fragment key={index}>
-                    <FormControl className={classes.formControl} error={errorState.getIn(["currentState", index])}>
+                    <FormControl
+                        className={classes.formControl}
+                        error={errorState.getIn(["currentState", index])}
+                        disabled={states.isEmpty()}
+                    >
                         <InputLabel id="transition-current-state-label">Current state</InputLabel>
                         <Select
                             labelId="transition-current-state-label"
@@ -92,7 +96,11 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                         </Select>
                         <FormHelperText>{helperText.getIn(["currentState", index])}</FormHelperText>
                     </FormControl>
-                    <FormControl className={classes.formControl} error={errorState.getIn(["symbol", index])}>
+                    <FormControl
+                        className={classes.formControl}
+                        error={errorState.getIn(["symbol", index])}
+                        disabled={alphabet.isEmpty()}
+                    >
                         <InputLabel id="transition-symbol-label">Symbol</InputLabel>
                         <Select
                             labelId="transition-symbol-label"
@@ -105,7 +113,11 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
                         </Select>
                         <FormHelperText>{helperText.getIn(["symbol", index])}</FormHelperText>
                     </FormControl>
-                    <FormControl className={classes.formControl} error={errorState.getIn(["nextStates", index])}>
+                    <FormControl
+                        className={classes.formControl}
+                        error={errorState.getIn(["nextStates", index])}
+                        disabled={states.isEmpty()}
+                    >
                         <InputLabel id="transition-next-states-label">Next states</InputLabel>
                         <Select
                             labelId="transition-next-states-label"

@@ -270,6 +270,14 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         ]).filter(x => x !== true)
     });
 
+    const fixInitialStateId = () => {
+        setInitialStateId(prevInitialStateId => stateIds.includes(prevInitialStateId) ? prevInitialStateId : NIL);
+    };
+
+    const fixFinalStateIds = () => {
+        setFinalStateIds(prevFinalStateIds => prevFinalStateIds.intersect(stateIds));
+    };
+
     const fixTransitionCurrentStates = () => {
         setTransitions(prevTransitions => prevTransitions.map(transition =>
             transition.update("currentState", currentState => stateIds.includes(currentState) ? currentState : "")
@@ -282,6 +290,8 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         ));
     };
 
+    React.useEffect(fixInitialStateId, [stateIds]);
+    React.useEffect(fixFinalStateIds, [stateIds]);
     React.useEffect(fixTransitionCurrentStates, [stateIds]);
     React.useEffect(fixTransitionNextStates, [stateIds]);
 

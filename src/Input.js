@@ -136,14 +136,27 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         }),
     });
 
+    const disabled = Map({
+        transitions: Map({
+            currentState: transitions.map(() => errors.getIn(["states", "isNonEmpty"])),
+            symbol: transitions.map(() => errors.getIn(["alphabet", "isNonEmpty"])),
+            nextStates: transitions.map(() => errors.getIn(["states", "isNonEmpty"])),
+        })
+    })
+
     // For single boolean values, can compute error state by doing !(x1 && ... && xn) (each xi is a check)
     // For lists, need to repeat this for each item in the lists
-    const createErrorStateList = errors => {
+    const createErrorStateList = (errors, disabled) => {
         let l = errors[0];
         for (let i = 1; i < errors.length; i++) {
             l = l.zipWith((x, y) => x && y, errors[i]);
         }
         l = l.map(x => !x);
+
+        if (disabled) {
+            l = disabled.zipWith((x, y) => x && y, l);
+        }
+
         return l;
     }
 
@@ -162,23 +175,20 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
             ])
         }),
         transitions: Map({
-            currentState: transitions.map(() => errors.getIn(["states", "isNonEmpty"]))
-                .zipWith((x, y) => x && y, createErrorStateList([
-                    errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
-                    errors.getIn(["transitions", "areCurrentStatesValid"]),
-                    errors.getIn(["transitions", "areTransitionsUnique"]),
-                ])),
-            symbol: transitions.map(() => errors.getIn(["alphabet", "isNonEmpty"]))
-                .zipWith((x, y) => x && y, createErrorStateList([
-                    errors.getIn(["transitions", "areSymbolsNonEmpty"]),
-                    errors.getIn(["transitions", "areSymbolsValid"]),
-                    errors.getIn(["transitions", "areTransitionsUnique"]),
-                ])),
-            nextStates: transitions.map(() => errors.getIn(["states", "isNonEmpty"]))
-                .zipWith((x, y) => x && y, createErrorStateList([
-                    errors.getIn(["transitions", "areNextStatesNonEmpty"]),
-                    errors.getIn(["transitions", "areNextStatesValid"]),
-                ])),
+            currentState: createErrorStateList([
+                errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
+                errors.getIn(["transitions", "areCurrentStatesValid"]),
+                errors.getIn(["transitions", "areTransitionsUnique"]),
+            ], disabled.getIn(["transitions", "currentState"])),
+            symbol: createErrorStateList([
+                errors.getIn(["transitions", "areSymbolsNonEmpty"]),
+                errors.getIn(["transitions", "areSymbolsValid"]),
+                errors.getIn(["transitions", "areTransitionsUnique"]),
+            ], disabled.getIn(["transitions", "symbol"])),
+            nextStates: createErrorStateList([
+                errors.getIn(["transitions", "areNextStatesNonEmpty"]),
+                errors.getIn(["transitions", "areNextStatesValid"]),
+            ], disabled.getIn(["transitions", "nextStates"])),
         }),
     });
 

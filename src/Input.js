@@ -284,6 +284,12 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         ));
     };
 
+    const fixTransitionSymbol = () => {
+        setTransitions(prevTransitions => prevTransitions.map(transition =>
+            transition.update("symbol", symbol => alphabet.includes(symbol) ? symbol : "")
+        ));
+    };
+
     const fixTransitionNextStates = () => {
         setTransitions(prevTransitions => prevTransitions.map(transition =>
             transition.update("nextStates", nextStates => nextStates.intersect(stateIds))
@@ -291,6 +297,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     };
 
     React.useEffect(fixInitialStateId, [stateIds]);
+    React.useEffect(fixTransitionSymbol, [alphabet]);
     React.useEffect(fixFinalStateIds, [stateIds]);
     React.useEffect(fixTransitionCurrentStates, [stateIds]);
     React.useEffect(fixTransitionNextStates, [stateIds]);

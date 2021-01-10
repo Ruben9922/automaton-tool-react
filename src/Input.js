@@ -336,6 +336,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const countErrors = key => errorState.get(key).toList().flatten().count(x => x === true)
         + (errorAlertText.has(key) ? errorAlertText.get(key).count() : 0);
 
+    // TODO: Maybe remove this and put errorCount in its own Map
     const steps = List([
         Map({
             label: "Specify alphabet",

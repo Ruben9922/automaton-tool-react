@@ -237,7 +237,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                 errors.getIn(["transitions", "areCurrentStatesValid"]),
                 errors.getIn(["transitions", "areTransitionsUnique"]),
             ], [
-                transitions.map(() => errorMessages.getIn(["transitions", "statesIsNonEmpty"])),
+                errorMessages.getIn(["transitions", "statesIsNonEmpty"]),
                 errorMessages.getIn(["transitions", "areCurrentStatesNonEmpty"]),
                 errorMessages.getIn(["transitions", "areCurrentStatesValid"]),
                 errorMessages.getIn(["transitions", "areTransitionsUnique"]),
@@ -248,7 +248,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                 errors.getIn(["transitions", "areSymbolsValid"]),
                 errors.getIn(["transitions", "areTransitionsUnique"]),
             ], [
-                transitions.map(() => errorMessages.getIn(["transitions", "alphabetIsNonEmpty"])),
+                errorMessages.getIn(["transitions", "alphabetIsNonEmpty"]),
                 errorMessages.getIn(["transitions", "areSymbolsNonEmpty"]),
                 errorMessages.getIn(["transitions", "areSymbolsValid"]),
                 errorMessages.getIn(["transitions", "areTransitionsUnique"]),
@@ -258,7 +258,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                 errors.getIn(["transitions", "areNextStatesNonEmpty"]),
                 errors.getIn(["transitions", "areNextStatesValid"]),
             ], [
-                transitions.map(() => errorMessages.getIn(["transitions", "statesIsNonEmpty"])),
+                errorMessages.getIn(["transitions", "statesIsNonEmpty"]),
                 errorMessages.getIn(["transitions", "areNextStatesNonEmpty"]),
                 errorMessages.getIn(["transitions", "areNextStatesValid"]),
             ]),

@@ -232,7 +232,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         }),
         transitions: Map({
             currentState: createHelperTextList([
-                transitions.map(() => errors.getIn(["states", "isNonEmpty"])),
+                disabled.getIn(["transitions", "currentState"]),
                 errors.getIn(["transitions", "areCurrentStatesNonEmpty"]),
                 errors.getIn(["transitions", "areCurrentStatesValid"]),
                 errors.getIn(["transitions", "areTransitionsUnique"]),
@@ -243,7 +243,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                 errorMessages.getIn(["transitions", "areTransitionsUnique"]),
             ]),
             symbol: createHelperTextList([
-                transitions.map(() => errors.getIn(["alphabet", "isNonEmpty"])),
+                disabled.getIn(["transitions", "symbol"]),
                 errors.getIn(["transitions", "areSymbolsNonEmpty"]),
                 errors.getIn(["transitions", "areSymbolsValid"]),
                 errors.getIn(["transitions", "areTransitionsUnique"]),
@@ -254,7 +254,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                 errorMessages.getIn(["transitions", "areTransitionsUnique"]),
             ]),
             nextStates: createHelperTextList([
-                transitions.map(() => errors.getIn(["states", "isNonEmpty"])),
+                disabled.getIn(["transitions", "nextStates"]),
                 errors.getIn(["transitions", "areNextStatesNonEmpty"]),
                 errors.getIn(["transitions", "areNextStatesValid"]),
             ], [

@@ -404,29 +404,22 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
                     </Step>
                 ))}
             </Stepper>
-            <div>
-                <div>
-                    {stepContent[activeStepIndex]}
-                    <div>
-                        <Button disabled={activeStepIndex === 0} onClick={handleBack} className={classes.button}>
-                            Back
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleNext}
-                            className={classes.button}
-                            disabled={activeStepIndex === steps.count() - 1 && allStepsCompleted()}
-                        >
-                            Next
-                        </Button>
-
-                        <Button variant="contained" color="primary" onClick={handleFinish} disabled={!allStepsCompleted()}>
-                            Finish
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            {stepContent[activeStepIndex]}
+            <Button disabled={activeStepIndex === 0} onClick={handleBack} className={classes.button}>
+                Back
+            </Button>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleNext}
+                className={classes.button}
+                disabled={activeStepIndex === steps.count() - 1 && allStepsCompleted()}
+            >
+                Next
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleFinish} disabled={!allStepsCompleted()}>
+                Finish
+            </Button>
         </div>
     );
 }

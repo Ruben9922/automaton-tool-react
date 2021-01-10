@@ -14,6 +14,8 @@ import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
 import {FormHelperText} from "@material-ui/core";
 import {NIL} from "uuid";
+import Alert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,7 +44,15 @@ const getStyles = (state, transition, theme) => ({
             : theme.typography.fontWeightRegular,
 });
 
-export default function TransitionsInput({transitions, onTransitionsChange, alphabet, states, errorState, helperText}) {
+export default function TransitionsInput({
+                                             transitions,
+                                             onTransitionsChange,
+                                             alphabet,
+                                             states,
+                                             errorState,
+                                             helperText,
+                                             warningAlertText,
+                                         }) {
     const classes = useStyles();
     const theme = useTheme();
 
@@ -76,90 +86,102 @@ export default function TransitionsInput({transitions, onTransitionsChange, alph
     };
 
     return (
-        <form className={classes.root} autoComplete="off">
-            {transitions.map((transition, index) => (
-                <React.Fragment key={index}>
-                    <FormControl
-                        className={classes.formControl}
-                        error={errorState.getIn(["currentState", index])}
-                        disabled={states.isEmpty()}
-                    >
-                        <InputLabel id="transition-current-state-label">Current state</InputLabel>
-                        <Select
-                            labelId="transition-current-state-label"
-                            id="transition-current-state"
-                            value={transition.get("currentState")}
-                            onChange={event => handleCurrentStateChange(event, index)}>
-                            {states.map((state, index) =>
-                                <MenuItem key={index} value={state.get("id")}>{state.get("name")}</MenuItem>
-                            )}
-                        </Select>
-                        <FormHelperText>{helperText.getIn(["currentState", index])}</FormHelperText>
-                    </FormControl>
-                    <FormControl
-                        className={classes.formControl}
-                        error={errorState.getIn(["symbol", index])}
-                        disabled={alphabet.isEmpty()}
-                    >
-                        <InputLabel id="transition-symbol-label">Symbol</InputLabel>
-                        <Select
-                            labelId="transition-symbol-label"
-                            id="transition-symbol"
-                            value={transition.get("symbol")}
-                            onChange={event => handleSymbolChange(event, index)}>
-                            {alphabet.map((symbol, index) =>
-                                <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
-                            )}
-                        </Select>
-                        <FormHelperText>{helperText.getIn(["symbol", index])}</FormHelperText>
-                    </FormControl>
-                    <FormControl
-                        className={classes.formControl}
-                        error={errorState.getIn(["nextStates", index])}
-                        disabled={states.isEmpty()}
-                    >
-                        <InputLabel id="transition-next-states-label">Next states</InputLabel>
-                        <Select
-                            labelId="transition-next-states-label"
-                            id="transition-next-states-label"
-                            multiple
-                            value={transition.get("nextStates").sort().toArray()}
-                            onChange={event => handleNextStatesChange(event, index)}
-                            input={<Input id="transition-next-states-select"/>}
-                            renderValue={nextStateIds => (
-                                <div className={classes.chips}>
-                                    {nextStateIds.map((nextStateId, index) => (
-                                        <Chip
-                                            key={index}
-                                            label={states.some(state => state.get("id") === nextStateId)
-                                                ? states.find(state => state.get("id") === nextStateId).get("name")
-                                                : "[Invalid]"}
-                                            className={classes.chip}
-                                        />
-                                    ))}
-                                </div>
-                            )}
+        <>
+            <form className={classes.root} autoComplete="off">
+                {transitions.map((transition, index) => (
+                    <React.Fragment key={index}>
+                        <FormControl
+                            className={classes.formControl}
+                            error={errorState.getIn(["currentState", index])}
+                            disabled={states.isEmpty()}
                         >
-                            {states.map((state, index) => (
-                                <MenuItem
-                                    key={index}
-                                    value={state.get("id")}
-                                    style={getStyles(state, transition, theme)}
-                                >
-                                    {state.get("name")}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText>{helperText.getIn(["nextStates", index])}</FormHelperText>
-                    </FormControl>
-                    <Tooltip title={`Delete Transition ${index + 1}`}>
-                        <IconButton onClick={() => handleRemoveTransitionClick(index)} aria-label="delete">
-                            <DeleteIcon/>
-                        </IconButton>
-                    </Tooltip>
-                </React.Fragment>
-            ))}
-            <Button onClick={handleAddTransitionClick} variant="contained">Add transition</Button>
-        </form>
+                            <InputLabel id="transition-current-state-label">Current state</InputLabel>
+                            <Select
+                                labelId="transition-current-state-label"
+                                id="transition-current-state"
+                                value={transition.get("currentState")}
+                                onChange={event => handleCurrentStateChange(event, index)}>
+                                {states.map((state, index) =>
+                                    <MenuItem key={index} value={state.get("id")}>{state.get("name")}</MenuItem>
+                                )}
+                            </Select>
+                            <FormHelperText>{helperText.getIn(["currentState", index])}</FormHelperText>
+                        </FormControl>
+                        <FormControl
+                            className={classes.formControl}
+                            error={errorState.getIn(["symbol", index])}
+                            disabled={alphabet.isEmpty()}
+                        >
+                            <InputLabel id="transition-symbol-label">Symbol</InputLabel>
+                            <Select
+                                labelId="transition-symbol-label"
+                                id="transition-symbol"
+                                value={transition.get("symbol")}
+                                onChange={event => handleSymbolChange(event, index)}>
+                                {alphabet.map((symbol, index) =>
+                                    <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
+                                )}
+                            </Select>
+                            <FormHelperText>{helperText.getIn(["symbol", index])}</FormHelperText>
+                        </FormControl>
+                        <FormControl
+                            className={classes.formControl}
+                            error={errorState.getIn(["nextStates", index])}
+                            disabled={states.isEmpty()}
+                        >
+                            <InputLabel id="transition-next-states-label">Next states</InputLabel>
+                            <Select
+                                labelId="transition-next-states-label"
+                                id="transition-next-states-label"
+                                multiple
+                                value={transition.get("nextStates").sort().toArray()}
+                                onChange={event => handleNextStatesChange(event, index)}
+                                input={<Input id="transition-next-states-select"/>}
+                                renderValue={nextStateIds => (
+                                    <div className={classes.chips}>
+                                        {nextStateIds.map((nextStateId, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={states.some(state => state.get("id") === nextStateId)
+                                                    ? states.find(state => state.get("id") === nextStateId).get("name")
+                                                    : "[Invalid]"}
+                                                className={classes.chip}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            >
+                                {states.map((state, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={state.get("id")}
+                                        style={getStyles(state, transition, theme)}
+                                    >
+                                        {state.get("name")}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            <FormHelperText>{helperText.getIn(["nextStates", index])}</FormHelperText>
+                        </FormControl>
+                        <Tooltip title={`Delete Transition ${index + 1}`}>
+                            <IconButton onClick={() => handleRemoveTransitionClick(index)} aria-label="delete">
+                                <DeleteIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    </React.Fragment>
+                ))}
+                <Button onClick={handleAddTransitionClick} variant="contained">Add transition</Button>
+            </form>
+            {warningAlertText.isEmpty() || (
+                <Alert severity="warning">
+                    <AlertTitle>{warningAlertText.count() === 1 ? "Warning" : "Warnings"}</AlertTitle>
+                    <ul>
+                        {warningAlertText.map((message, index) => (
+                            <li key={index}>{message}</li>
+                        ))}
+                    </ul>
+                </Alert>
+            )}
+        </>
     );
 }

@@ -66,11 +66,13 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const [finalStateIds, setFinalStateIds] = React.useState(OrderedSet());
     const [transitions, setTransitions] = React.useState(List());
 
+    const stateIds = states.map(state => state.get("id"));
+    const findStateById = id => states.find(state => state.get("id") === id);
+
     // Error checks to be performed
     // Values may be a single boolean value or a List of boolean values, depending on the nature of the check
     // For example, a check that is performed on the list of states will be a list of boolean values of the same length
     // TODO: Currently `true` means valid which is counterintuitive; might change this
-    const stateIds = states.map(state => state.get("id"));
     const errors = Map({
         alphabet: Map({
             isNonEmpty: !alphabet.isEmpty(),
@@ -103,6 +105,9 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         states: Map({
             atLeastOneFinalState: !finalStateIds.isEmpty(),
         }),
+        transitions: Map({
+            isNonEmpty: !transitions.isEmpty(),
+        }),
     });
 
     // Messages for each of the error checks
@@ -133,6 +138,13 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     const warningMessages = Map({
         states: Map({
             atLeastOneFinalState: "No state is selected as the final state, so all strings will be rejected by the automaton",
+        }),
+        transitions: Map({
+            isNonEmpty: states.isEmpty() || initialStateId === NIL ? "There are no transitions" : (
+                finalStateIds.includes(initialStateId)
+                    ? `There are no transitions and initial state "${findStateById(initialStateId).get("name")}" is a final state, so all strings will be accepted by the automaton`
+                    : `There are no transitions and initial state "${findStateById(initialStateId).get("name")}" is not a final state, so all strings will be rejected by the automaton`
+            ),
         }),
     });
 
@@ -260,15 +272,18 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
         states: List([
             errors.getIn(["states", "isNonEmpty"]) || errorMessages.getIn(["states", "isNonEmpty"]),
             !errors.getIn(["states", "isNonEmpty"]) || errors.getIn(["states", "exactlyOneInitialState"]) || errorMessages.getIn(["states", "exactlyOneInitialState"]),
-        ]).filter(x => x !== true)
-    });
+        ]),
+    }).map(x => x.filterNot(y => y === true)); // Remove `true` values, thus keeping only the strings
 
     // List of warning messages to display in an alert
     const warningAlertText = Map({
         states: List([
             !errors.getIn(["states", "isNonEmpty"]) || warnings.getIn(["states", "atLeastOneFinalState"]) || warningMessages.getIn(["states", "atLeastOneFinalState"]),
-        ]).filter(x => x !== true)
-    });
+        ]),
+        transitions: List([
+            !errors.getIn(["states", "exactlyOneInitialState"]) || !warnings.getIn(["states", "atLeastOneFinalState"]) || warnings.getIn(["transitions", "isNonEmpty"]) || warningMessages.getIn(["transitions", "isNonEmpty"]),
+        ]),
+    }).map(x => x.filterNot(y => y === true));
 
     const fixInitialStateId = () => {
         setInitialStateId(prevInitialStateId => stateIds.includes(prevInitialStateId) ? prevInitialStateId : NIL);
@@ -330,13 +345,14 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
             states={states}
             errorState={errorState.get("transitions")}
             helperText={helperText.get("transitions")}
+            warningAlertText={warningAlertText.get("transitions")}
         />,
     ];
 
     const countErrors = key => errorState.get(key).toList().flatten().count(x => x === true)
         + (errorAlertText.has(key) ? errorAlertText.get(key).count() : 0);
 
-    // TODO: Maybe remove this and put errorCount in its own Map
+    // TODO: Maybe remove this and put warningCount and errorCount in their own Maps
     const steps = List([
         Map({
             label: "Specify alphabet",
@@ -353,6 +369,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
             label: "Specify transitions",
             completed: countErrors("transitions") === 0,
             errorCount: countErrors("transitions"),
+            warningCount: warningAlertText.get("transitions").count(),
         }),
     ]);
     const [activeStepIndex, setActiveStepIndex] = React.useState(0);

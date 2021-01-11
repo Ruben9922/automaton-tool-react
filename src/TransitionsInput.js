@@ -35,9 +35,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const getStyles = (state, transition, theme) => ({
+const getStyles = (stateId, transition, theme) => ({
     fontWeight:
-        transition.get("nextStates").includes(state)
+        transition.get("nextStates").includes(stateId)
             ? theme.typography.fontWeightMedium
             : theme.typography.fontWeightRegular,
 });
@@ -153,7 +153,7 @@ export default function TransitionsInput({
                                     <MenuItem
                                         key={index}
                                         value={state.get("id")}
-                                        style={getStyles(state, transition, theme)}
+                                        style={getStyles(state.get("id"), transition, theme)}
                                     >
                                         {state.get("name")}
                                     </MenuItem>

@@ -1,10 +1,6 @@
 import React from 'react';
 import Header from "./Header";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route
-} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Home from "./Home";
 import Container from "@material-ui/core/Container";
 import View from "./View";

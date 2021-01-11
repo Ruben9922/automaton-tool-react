@@ -1,6 +1,5 @@
 import React from "react";
-import {fromJS, OrderedSet, Set, Map} from "immutable";
-import Container from "@material-ui/core/Container";
+import {fromJS, OrderedSet, Set} from "immutable";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";

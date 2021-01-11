@@ -1,6 +1,5 @@
 import React from "react";
-import {List, OrderedSet, Map, is, Record} from "immutable";
-import Container from "@material-ui/core/Container";
+import {Record} from "immutable";
 import {makeStyles} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";

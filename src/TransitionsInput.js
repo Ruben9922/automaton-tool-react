@@ -1,7 +1,6 @@
 import React from "react";
-import {Set, Map, List, Record} from "immutable";
+import {Record, Set} from "immutable";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -13,7 +12,6 @@ import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
 import {FormHelperText} from "@material-ui/core";
-import {NIL} from "uuid";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 

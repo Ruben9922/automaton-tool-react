@@ -37,14 +37,10 @@ const useStyles = makeStyles((theme) => ({
     placeholderStateName: {
         fontStyle: "italic",
     },
+    selected: {
+        fontWeight: theme.typography.fontWeightMedium,
+    },
 }));
-
-const getStyles = (stateId, transition, theme) => ({
-    fontWeight:
-        transition.get("nextStates").includes(stateId)
-            ? theme.typography.fontWeightMedium
-            : theme.typography.fontWeightRegular,
-});
 
 export default function TransitionsInput({
                                              transitions,
@@ -170,8 +166,10 @@ export default function TransitionsInput({
                                     <MenuItem
                                         key={index}
                                         value={state.get("id")}
-                                        style={getStyles(state.get("id"), transition, theme)}
-                                        className={clsx({[classes.placeholderStateName]: state.get("name") === ""})}
+                                        className={clsx({
+                                            [classes.placeholderStateName]: state.get("name") === "",
+                                            [classes.selected]: transition.get("nextStates").includes(state.get("id")),
+                                        })}
                                     >
                                         {createStateDisplayName(state, index)}
                                     </MenuItem>

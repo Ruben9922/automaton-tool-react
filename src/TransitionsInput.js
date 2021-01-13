@@ -14,6 +14,7 @@ import Input from "@material-ui/core/Input";
 import {FormHelperText} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
     },
     chip: {
         margin: 2,
+    },
+    placeholderStateName: {
+        fontStyle: "italic",
     },
 }));
 
@@ -83,6 +87,8 @@ export default function TransitionsInput({
         onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "nextStates"], Set(updatedNextStates)));
     };
 
+    const generatePlaceholderStateName = index => `[State ${index + 1}]`;
+
     return (
         <>
             <form className={classes.root} autoComplete="off">
@@ -100,7 +106,13 @@ export default function TransitionsInput({
                                 value={transition.get("currentState")}
                                 onChange={event => handleCurrentStateChange(event, index)}>
                                 {states.map((state, index) =>
-                                    <MenuItem key={index} value={state.get("id")}>{state.get("name")}</MenuItem>
+                                    <MenuItem
+                                        key={index}
+                                        value={state.get("id")}
+                                        className={clsx({[classes.placeholderStateName]: state.get("name") === ""})}
+                                    >
+                                        {state.get("name") === "" ? generatePlaceholderStateName(index) : state.get("name")}
+                                    </MenuItem>
                                 )}
                             </Select>
                             <FormHelperText>{helperText.getIn(["currentState", index])}</FormHelperText>

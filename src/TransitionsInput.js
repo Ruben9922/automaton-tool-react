@@ -14,6 +14,7 @@ import Input from "@material-ui/core/Input";
 import {FormHelperText} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
     },
     chip: {
         margin: 2,
+    },
+    placeholderStateName: {
+        fontStyle: "italic",
     },
 }));
 
@@ -83,6 +87,11 @@ export default function TransitionsInput({
         onTransitionsChange(prevTransitions => prevTransitions.setIn([index, "nextStates"], Set(updatedNextStates)));
     };
 
+    const generatePlaceholderStateName = index => `[State ${index + 1}]`;
+
+    const createStateDisplayName = (state, index) =>
+        state.get("name") === "" ? generatePlaceholderStateName(index) : state.get("name");
+
     return (
         <>
             <form className={classes.root} autoComplete="off">
@@ -100,7 +109,13 @@ export default function TransitionsInput({
                                 value={transition.get("currentState")}
                                 onChange={event => handleCurrentStateChange(event, index)}>
                                 {states.map((state, index) =>
-                                    <MenuItem key={index} value={state.get("id")}>{state.get("name")}</MenuItem>
+                                    <MenuItem
+                                        key={index}
+                                        value={state.get("id")}
+                                        className={clsx({[classes.placeholderStateName]: state.get("name") === ""})}
+                                    >
+                                        {createStateDisplayName(state, index)}
+                                    </MenuItem>
                                 )}
                             </Select>
                             <FormHelperText>{helperText.getIn(["currentState", index])}</FormHelperText>
@@ -140,8 +155,10 @@ export default function TransitionsInput({
                                         {nextStateIds.map((nextStateId, index) => (
                                             <Chip
                                                 key={index}
+                                                // TODO: Make this nicer - e.g. by using states instead of state IDs as values here
                                                 label={states.some(state => state.get("id") === nextStateId)
-                                                    ? states.find(state => state.get("id") === nextStateId).get("name")
+                                                    ? createStateDisplayName(states.find(state => state.get("id") === nextStateId),
+                                                        states.findIndex(state => state.get("id") === nextStateId))
                                                     : "[Invalid]"}
                                                 className={classes.chip}
                                             />
@@ -154,8 +171,9 @@ export default function TransitionsInput({
                                         key={index}
                                         value={state.get("id")}
                                         style={getStyles(state.get("id"), transition, theme)}
+                                        className={clsx({[classes.placeholderStateName]: state.get("name") === ""})}
                                     >
-                                        {state.get("name")}
+                                        {createStateDisplayName(state, index)}
                                     </MenuItem>
                                 ))}
                             </Select>

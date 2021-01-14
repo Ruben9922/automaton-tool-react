@@ -97,10 +97,10 @@ export default function TransitionsInput({
               error={errorState.getIn(["currentState", index])}
               disabled={states.isEmpty()}
             >
-              <InputLabel id="transition-current-state-label">Current state</InputLabel>
+              <InputLabel id={`transition-current-state-${index + 1}-label`}>Current state</InputLabel>
               <Select
-                labelId="transition-current-state-label"
-                id="transition-current-state"
+                labelId={`transition-current-state-${index + 1}-label`}
+                id={`transition-current-state-${index + 1}`}
                 value={transition.get("currentState")}
                 onChange={event => handleCurrentStateChange(event, index)}>
                 {states.map((state, index) =>
@@ -120,10 +120,10 @@ export default function TransitionsInput({
               error={errorState.getIn(["symbol", index])}
               disabled={alphabet.isEmpty()}
             >
-              <InputLabel id="transition-symbol-label">Symbol</InputLabel>
+              <InputLabel id={`transition-symbol-${index + 1}-label`}>Symbol</InputLabel>
               <Select
-                labelId="transition-symbol-label"
-                id="transition-symbol"
+                labelId={`transition-symbol-${index + 1}-label`}
+                id={`transition-symbol-${index + 1}`}
                 value={transition.get("symbol")}
                 onChange={event => handleSymbolChange(event, index)}>
                 {alphabet.map((symbol, index) =>
@@ -137,10 +137,10 @@ export default function TransitionsInput({
               error={errorState.getIn(["nextStates", index])}
               disabled={states.isEmpty()}
             >
-              <InputLabel id="transition-next-states-label">Next states</InputLabel>
+              <InputLabel id={`transition-next-states-${index + 1}-label`}>Next states</InputLabel>
               <Select
-                labelId="transition-next-states-label"
-                id="transition-next-states-label"
+                labelId={`transition-next-states-${index + 1}-label`}
+                id={`transition-next-states-${index + 1}`}
                 multiple
                 value={transition.get("nextStates").sort().toArray()}
                 onChange={event => handleNextStatesChange(event, index)}

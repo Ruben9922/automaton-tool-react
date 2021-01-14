@@ -1,6 +1,6 @@
 import React from "react";
 import {Record, Set} from "immutable";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -52,7 +52,6 @@ export default function TransitionsInput({
                                              warningAlertText,
                                          }) {
     const classes = useStyles();
-    const theme = useTheme();
 
     const Transition = Record({
         currentState: "",

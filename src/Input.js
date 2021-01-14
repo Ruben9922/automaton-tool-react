@@ -50,7 +50,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
         states: OrderedSet(states),
         transitionFunction: transitionsToTransitionFunction(transitions),
         initialState: states.get(initialStateIndex),
-        finalStates: states.filter((value, index, iter) => finalStateIndices.includes(index)),
+        finalStates: states.filter((value, index) => finalStateIndices.includes(index)),
     })
 }
 

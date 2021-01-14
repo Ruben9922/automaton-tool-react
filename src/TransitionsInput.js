@@ -155,8 +155,7 @@ export default function TransitionsInput({
                                             return (
                                                 <Chip
                                                     key={index}
-                                                    label={states.some(state => state.get("id") === nextStateId)
-                                                        ? createStateDisplayName(state, stateIndex) : "[Invalid]"}
+                                                    label={createStateDisplayName(state, stateIndex)}
                                                     className={clsx(classes.chip, {[classes.placeholderStateName]: state.get("name") === ""})}
                                                 />
                                             );

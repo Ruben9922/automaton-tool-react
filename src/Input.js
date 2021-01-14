@@ -400,7 +400,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
 
     return (
         <div className={classes.root}>
-            <Stepper alternativeLabel nonLinear activeStep={activeStepIndex} style={{ backgroundColor: "transparent" }}>
+            <Stepper alternativeLabel nonLinear activeStep={activeStepIndex} style={{backgroundColor: "transparent"}}>
                 {steps.map((step, index) => (
                     <Step key={index}>
                         <StepButton

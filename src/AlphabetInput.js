@@ -20,7 +20,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AlphabetInput({alphabet, onAlphabetChange, alphabetPresetIndex, onAlphabetPresetIndexChange, errorState, helperText}) {
+export default function AlphabetInput({
+                                          alphabet,
+                                          onAlphabetChange,
+                                          alphabetPresetIndex,
+                                          onAlphabetPresetIndexChange,
+                                          errorState,
+                                          helperText
+                                      }) {
     const classes = useStyles();
 
     const handleAlphabetPresetChange = event => {

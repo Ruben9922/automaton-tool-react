@@ -148,17 +148,19 @@ export default function TransitionsInput({
                                 input={<Input id="transition-next-states-select"/>}
                                 renderValue={nextStateIds => (
                                     <div className={classes.chips}>
-                                        {nextStateIds.map((nextStateId, index) => (
-                                            <Chip
-                                                key={index}
-                                                // TODO: Make this nicer - e.g. by using states instead of state IDs as values here
-                                                label={states.some(state => state.get("id") === nextStateId)
-                                                    ? createStateDisplayName(states.find(state => state.get("id") === nextStateId),
-                                                        states.findIndex(state => state.get("id") === nextStateId))
-                                                    : "[Invalid]"}
-                                                className={classes.chip}
-                                            />
-                                        ))}
+                                        {nextStateIds.map((nextStateId, index) => {
+                                            // TODO: Make this nicer - e.g. by using states instead of state IDs as values here
+                                            const state = states.find(state => state.get("id") === nextStateId);
+                                            const stateIndex = states.findIndex(state => state.get("id") === nextStateId);
+                                            return (
+                                                <Chip
+                                                    key={index}
+                                                    label={states.some(state => state.get("id") === nextStateId)
+                                                        ? createStateDisplayName(state, stateIndex) : "[Invalid]"}
+                                                    className={clsx(classes.chip, {[classes.placeholderStateName]: state.get("name") === ""})}
+                                                />
+                                            );
+                                        })}
                                     </div>
                                 )}
                             >

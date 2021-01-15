@@ -36,14 +36,6 @@ export default function Home({automata, onAutomataChange, onSnackbarOpenChange})
     setDialogOpen(true);
   }
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    onSnackbarOpenChange(false);
-  };
-
   const handleDialogClose = () => {
     setDialogOpen(false);
   };

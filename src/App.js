@@ -34,12 +34,12 @@ export default function App() {
   });
 
   React.useEffect(() => {
-    if (snackPack.count() && !messageInfo) {
+    if (!snackPack.isEmpty() && !messageInfo) {
       // Set a new snack when we don't have an active one
       setMessageInfo(snackPack.first());
       setSnackPack(prevSnackPack => prevSnackPack.shift());
       setOpen(true);
-    } else if (snackPack.count() && messageInfo && open) {
+    } else if (!snackPack.isEmpty() && messageInfo && open) {
       // Close an active snack when a new one is added
       setOpen(false);
     }

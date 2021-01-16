@@ -54,7 +54,7 @@ function createAutomaton(alphabet, states, initialStateIndex, finalStateIndices,
   })
 }
 
-export default function Input({addAutomaton, onSnackbarOpenChange}) {
+export default function Input({addAutomaton, openSnackbar}) {
   const classes = useStyles();
 
   const history = useHistory();
@@ -395,7 +395,7 @@ export default function Input({addAutomaton, onSnackbarOpenChange}) {
     let automaton = createAutomaton(alphabet, states, initialStateId, finalStateIds, transitions);
     addAutomaton(automaton);
     history.push("/");
-    onSnackbarOpenChange(true);
+    openSnackbar();
   };
 
   return (

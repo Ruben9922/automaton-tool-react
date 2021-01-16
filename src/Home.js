@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home({automata, onAutomataChange, onSnackbarOpenChange}) {
+export default function Home({automata, onAutomataChange, openSnackbar}) {
   const classes = useStyles();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -42,7 +42,7 @@ export default function Home({automata, onAutomataChange, onSnackbarOpenChange})
 
   const handleDialogConfirmClick = () => {
     onAutomataChange(prevAutomata => prevAutomata.delete(automatonDeleteIndex));
-    onSnackbarOpenChange(true);
+    openSnackbar();
     setDialogOpen(false);
   };
 

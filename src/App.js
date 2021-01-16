@@ -5,25 +5,70 @@ import Home from "./Home";
 import Container from "@material-ui/core/Container";
 import View from "./View";
 import Input from "./Input";
-import {List, Map} from "immutable";
+import {List, Map, Record} from "immutable";
 import Snackbar from "@material-ui/core/Snackbar";
-import Alert from "@material-ui/lab/Alert";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import {makeStyles} from "@material-ui/core/styles";
+import CloseIcon from "@material-ui/icons/Close";
+import {v4 as uuidv4} from "uuid";
+
+const useStyles = makeStyles((theme) => ({
+  close: {
+    padding: theme.spacing(0.5),
+  },
+}));
 
 export default function App() {
+  const classes = useStyles();
+
   const [automata, setAutomata] = React.useState(List());
-  const [snackbarsOpen, setSnackbarsOpen] = React.useState(Map({created: false, deleted: false}));
+  const [snackPack, setSnackPack] = React.useState(List());
+  const [open, setOpen] = React.useState(false);
+  const [messageInfo, setMessageInfo] = React.useState(undefined);
 
-  const addAutomaton = automaton => setAutomata(prevAutomata => prevAutomata.push(automaton));
+  const messages = Map({
+    automatonAdded: "Automaton created",
+    automatonDeleted: "Automaton deleted",
+    stateDeleted: "State deleted",
+  });
 
-  const handleSnackbarOpen = key => setSnackbarsOpen(prevSnackbarsOpen => prevSnackbarsOpen.set(key, true));
+  React.useEffect(() => {
+    if (snackPack.count() && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo(snackPack.first());
+      setSnackPack(prevSnackPack => prevSnackPack.shift());
+      setOpen(true);
+    } else if (snackPack.count() && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpen(false);
+    }
+  }, [snackPack, messageInfo, open]);
 
-  const handleSnackbarClose = (event, reason, key) => {
-    if (reason === 'clickaway') {
+  const SnackbarMessage = Record({
+    id: uuidv4(),
+    message: "",
+  });
+
+  const handleSnackbarOpen = messageKey => () => {
+    setSnackPack(prevSnackPack => prevSnackPack.push(SnackbarMessage({
+      message: messages.get(messageKey),
+    })));
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
       return;
     }
 
-    setSnackbarsOpen(prevSnackbarsOpen => prevSnackbarsOpen.set(key, false));
+    setOpen(false);
   };
+
+  const handleSnackbarExited = () => {
+    setMessageInfo(undefined);
+  };
+
+  const addAutomaton = automaton => setAutomata(prevAutomata => prevAutomata.push(automaton));
 
   return (
     <Router>
@@ -34,44 +79,39 @@ export default function App() {
             <Home
               automata={automata}
               onAutomataChange={setAutomata}
-              onSnackbarOpenChange={() => handleSnackbarOpen("deleted")}
+              openSnackbar={handleSnackbarOpen("automatonDeleted")}
             />
           </Route>
           <Route path="/view">
             <View/>
           </Route>
           <Route path="/create">
-            <Input addAutomaton={addAutomaton} onSnackbarOpenChange={() => handleSnackbarOpen("created")}/>
+            <Input addAutomaton={addAutomaton} openSnackbar={handleSnackbarOpen("automatonAdded")}/>
           </Route>
         </Switch>
         <Snackbar
-          open={snackbarsOpen.get("created")}
-          autoHideDuration={2000}
-          onClose={(event, reason) => handleSnackbarClose(event, reason, "created")}
-        >
-          <Alert
-            elevation={6}
-            variant="filled"
-            onClose={(event, reason) => handleSnackbarClose(event, reason, "created")}
-            severity="success"
-          >
-            Automaton created successfully!
-          </Alert>
-        </Snackbar>
-        <Snackbar
-          open={snackbarsOpen.get("deleted")}
-          autoHideDuration={2000}
-          onClose={(event, reason) => handleSnackbarClose(event, reason, "deleted")}
-        >
-          <Alert
-            elevation={6}
-            variant="filled"
-            onClose={(event, reason) => handleSnackbarClose(event, reason, "deleted")}
-            severity="success"
-          >
-            Automaton deleted successfully!
-          </Alert>
-        </Snackbar>
+          key={messageInfo ? messageInfo.key : undefined}
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          onExited={handleSnackbarExited}
+          message={messageInfo ? messageInfo.message : undefined}
+          action={
+            <React.Fragment>
+              <Button color="secondary" size="small" onClick={handleSnackbarClose}>
+                UNDO
+              </Button>
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                className={classes.close}
+                onClick={handleSnackbarClose}
+              >
+                <CloseIcon />
+              </IconButton>
+            </React.Fragment>
+          }
+        />
       </Container>
     </Router>
   );

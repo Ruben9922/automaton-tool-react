@@ -23,9 +23,9 @@ export default function App() {
   const classes = useStyles();
 
   const [automata, setAutomata] = React.useState(List());
-  const [snackPack, setSnackPack] = React.useState(List());
-  const [open, setOpen] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState(undefined);
+  const [snackbarQueue, setSnackbarQueue] = React.useState(List());
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbar, setSnackbar] = React.useState(undefined);
 
   const messages = Map({
     automatonAdded: "Automaton created",
@@ -34,25 +34,25 @@ export default function App() {
   });
 
   React.useEffect(() => {
-    if (!snackPack.isEmpty() && !messageInfo) {
+    if (!snackbarQueue.isEmpty() && !snackbar) {
       // Set a new snack when we don't have an active one
-      setMessageInfo(snackPack.first());
-      setSnackPack(prevSnackPack => prevSnackPack.shift());
-      setOpen(true);
-    } else if (!snackPack.isEmpty() && messageInfo && open) {
+      setSnackbar(snackbarQueue.first());
+      setSnackbarQueue(prevSnackbarQueue => prevSnackbarQueue.shift());
+      setSnackbarOpen(true);
+    } else if (!snackbarQueue.isEmpty() && snackbar && snackbarOpen) {
       // Close an active snack when a new one is added
-      setOpen(false);
+      setSnackbarOpen(false);
     }
-  }, [snackPack, messageInfo, open]);
+  }, [snackbarQueue, snackbar, snackbarOpen]);
 
   const SnackbarMessage = Record({
     id: uuidv4(),
     message: "",
   });
 
-  const handleSnackbarOpen = messageKey => () => {
-    setSnackPack(prevSnackPack => prevSnackPack.push(SnackbarMessage({
-      message: messages.get(messageKey),
+  const handleSnackbarOpen = key => () => {
+    setSnackbarQueue(prevSnackPack => prevSnackPack.push(SnackbarMessage({
+      message: messages.get(key),
     })));
   };
 
@@ -61,11 +61,11 @@ export default function App() {
       return;
     }
 
-    setOpen(false);
+    setSnackbarOpen(false);
   };
 
   const handleSnackbarExited = () => {
-    setMessageInfo(undefined);
+    setSnackbar(undefined);
   };
 
   const addAutomaton = automaton => setAutomata(prevAutomata => prevAutomata.push(automaton));
@@ -90,12 +90,12 @@ export default function App() {
           </Route>
         </Switch>
         <Snackbar
-          key={messageInfo ? messageInfo.key : undefined}
-          open={open}
+          key={snackbar ? snackbar.key : undefined}
+          open={snackbarOpen}
           autoHideDuration={6000}
           onClose={handleSnackbarClose}
           onExited={handleSnackbarExited}
-          message={messageInfo ? messageInfo.message : undefined}
+          message={snackbar ? snackbar.message : undefined}
           action={
             <React.Fragment>
               <Button color="secondary" size="small" onClick={handleSnackbarClose}>

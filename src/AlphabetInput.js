@@ -32,9 +32,7 @@ export default function AlphabetInput({
 
   const handleAlphabetPresetChange = event => {
     const updatedAlphabetPresetIndex = event.target.value;
-
     onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
-    onAlphabetChange(alphabetPresets.get(updatedAlphabetPresetIndex).get("alphabet"));
   };
 
   const alphabetToAlphabetString = alphabet => alphabet.join("");
@@ -43,17 +41,7 @@ export default function AlphabetInput({
   const handleAlphabetChange = event => {
     const updatedAlphabetString = event.target.value;
     const updatedAlphabet = alphabetStringToAlphabet(updatedAlphabetString);
-
     onAlphabetChange(updatedAlphabet);
-
-    // Check if the entered alphabet matches the alphabet of a preset
-    // If so, select this preset
-    // (Ignoring order, hence converting both to Sets)
-    let updatedAlphabetPresetIndex = alphabetPresets.findIndex((ap) => Set(ap.get("alphabet")).equals(Set(updatedAlphabet)));
-    if (updatedAlphabetPresetIndex === -1) {
-      updatedAlphabetPresetIndex = 5;
-    }
-    onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
   };
 
   const alphabetPresets = fromJS([
@@ -82,6 +70,36 @@ export default function AlphabetInput({
       alphabet: alphabetStringToAlphabet(""),
     },
   ]);
+
+  const alphabetToAlphabetPresetIndex = a => {
+    // Check if the entered alphabet matches the alphabet of a preset
+    // If so, select this preset
+    // (Ignoring order, hence converting both to Sets)
+    let updatedAlphabetPresetIndex = alphabetPresets.findIndex(alphabetPreset =>
+      Set(alphabetPreset.get("alphabet")).equals(Set(a))
+    );
+
+    // If it doesn't match a preset, then use the custom preset (whose index is 5)
+    if (updatedAlphabetPresetIndex === -1) {
+      updatedAlphabetPresetIndex = 5;
+    }
+
+    return updatedAlphabetPresetIndex;
+  };
+  const alphabetPresetIndexToAlphabet = api => alphabetPresets.get(api).get("alphabet");
+  const updateAlphabet = () => {
+    if (alphabetPresetIndex !== "") {
+      onAlphabetChange(a => {
+        return alphabetToAlphabetPresetIndex(a) === alphabetPresetIndex ? a : alphabetPresetIndexToAlphabet(alphabetPresetIndex);
+      });
+    }
+  };
+  const updateAlphabetPresetIndex = () => {
+    const updatedAlphabetPresetIndex = alphabetToAlphabetPresetIndex(alphabet);
+    onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
+  };
+  React.useEffect(updateAlphabet, [alphabetPresetIndex]);
+  React.useEffect(updateAlphabetPresetIndex, [alphabet]);
 
   return (
     <form className={classes.root} autoComplete="off">

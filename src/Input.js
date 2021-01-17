@@ -140,7 +140,7 @@ export default function Input({addAutomaton, openSnackbar}) {
       atLeastOneFinalState: "No state is selected as the final state, so all strings will be rejected by the automaton",
     }),
     transitions: Map({
-      isNonEmpty: states.isEmpty() || initialStateId === NIL ? "There are no transitions" : (
+      isNonEmpty: states.isEmpty() || !stateIds.includes(initialStateId) ? "There are no transitions" : (
         finalStateIds.includes(initialStateId)
           ? `There are no transitions and initial state "${findStateById(initialStateId).get("name")}" is a final state, so all strings will be accepted by the automaton`
           : `There are no transitions and initial state "${findStateById(initialStateId).get("name")}" is not a final state, so all strings will be rejected by the automaton`

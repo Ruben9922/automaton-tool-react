@@ -20,6 +20,63 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// TODO: Use List() and Map() methods instead of fromJS
+const alphabetPresets = fromJS([
+  {
+    name: "Binary digits (0-1)",
+    alphabet: alphabetStringToAlphabet("01"),
+  },
+  {
+    name: "Decimal digits (0-9)",
+    alphabet: alphabetStringToAlphabet("0123456789"),
+  },
+  {
+    name: "Upper-case letters (A-Z)",
+    alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+  },
+  {
+    name: "Lower-case letters (a-z)",
+    alphabet: alphabetStringToAlphabet("abcdefghijklmnopqrstuvwxyz"),
+  },
+  {
+    name: "Upper- & lower-case letters (A-Z, a-z)",
+    alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
+  },
+  {
+    name: "Custom",
+    alphabet: alphabetStringToAlphabet(""),
+  },
+]);
+
+function alphabetToAlphabetString(a) {
+  return a.join("");
+}
+
+function alphabetStringToAlphabet(as) {
+  return OrderedSet(as.split(""));
+}
+
+function alphabetToAlphabetPresetIndex(a) {
+  // Check if the entered alphabet matches the alphabet of a preset
+  // If so, select this preset
+  // (Ignoring order, hence converting both to Sets)
+  // TODO: Maybe use toSet() instead of Set()
+  let updatedAlphabetPresetIndex = alphabetPresets.findIndex(alphabetPreset =>
+    Set(alphabetPreset.get("alphabet")).equals(Set(a))
+  );
+
+  // If it doesn't match a preset, then use the custom preset (whose index is 5)
+  if (updatedAlphabetPresetIndex === -1) {
+    updatedAlphabetPresetIndex = 5;
+  }
+
+  return updatedAlphabetPresetIndex;
+}
+
+function alphabetPresetIndexToAlphabet(api) {
+  return alphabetPresets.get(api).get("alphabet");
+}
+
 export default function AlphabetInput({
                                         alphabet,
                                         onAlphabetChange,
@@ -35,58 +92,12 @@ export default function AlphabetInput({
     onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
   };
 
-  const alphabetToAlphabetString = alphabet => alphabet.join("");
-  const alphabetStringToAlphabet = alphabetString => OrderedSet(alphabetString.split(""));
-
   const handleAlphabetChange = event => {
     const updatedAlphabetString = event.target.value;
     const updatedAlphabet = alphabetStringToAlphabet(updatedAlphabetString);
     onAlphabetChange(updatedAlphabet);
   };
 
-  const alphabetPresets = fromJS([
-    {
-      name: "Binary digits (0-1)",
-      alphabet: alphabetStringToAlphabet("01"),
-    },
-    {
-      name: "Decimal digits (0-9)",
-      alphabet: alphabetStringToAlphabet("0123456789"),
-    },
-    {
-      name: "Upper-case letters (A-Z)",
-      alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-    },
-    {
-      name: "Lower-case letters (a-z)",
-      alphabet: alphabetStringToAlphabet("abcdefghijklmnopqrstuvwxyz"),
-    },
-    {
-      name: "Upper- & lower-case letters (A-Z, a-z)",
-      alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
-    },
-    {
-      name: "Custom",
-      alphabet: alphabetStringToAlphabet(""),
-    },
-  ]);
-
-  const alphabetToAlphabetPresetIndex = a => {
-    // Check if the entered alphabet matches the alphabet of a preset
-    // If so, select this preset
-    // (Ignoring order, hence converting both to Sets)
-    let updatedAlphabetPresetIndex = alphabetPresets.findIndex(alphabetPreset =>
-      Set(alphabetPreset.get("alphabet")).equals(Set(a))
-    );
-
-    // If it doesn't match a preset, then use the custom preset (whose index is 5)
-    if (updatedAlphabetPresetIndex === -1) {
-      updatedAlphabetPresetIndex = 5;
-    }
-
-    return updatedAlphabetPresetIndex;
-  };
-  const alphabetPresetIndexToAlphabet = api => alphabetPresets.get(api).get("alphabet");
   const updateAlphabet = () => {
     if (alphabetPresetIndex !== "") {
       onAlphabetChange(a => {
@@ -94,12 +105,14 @@ export default function AlphabetInput({
       });
     }
   };
+
   const updateAlphabetPresetIndex = () => {
     const updatedAlphabetPresetIndex = alphabetToAlphabetPresetIndex(alphabet);
     onAlphabetPresetIndexChange(updatedAlphabetPresetIndex);
   };
-  React.useEffect(updateAlphabet, [alphabetPresetIndex]);
-  React.useEffect(updateAlphabetPresetIndex, [alphabet]);
+
+  React.useEffect(updateAlphabet, [alphabetPresetIndex, onAlphabetChange]);
+  React.useEffect(updateAlphabetPresetIndex, [alphabet, onAlphabetPresetIndexChange]);
 
   return (
     <form className={classes.root} autoComplete="off">

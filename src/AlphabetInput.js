@@ -59,9 +59,8 @@ function alphabetToAlphabetPresetIndex(a) {
   // Check if the entered alphabet matches the alphabet of a preset
   // If so, select this preset
   // (Ignoring order, hence converting both to Sets)
-  // TODO: Maybe use toSet() instead of Set()
   let updatedAlphabetPresetIndex = alphabetPresets.findIndex(alphabetPreset =>
-    Set(alphabetPreset.get("alphabet")).equals(Set(a))
+    alphabetPreset.get("alphabet").toSet().equals(a.toSet())
   );
 
   // If it doesn't match a preset, then use the custom preset (whose index is 5)

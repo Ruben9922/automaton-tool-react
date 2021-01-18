@@ -1,5 +1,5 @@
 import React from "react";
-import {fromJS, OrderedSet, Set} from "immutable";
+import {List, Map, OrderedSet, Set} from "immutable";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -20,32 +20,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// TODO: Use List() and Map() methods instead of fromJS
-const alphabetPresets = fromJS([
-  {
+const alphabetPresets = List([
+  Map({
     name: "Binary digits (0-1)",
     alphabet: alphabetStringToAlphabet("01"),
-  },
-  {
+  }),
+  Map({
     name: "Decimal digits (0-9)",
     alphabet: alphabetStringToAlphabet("0123456789"),
-  },
-  {
+  }),
+  Map({
     name: "Upper-case letters (A-Z)",
     alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-  },
-  {
+  }),
+  Map({
     name: "Lower-case letters (a-z)",
     alphabet: alphabetStringToAlphabet("abcdefghijklmnopqrstuvwxyz"),
-  },
-  {
+  }),
+  Map({
     name: "Upper- & lower-case letters (A-Z, a-z)",
     alphabet: alphabetStringToAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
-  },
-  {
+  }),
+  Map({
     name: "Custom",
     alphabet: alphabetStringToAlphabet(""),
-  },
+  }),
 ]);
 
 function alphabetToAlphabetString(a) {

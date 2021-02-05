@@ -1,9 +1,9 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import Typography from "@material-ui/core/Typography";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from '@material-ui/icons/Add';
-import {makeStyles} from "@material-ui/core/styles";
-import {Link} from "react-router-dom";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -16,8 +16,10 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Button from "@material-ui/core/Button";
+import * as R from "ramda";
+import Automaton from "./automaton";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   fab: {
     position: 'absolute',
     bottom: theme.spacing(4),
@@ -25,30 +27,36 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home({automata, onAutomataChange, openSnackbar}) {
+type HomeProps = {
+  automata: Automaton[];
+  onAutomataChange: Dispatch<SetStateAction<Automaton[]>>;
+  openSnackbar: () => void;
+};
+
+export default function Home({ automata, onAutomataChange, openSnackbar }: HomeProps) {
   const classes = useStyles();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [automatonDeleteIndex, setAutomatonDeleteIndex] = React.useState(null);
+  const [automatonDeleteIndex, setAutomatonDeleteIndex] = React.useState<number | null>(null);
 
-  const handleRemoveAutomatonClick = index => {
+  const handleRemoveAutomatonClick = (index: number): void => {
     setAutomatonDeleteIndex(index);
     setDialogOpen(true);
-  }
+  };
 
-  const handleDialogClose = () => {
+  const handleDialogClose = (): void => {
     setDialogOpen(false);
   };
 
-  const handleDialogConfirmClick = () => {
-    onAutomataChange(prevAutomata => prevAutomata.delete(automatonDeleteIndex));
+  const handleDialogConfirmClick = (): void => {
+    onAutomataChange((prevAutomata) => R.remove(automatonDeleteIndex as number, 1, prevAutomata));
     openSnackbar();
     setDialogOpen(false);
   };
 
   return (
     <>
-      {automata.isEmpty() ? (
+      {R.isEmpty(automata) ? (
         <>
           <Typography variant="h5" component="h1" gutterBottom>
             Welcome to Automaton Tool!
@@ -59,17 +67,17 @@ export default function Home({automata, onAutomataChange, openSnackbar}) {
         </>
       ) : (
         <List>
-          {automata.map((automaton, index) => (
-            <React.Fragment key={index}>
-              <ListItem key={index}>
+          {automata.map((automaton: Automaton, index: number) => (
+            <React.Fragment key={automaton.id}>
+              <ListItem>
                 <ListItemText
                   primary={`Automaton ${index + 1}`}
-                  secondary={`${automaton.get("alphabet").count()} symbols, ${automaton.get("states").count()} states, ${automaton.get("transitionFunction").count()} transitions`}
+                  secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
                 />
               </ListItem>
               <Tooltip title={`Delete Automaton ${index + 1}`}>
                 <IconButton onClick={() => handleRemoveAutomatonClick(index)} aria-label="delete">
-                  <DeleteIcon/>
+                  <DeleteIcon />
                 </IconButton>
               </Tooltip>
             </React.Fragment>
@@ -79,7 +87,7 @@ export default function Home({automata, onAutomataChange, openSnackbar}) {
       <Link to="/create">
         <Tooltip title="Add automaton" className={classes.fab}>
           <Fab color="primary" aria-label="add">
-            <AddIcon/>
+            <AddIcon />
           </Fab>
         </Tooltip>
       </Link>
@@ -89,10 +97,10 @@ export default function Home({automata, onAutomataChange, openSnackbar}) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Delete automaton?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Delete automaton?</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you wish to permanently delete Automaton {automatonDeleteIndex + 1}? This cannot be undone.
+            {`Are you sure you wish to permanently delete Automaton ${automatonDeleteIndex! + 1}? This cannot be undone.`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

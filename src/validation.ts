@@ -2,7 +2,12 @@ import * as R from "ramda";
 import { NIL } from "uuid";
 import State from "./state";
 import Transition from "./transition";
-import { findStateById, isSubset, isUnique } from "./utilities";
+import {
+  findStateById,
+  getIds,
+  isSubset,
+  isUnique,
+} from "./utilities";
 
 interface Check<T> {
   isValid: T;
@@ -161,7 +166,7 @@ function createAlertTextList(checks: Check<boolean>[]): string[] {
 
 export function validate(alphabet: string[], states: State[], transitions: Transition[],
   initialStateId: string, finalStateIds: string[]) {
-  const stateIds = R.map((s) => s.id, states);
+  const stateIds = getIds(states);
 
   const errors: Errors = {
     alphabet: {

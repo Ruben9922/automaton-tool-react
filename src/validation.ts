@@ -274,7 +274,7 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
   // an error
   const errorState: ErrorState = {
     alphabet: {
-      alphabet: !errors.alphabet.isNonEmpty,
+      alphabet: !errors.alphabet.isNonEmpty.isValid,
     },
     states: {
       stateName: createErrorStateList([

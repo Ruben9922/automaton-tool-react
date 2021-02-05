@@ -318,11 +318,11 @@ export default function Input({ addAutomaton, openSnackbar }: InputProps) {
             <StepButton
               onClick={handleStep(index)}
               completed={step.completed}
-              optional={(step.errorCount && (
+              optional={(step.errorCount !== 0 && (
                 <Typography variant="caption" color="error">
                   {`${step.errorCount} ${step.errorCount === 1 ? "error" : "errors"}`}
                 </Typography>
-              )) || (step.warningCount && (
+              )) || (step.warningCount !== 0 && (
                 <Typography variant="caption">
                   {`${step.warningCount} ${step.warningCount === 1 ? "warning" : "warnings"}`}
                 </Typography>

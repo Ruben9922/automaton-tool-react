@@ -11,3 +11,5 @@ export function isUnique<T>(p: (s1: T, s2: T) => boolean, l: T[]) {
 }
 
 export const isSubset: <T>(l1: T[], l2: T[]) => boolean = R.uncurryN(2, R.pipe(R.without, R.empty));
+
+export const getIds: (l: {id: string}[]) => string[] = R.map((s) => s.id);

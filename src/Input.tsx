@@ -23,6 +23,7 @@ import Transition from "./transition";
 import State from "./state";
 import Automaton from "./automaton";
 import { alphabetPresets } from './alphabetPreset';
+import { getIds } from './utilities';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -124,8 +125,6 @@ function fixTransitionNextStates(transitions: Transition[], stateIds: string[]):
 }
 
 function reducer(draft: InputState, action: Action) {
-  const stateIds = R.map((s) => s.id, draft.states);
-
   switch (action.type) {
     case "setAlphabetPresetIndex":
       draft.alphabetPresetIndex = action.index;
@@ -146,18 +145,18 @@ function reducer(draft: InputState, action: Action) {
         name: "",
       }, draft.states);
 
-      draft.transitions = fixTransitionCurrentStates(draft.transitions, stateIds);
-      draft.transitions = fixTransitionNextStates(draft.transitions, stateIds);
-      draft.initialStateId = fixInitialStateId(draft.initialStateId, stateIds);
-      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, stateIds);
+      draft.transitions = fixTransitionCurrentStates(draft.transitions, getIds(draft.states));
+      draft.transitions = fixTransitionNextStates(draft.transitions, getIds(draft.states));
+      draft.initialStateId = fixInitialStateId(draft.initialStateId, getIds(draft.states));
+      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, getIds(draft.states));
       return;
     case "removeState":
       draft.states = R.remove(action.index, 1, draft.states);
 
-      draft.transitions = fixTransitionCurrentStates(draft.transitions, stateIds);
-      draft.transitions = fixTransitionNextStates(draft.transitions, stateIds);
-      draft.initialStateId = fixInitialStateId(draft.initialStateId, stateIds);
-      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, stateIds);
+      draft.transitions = fixTransitionCurrentStates(draft.transitions, getIds(draft.states));
+      draft.transitions = fixTransitionNextStates(draft.transitions, getIds(draft.states));
+      draft.initialStateId = fixInitialStateId(draft.initialStateId, getIds(draft.states));
+      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, getIds(draft.states));
       return;
     case "setStateName":
       draft.states[action.index].name = action.name;

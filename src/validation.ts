@@ -7,6 +7,7 @@ import {
   getIds,
   isSubset,
   isUnique,
+  isUniqueList,
 } from "./utilities";
 
 interface Check<T> {
@@ -17,6 +18,7 @@ interface Check<T> {
 interface Errors {
   alphabet: {
     isNonEmpty: Check<boolean>;
+    areSymbolsUnique: Check<boolean>;
   };
   states: {
     areStateNamesNonEmpty: Check<boolean[]>;
@@ -149,7 +151,14 @@ function createHelperTextList(c: Check<boolean[]>): (string | null)[] {
   return R.map((x) => (x ? null : c.message), c.isValid);
 }
 
+function createHelperTextMultiple(checks: Check<boolean>[]): string | null {
+  return R.reduce((h: string | null, c: Check<boolean>) => (
+    h !== null ? R.reduced(h) : createHelperText(c)
+  ), null, checks);
+}
+
 // Same idea as `createErrorStateList`
+// TODO: Use reduce() instead of for loop (?)
 function createHelperTextListMultiple(errors: Check<boolean[]>[]): (string | null)[] {
   let l = createHelperTextList(errors[0]);
   for (let i = 1; i < errors.length; i += 1) {
@@ -174,6 +183,10 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         isValid: !R.isEmpty(alphabet),
         message: "Alphabet cannot be empty",
       },
+      areSymbolsUnique: {
+        isValid: isUnique(alphabet),
+        message: "Alphabet must contain unique symbols",
+      },
     },
     states: {
       isNonEmpty: {
@@ -185,7 +198,7 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         message: "State name cannot be left blank",
       },
       areStateNamesUnique: {
-        isValid: isUnique((s1, s2) => s2.name === s1.name, states),
+        isValid: isUniqueList((s1, s2) => s2.name === s1.name, states),
         message: "State name must be unique",
       },
       exactlyOneInitialState: {
@@ -219,7 +232,7 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         message: "One or more states do not exist",
       },
       areTransitionsUnique: {
-        isValid: isUnique((t1, t2) => (
+        isValid: isUniqueList((t1, t2) => (
           t1.currentState === t2.currentState && t1.symbol === t2.symbol
         ), transitions),
         message: "Transition must be unique",
@@ -274,7 +287,7 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
   // an error
   const errorState: ErrorState = {
     alphabet: {
-      alphabet: !errors.alphabet.isNonEmpty.isValid,
+      alphabet: !errors.alphabet.isNonEmpty.isValid || !errors.alphabet.areSymbolsUnique.isValid,
     },
     states: {
       stateName: createErrorStateList([
@@ -304,7 +317,10 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
   // Same idea as `errorState`
   const helperText: HelperText = {
     alphabet: {
-      alphabet: createHelperText(errors.alphabet.isNonEmpty),
+      alphabet: createHelperTextMultiple([
+        errors.alphabet.isNonEmpty,
+        errors.alphabet.areSymbolsUnique,
+      ]),
     },
     states: {
       stateName: createHelperTextListMultiple([

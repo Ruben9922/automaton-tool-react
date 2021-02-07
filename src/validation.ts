@@ -47,31 +47,6 @@ interface Warnings {
   };
 }
 
-// interface Messages {
-//   alphabet: {
-//     isNonEmpty: string;
-//   };
-//   states: {
-//     areStateNamesNonEmpty: string;
-//     areStateNamesUnique: string;
-//     exactlyOneInitialState: string;
-//     isNonEmpty: string;
-//     atLeastOneFinalState: string;
-//   };
-//   transitions: {
-//     areCurrentStatesNonEmpty: string;
-//     areCurrentStatesValid: string;
-//     areSymbolsNonEmpty: string;
-//     areTransitionsUnique: string;
-//     // statesIsNonEmpty: string;
-//     // alphabetIsNonEmpty: string;
-//     areSymbolsValid: string;
-//     areNextStatesNonEmpty: string;
-//     areNextStatesValid: string;
-//     isNonEmpty: string;
-//   };
-// }
-
 interface Disabled {
   transitions: {
     symbol: Check<boolean[]>;

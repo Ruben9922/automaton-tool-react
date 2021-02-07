@@ -5,6 +5,10 @@ export function findStateById(states: State[], id: string): State | undefined {
   return R.find((state) => state.id === id, states);
 }
 
+export function findStateIndexById(states: State[], id: string): number {
+  return R.findIndex((s) => s.id === id, states);
+}
+
 export function isUnique<T>(l: T[]): boolean {
   return R.equals(l, R.uniq(l));
 }

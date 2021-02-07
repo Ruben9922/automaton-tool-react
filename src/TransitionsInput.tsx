@@ -17,7 +17,7 @@ import clsx from "clsx";
 import * as R from "ramda";
 import Transition from "./transition";
 import State from "./state";
-import { findStateById } from "./utilities";
+import { findStateById, findStateIndexById } from "./utilities";
 import { TransitionsErrorState, TransitionsHelperText } from "./validation";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -141,7 +141,7 @@ export default function TransitionsInput({
                 labelId={`transition-next-states-${transitionIndex + 1}-label`}
                 id={`transition-next-states-${transitionIndex + 1}`}
                 multiple
-                value={transition.nextStates}
+                value={R.sortBy(R.curry(findStateIndexById)(states), transition.nextStates)}
                 onChange={(event) => onNextStatesChange(transitionIndex,
                   event.target.value as string[])}
                 input={<Input id="transition-next-states-select" />}
@@ -151,7 +151,7 @@ export default function TransitionsInput({
                     <div className={classes.chips}>
                       {nextStateIds.map((nextStateId: string) => {
                         const state = findStateById(states, nextStateId) as State;
-                        const stateIndex = states.findIndex((s) => s.id === nextStateId);
+                        const stateIndex = findStateIndexById(states, nextStateId);
                         return (
                           <Chip
                             key={nextStateId}

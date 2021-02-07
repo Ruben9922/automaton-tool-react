@@ -129,12 +129,16 @@ interface AlertText {
 // For single boolean values, can compute error state by doing !(x1 && ... && xn)
 // (each xi is a check)
 // For lists, need to repeat this for each item in the lists
-function createErrorStateList(errors: Check<boolean[]>[], disabled?: Check<boolean[]>): boolean[] {
-  let l = errors[0].isValid;
-  for (let i = 1; i < errors.length; i += 1) {
-    l = R.zipWith((x, y) => x && y, l, errors[i].isValid);
+function createErrorStateList(checks: Check<boolean[]>[], disabled?: Check<boolean[]>): boolean[] {
+  if (R.isEmpty(checks)) {
+    return [];
   }
-  l = R.map((x) => !x, l);
+
+  let l = R.reduce((es: boolean[], c: Check<boolean[]>) => (
+    R.zipWith((x: boolean, y: boolean) => x && y, es, c.isValid)
+  ), (R.head(checks) as Check<boolean[]>).isValid, R.tail(checks));
+
+  l = R.map(R.not, l);
 
   if (disabled !== undefined) {
     l = R.zipWith((x, y) => x && y, disabled.isValid, l);
@@ -158,14 +162,16 @@ function createHelperTextMultiple(checks: Check<boolean>[]): string | null {
 }
 
 // Same idea as `createErrorStateList`
-// TODO: Use reduce() instead of for loop (?)
-function createHelperTextListMultiple(errors: Check<boolean[]>[]): (string | null)[] {
-  let l = createHelperTextList(errors[0]);
-  for (let i = 1; i < errors.length; i += 1) {
-    const helperText = createHelperTextList(errors[i]);
-    l = R.zipWith((x, y) => (x === null ? y : x), l, helperText);
+function createHelperTextListMultiple(checks: Check<boolean[]>[]): (string | null)[] {
+  if (R.isEmpty(checks)) {
+    return [];
   }
-  return l;
+
+  return R.reduce((hs: (string | null)[], c: Check<boolean[]>) => (
+    R.zipWith((x: string | null, y: string | null) => (
+      x === null ? y : x
+    ), hs, createHelperTextList(c))
+  ), createHelperTextList(R.head(checks) as Check<boolean[]>), R.tail(checks));
 }
 
 function createAlertTextList(checks: Check<boolean>[]): string[] {

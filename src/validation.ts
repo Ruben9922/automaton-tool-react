@@ -134,9 +134,11 @@ function createErrorStateList(checks: Check<boolean[]>[], disabled?: Check<boole
     return [];
   }
 
-  let l = R.reduce((es: boolean[], c: Check<boolean[]>) => (
-    R.zipWith((x: boolean, y: boolean) => x && y, es, c.isValid)
-  ), (R.head(checks) as Check<boolean[]>).isValid, R.tail(checks));
+  const checksIsValid = R.map((c: Check<boolean[]>) => c.isValid, checks);
+
+  let l = R.reduce((es: boolean[], c: boolean[]) => (
+    R.zipWith((x: boolean, y: boolean) => x && y, es, c)
+  ), R.head(checksIsValid) as boolean[], R.tail(checksIsValid));
 
   l = R.map(R.not, l);
 
@@ -167,11 +169,13 @@ function createHelperTextListMultiple(checks: Check<boolean[]>[]): (string | nul
     return [];
   }
 
-  return R.reduce((hs: (string | null)[], c: Check<boolean[]>) => (
+  const helperTextLists = R.map(createHelperTextList, checks);
+
+  return R.reduce((hs: (string | null)[], c: (string | null)[]) => (
     R.zipWith((x: string | null, y: string | null) => (
       x === null ? y : x
-    ), hs, createHelperTextList(c))
-  ), createHelperTextList(R.head(checks) as Check<boolean[]>), R.tail(checks));
+    ), hs, c)
+  ), R.head(helperTextLists) as (string | null)[], R.tail(helperTextLists));
 }
 
 function createAlertTextList(checks: Check<boolean>[]): string[] {

@@ -246,7 +246,6 @@ export default function Input({ addAutomaton, openSnackbar }: InputProps) {
   ];
 
   // TODO: Maybe find a better way of doing this
-  // TODO: In validation, use boolean[] instead of List<boolean> (so code below works)
   const countErrors = (errorState1: AlphabetErrorState | StatesErrorState | TransitionsErrorState,
     errorAlertText1: string[]): number => (
     R.length(R.filter((x) => x === true, R.flatten([R.values(errorState1)])))

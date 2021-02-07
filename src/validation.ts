@@ -135,10 +135,11 @@ function createErrorStateList(checks: Check<boolean[]>[], disabled?: Check<boole
   }
 
   const checksIsValid = R.map((c: Check<boolean[]>) => c.isValid, checks);
+  const identity = R.map(R.T, checksIsValid);
 
   let l = R.reduce((es: boolean[], c: boolean[]) => (
     R.zipWith((x: boolean, y: boolean) => x && y, es, c)
-  ), R.head(checksIsValid) as boolean[], R.tail(checksIsValid));
+  ), identity, checksIsValid);
 
   l = R.map(R.not, l);
 
@@ -170,12 +171,13 @@ function createHelperTextListMultiple(checks: Check<boolean[]>[]): (string | nul
   }
 
   const helperTextLists = R.map(createHelperTextList, checks);
+  const identity = R.map(() => null, helperTextLists);
 
   return R.reduce((hs: (string | null)[], c: (string | null)[]) => (
     R.zipWith((x: string | null, y: string | null) => (
       x === null ? y : x
     ), hs, c)
-  ), R.head(helperTextLists) as (string | null)[], R.tail(helperTextLists));
+  ), identity, helperTextLists);
 }
 
 function createAlertTextList(checks: Check<boolean>[]): string[] {

@@ -58,7 +58,7 @@ type InputState = {
   finalStateIds: string[];
 };
 
-export type Action =
+type Action =
   | { type: "setAlphabetPresetIndex", index: number | "" }
   | { type: "setAlphabet", alphabetString: string }
   | { type: "addState" }

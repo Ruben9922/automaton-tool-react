@@ -25,25 +25,38 @@ interface SnackbarMessage {
   message: string;
 }
 
-const messages: Record<string, string> = {
-  automatonAdded: "Automaton created",
-  automatonDeleted: "Automaton deleted",
-  stateDeleted: "State deleted",
-};
-
 export default function App() {
   const classes = useStyles();
 
+  // TODO: Use useReducer hook
   const [automata, setAutomata] = React.useState<Automaton[]>([]);
+  const [snackbarQueue, setSnackbarQueue] = React.useState<SnackbarMessage[]>([]);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState<SnackbarMessage | null>(null);
 
+  const messages: Record<string, string> = {
+    automatonAdded: "Automaton created",
+    automatonDeleted: "Automaton deleted",
+    stateDeleted: "State deleted",
+  };
+
+  React.useEffect((): void => {
+    if (!R.isEmpty(snackbarQueue) && snackbar === null) {
+      // Set a new snack when we don't have an active one
+      setSnackbar(R.head(snackbarQueue) as SnackbarMessage);
+      setSnackbarQueue((prevSnackbarQueue) => R.tail(prevSnackbarQueue));
+      setSnackbarOpen(true);
+    } else if (!R.isEmpty(snackbarQueue) && snackbar !== null && snackbarOpen) {
+      // Close an active snack when a new one is added
+      setSnackbarOpen(false);
+    }
+  }, [snackbarQueue, snackbar, snackbarOpen]);
+
   const handleSnackbarOpen = (key: string) => (): void => {
-    setSnackbar({
+    setSnackbarQueue((prevSnackPack) => R.append({
       id: uuidv4(),
       message: messages[key],
-    });
-    setSnackbarOpen(true);
+    }, prevSnackPack));
   };
 
   const handleSnackbarClose = (event: object | React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -83,12 +96,12 @@ export default function App() {
           </Route>
         </Switch>
         <Snackbar
-          key={snackbar !== null ? snackbar.id : null}
+          key={snackbar ? snackbar.id : null}
           open={snackbarOpen}
           autoHideDuration={6000}
           onClose={handleSnackbarClose}
           onExited={handleSnackbarExited}
-          message={snackbar !== null ? snackbar.message : null}
+          message={snackbar ? snackbar.message : null}
           action={(
             <>
               <Button color="secondary" size="small" onClick={handleSnackbarClose}>

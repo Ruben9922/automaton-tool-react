@@ -10,14 +10,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Button from "@material-ui/core/Button";
 import * as R from "ramda";
 import Automaton from "./automaton";
+import Dialog from "./Dialog";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -42,10 +37,6 @@ export default function Home({ automata, onAutomataChange, openSnackbar }: HomeP
   const handleRemoveAutomatonClick = (index: number): void => {
     setAutomatonDeleteIndex(index);
     setDialogOpen(true);
-  };
-
-  const handleDialogClose = (): void => {
-    setDialogOpen(false);
   };
 
   const handleDialogConfirmClick = (): void => {
@@ -93,25 +84,24 @@ export default function Home({ automata, onAutomataChange, openSnackbar }: HomeP
       </Link>
       <Dialog
         open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Delete automaton?</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`Are you sure you wish to permanently delete Automaton ${automatonDeleteIndex! + 1}? This cannot be undone.`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDialogConfirmClick} color="primary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        setOpen={setDialogOpen}
+        title="Delete automaton?"
+        message={`Are you sure you wish to permanently delete Automaton ${automatonDeleteIndex! + 1}? This cannot be undone.`}
+        buttons={[
+          {
+            content: "Cancel",
+            onClick: () => setDialogOpen(false),
+            color: "primary",
+            autoFocus: false,
+          },
+          {
+            content: "Delete",
+            onClick: handleDialogConfirmClick,
+            color: "primary",
+            autoFocus: true,
+          },
+        ]}
+      />
     </>
   );
 }

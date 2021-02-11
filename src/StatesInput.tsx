@@ -173,6 +173,7 @@ export default function StatesInput({
           {
             content: "State and transitions",
             onClick: () => {
+              // TODO: Maybe merge this into one action (?)
               onRemoveIncidentTransitions((stateDelete as State).id);
               onRemoveState(stateDeleteIndex as number);
               setDialogOpen(false);

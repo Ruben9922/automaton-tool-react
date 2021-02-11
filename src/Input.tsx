@@ -238,9 +238,11 @@ export default function Input({
       helperText={helperText.states}
       errorAlertText={errorAlertText.states}
       warningAlertText={warningAlertText.states}
-      openStateDeletedSnackbar={openStateDeletedSnackbar}
       onAddState={() => dispatch({ type: "addState" })}
-      onRemoveState={(index) => dispatch({ type: "removeState", index })}
+      onRemoveState={(index) => {
+        dispatch({ type: "removeState", index });
+        openStateDeletedSnackbar();
+      }}
       onRemoveIncidentTransitions={(stateId) => dispatch({ type: "removeIncidentTransitions", stateId })}
       onSetStateName={(index, name) => dispatch({ type: "setStateName", index, name })}
       onSetInitialStateId={(id) => dispatch({ type: "setInitialStateId", id })}

@@ -48,6 +48,7 @@ type InputProps = {
   addAutomaton: (automaton: Automaton) => void;
   openAutomatonAddedSnackbar: () => void;
   openStateDeletedSnackbar: () => void;
+  openTransitionDeletedSnackbar: () => void;
 };
 
 type InputState = {
@@ -205,6 +206,7 @@ export default function Input({
   addAutomaton,
   openAutomatonAddedSnackbar,
   openStateDeletedSnackbar,
+  openTransitionDeletedSnackbar,
 }: InputProps) {
   const classes = useStyles();
 
@@ -252,7 +254,10 @@ export default function Input({
       helperText={helperText.transitions}
       warningAlertText={warningAlertText.transitions}
       onAddTransition={() => dispatch({ type: "addTransition" })}
-      onRemoveTransition={(index) => dispatch({ type: "removeTransition", index })}
+      onRemoveTransition={(index) => {
+        dispatch({ type: "removeTransition", index });
+        openTransitionDeletedSnackbar();
+      }}
       onCurrentStateChange={(index, stateId) => dispatch({ type: "currentStateChange", index, stateId })}
       onSymbolChange={(index, symbol) => dispatch({ type: "symbolChange", index, symbol })}
       onNextStatesChange={(index, stateIds) => dispatch({ type: "nextStatesChange", index, stateIds })}

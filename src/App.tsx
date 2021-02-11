@@ -16,6 +16,7 @@ const messages: Record<string, string> = {
   automatonAdded: "Automaton created",
   automatonDeleted: "Automaton deleted",
   stateDeleted: "State deleted",
+  transitionDeleted: "Transition deleted",
 };
 
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
               addAutomaton={addAutomaton}
               openAutomatonAddedSnackbar={handleSnackbarOpen("automatonAdded")}
               openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}
+              openTransitionDeletedSnackbar={handleSnackbarOpen("transitionDeleted")}
             />
           </Route>
         </Switch>

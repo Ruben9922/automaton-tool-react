@@ -68,6 +68,7 @@ type Action =
   | { type: "setFinalStateIds", id: string, isFinal: boolean }
   | { type: "addTransition" }
   | { type: "removeTransition", index: number }
+  | { type: "removeIncidentTransitions", stateId: string }
   | { type: "currentStateChange", index: number, stateId: string }
   | { type: "symbolChange", index: number, symbol: string }
   | { type: "nextStatesChange", index: number, stateIds: string[] };
@@ -180,6 +181,11 @@ function reducer(draft: InputState, action: Action) {
     case "removeTransition":
       draft.transitions = R.remove(action.index, 1, draft.transitions);
       return;
+    case "removeIncidentTransitions":
+      draft.transitions = R.filter((t: Transition) => (
+        t.currentState !== action.stateId && !R.includes(action.stateId, t.nextStates)
+      ), draft.transitions);
+      return;
     case "currentStateChange":
       draft.transitions[action.index].currentState = action.stateId;
       return;
@@ -218,6 +224,7 @@ export default function Input({ addAutomaton, openSnackbar }: InputProps) {
     />,
     <StatesInput
       states={state.states}
+      transitions={state.transitions}
       initialStateId={state.initialStateId}
       finalStateIds={state.finalStateIds}
       errorState={errorState.states}
@@ -226,6 +233,7 @@ export default function Input({ addAutomaton, openSnackbar }: InputProps) {
       warningAlertText={warningAlertText.states}
       onAddState={() => dispatch({ type: "addState" })}
       onRemoveState={(index) => dispatch({ type: "removeState", index })}
+      onRemoveIncidentTransitions={(stateId) => dispatch({ type: "removeIncidentTransitions", stateId })}
       onSetStateName={(index, name) => dispatch({ type: "setStateName", index, name })}
       onSetInitialStateId={(id) => dispatch({ type: "setInitialStateId", id })}
       onSetFinalStateIds={(id, isFinal) => dispatch({ type: "setFinalStateIds", id, isFinal })}

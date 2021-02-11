@@ -13,6 +13,8 @@ import AlertTitle from "@material-ui/lab/AlertTitle";
 import * as R from "ramda";
 import State from "./state";
 import { StatesErrorState, StatesHelperText } from "./validation";
+import Dialog from "./Dialog";
+import Transition from "./transition";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -29,6 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type StatesInputProps = {
   states: State[];
+  transitions: Transition[];
   initialStateId: string;
   finalStateIds: string[];
   errorState: StatesErrorState;
@@ -37,6 +40,7 @@ type StatesInputProps = {
   warningAlertText: string[];
   onAddState: () => void;
   onRemoveState: (index: number) => void;
+  onRemoveIncidentTransitions: (stateId: string) => void;
   onSetStateName: (index: number, name: string) => void;
   onSetInitialStateId: (id: string) => void;
   onSetFinalStateIds: (id: string, isFinal: boolean) => void;
@@ -44,6 +48,7 @@ type StatesInputProps = {
 
 export default function StatesInput({
   states,
+  transitions,
   initialStateId,
   finalStateIds,
   errorState,
@@ -52,11 +57,16 @@ export default function StatesInput({
   warningAlertText,
   onAddState,
   onRemoveState,
+  onRemoveIncidentTransitions,
   onSetStateName,
   onSetInitialStateId,
   onSetFinalStateIds,
 }: StatesInputProps) {
   const classes = useStyles();
+
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [stateDeleteIndex, setStateDeleteIndex] = React.useState<number | null>(null);
+  const [stateDelete, setStateDelete] = React.useState<State | null>(null);
 
   return (
     <>
@@ -92,7 +102,24 @@ export default function StatesInput({
               label="Final"
             />
             <Tooltip title={`Delete State ${index + 1}`}>
-              <IconButton onClick={() => onRemoveState(index)} aria-label="delete">
+              <IconButton
+                onClick={() => {
+                  const isUsedInTransitions = R.includes(state.id, R.chain((t: Transition) => (
+                    R.append(t.currentState, t.nextStates)
+                  ), transitions));
+
+                  if (isUsedInTransitions) {
+                    // Show dialog asking whether to remove incident transitions as well
+                    setStateDelete(state);
+                    setStateDeleteIndex(index);
+                    setDialogOpen(true);
+                  } else {
+                    // Just remove the state
+                    onRemoveState(index);
+                  }
+                }}
+                aria-label="delete"
+              >
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -122,6 +149,39 @@ export default function StatesInput({
           </ul>
         </Alert>
       )}
+      <Dialog
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        title="Delete incident transitions?"
+        message="One or more transitions refer to this state, so deleting this state may make these transitions invalid. Should these incident transitions be deleted?"
+        buttons={[
+          {
+            content: "Cancel",
+            onClick: () => setDialogOpen(false),
+            color: "primary",
+            autoFocus: false,
+          },
+          {
+            content: "State only",
+            onClick: () => {
+              onRemoveState(stateDeleteIndex as number);
+              setDialogOpen(false);
+            },
+            color: "primary",
+            autoFocus: false,
+          },
+          {
+            content: "State and transitions",
+            onClick: () => {
+              onRemoveIncidentTransitions((stateDelete as State).id);
+              onRemoveState(stateDeleteIndex as number);
+              setDialogOpen(false);
+            },
+            color: "primary",
+            autoFocus: true,
+          },
+        ]}
+      />
     </>
   );
 }

@@ -16,7 +16,7 @@ import AlertTitle from "@material-ui/lab/AlertTitle";
 import clsx from "clsx";
 import * as R from "ramda";
 import Transition from "./transition";
-import State from "./state";
+import State, { createStateDisplayName } from "./state";
 import { findStateById, findStateIndexById } from "./utilities";
 import { TransitionsErrorState, TransitionsHelperText } from "./validation";
 
@@ -74,12 +74,6 @@ export default function TransitionsInput({
   onNextStatesChange,
 }: TransitionsInputProps) {
   const classes = useStyles();
-
-  const generatePlaceholderStateName = (index: number): string => `[State ${index + 1}]`;
-
-  const createStateDisplayName = (state: State, index: number): string => (
-    state.name === "" ? generatePlaceholderStateName(index) : state.name
-  );
 
   return (
     <>

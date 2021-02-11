@@ -38,6 +38,7 @@ type StatesInputProps = {
   helperText: StatesHelperText;
   errorAlertText: string[];
   warningAlertText: string[];
+  openStateDeletedSnackbar: () => void;
   onAddState: () => void;
   onRemoveState: (index: number) => void;
   onRemoveIncidentTransitions: (stateId: string) => void;
@@ -55,6 +56,7 @@ export default function StatesInput({
   helperText,
   errorAlertText,
   warningAlertText,
+  openStateDeletedSnackbar,
   onAddState,
   onRemoveState,
   onRemoveIncidentTransitions,
@@ -116,6 +118,7 @@ export default function StatesInput({
                   } else {
                     // Just remove the state
                     onRemoveState(index);
+                    openStateDeletedSnackbar();
                   }
                 }}
                 aria-label="delete"
@@ -165,6 +168,7 @@ export default function StatesInput({
             content: "State only",
             onClick: () => {
               onRemoveState(stateDeleteIndex as number);
+              openStateDeletedSnackbar();
               setDialogOpen(false);
             },
             color: "primary",
@@ -176,6 +180,7 @@ export default function StatesInput({
               // TODO: Maybe merge this into one action (?)
               onRemoveIncidentTransitions((stateDelete as State).id);
               onRemoveState(stateDeleteIndex as number);
+              openStateDeletedSnackbar();
               setDialogOpen(false);
             },
             color: "primary",

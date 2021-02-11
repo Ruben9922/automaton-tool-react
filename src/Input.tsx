@@ -46,7 +46,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type InputProps = {
   addAutomaton: (automaton: Automaton) => void;
-  openSnackbar: () => void;
+  openAutomatonAddedSnackbar: () => void;
+  openStateDeletedSnackbar: () => void;
 };
 
 type InputState = {
@@ -200,7 +201,11 @@ function reducer(draft: InputState, action: Action) {
   }
 }
 
-export default function Input({ addAutomaton, openSnackbar }: InputProps) {
+export default function Input({
+  addAutomaton,
+  openAutomatonAddedSnackbar,
+  openStateDeletedSnackbar,
+}: InputProps) {
   const classes = useStyles();
 
   const history = useHistory();
@@ -231,6 +236,7 @@ export default function Input({ addAutomaton, openSnackbar }: InputProps) {
       helperText={helperText.states}
       errorAlertText={errorAlertText.states}
       warningAlertText={warningAlertText.states}
+      openStateDeletedSnackbar={openStateDeletedSnackbar}
       onAddState={() => dispatch({ type: "addState" })}
       onRemoveState={(index) => dispatch({ type: "removeState", index })}
       onRemoveIncidentTransitions={(stateId) => dispatch({ type: "removeIncidentTransitions", stateId })}
@@ -313,7 +319,7 @@ export default function Input({ addAutomaton, openSnackbar }: InputProps) {
       state.initialStateId, state.finalStateIds);
     addAutomaton(automaton);
     history.push("/");
-    openSnackbar();
+    openAutomatonAddedSnackbar();
   };
 
   return (

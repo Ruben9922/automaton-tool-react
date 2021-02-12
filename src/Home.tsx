@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -65,12 +66,14 @@ export default function Home({ automata, onAutomataChange, openSnackbar }: HomeP
                   primary={`Automaton ${index + 1}`}
                   secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
                 />
+                <ListItemSecondaryAction>
+                  <Tooltip title={`Delete Automaton ${index + 1}`}>
+                    <IconButton onClick={() => handleRemoveAutomatonClick(index)} aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </ListItemSecondaryAction>
               </ListItem>
-              <Tooltip title={`Delete Automaton ${index + 1}`}>
-                <IconButton onClick={() => handleRemoveAutomatonClick(index)} aria-label="delete">
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
             </React.Fragment>
           ))}
         </List>

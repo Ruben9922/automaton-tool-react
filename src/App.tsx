@@ -46,9 +46,7 @@ export default function App() {
               openSnackbar={handleSnackbarOpen("automatonDeleted")}
             />
           </Route>
-          <Route path="/view">
-            <View />
-          </Route>
+          <Route path="/automaton/:automatonIndex" component={View} />
           <Route path="/create">
             <Input
               addAutomaton={addAutomaton}

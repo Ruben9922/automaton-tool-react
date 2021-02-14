@@ -171,7 +171,7 @@ export default function View({ automata }: ViewProps) {
             <TableBody>
               {automaton.states.map((currentState: State) => (
                 <TableRow key={currentState.id}>
-                  <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row" variant="head">
                     {currentState.name}
                   </TableCell>
                   {automaton.alphabet.map((symbol: string, index: number) => (

@@ -1,5 +1,9 @@
 import Chip from "@material-ui/core/Chip";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Paper from "@material-ui/core/Paper";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -13,6 +17,8 @@ import * as R from "ramda";
 import React from "react";
 import { useParams } from "react-router-dom";
 import Automaton from "./automaton";
+import State from "./state";
+import TransitionFunctionKey from "./transitionFunctionKey";
 import { allValid, Check, createHelperTextMultiple } from "./validation";
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +35,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+type TransitionView = "transitions" | "transitionFunction";
+
 type ViewParams = {
   id: string;
 };
@@ -39,6 +47,8 @@ type ViewProps = {
 
 export default function View({ automata }: ViewProps) {
   const classes = useStyles();
+
+  const [transitionsView, setTransitionsView] = React.useState<TransitionView>("transitions");
 
   // Processing parameters
   const params = useParams<ViewParams>();
@@ -93,41 +103,98 @@ export default function View({ automata }: ViewProps) {
       <Typography variant="h6" component="h2" gutterBottom>
         Transitions
       </Typography>
-      <TableContainer component={Paper}>
-        <Table aria-label="simple table" size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Current state</TableCell>
-              <TableCell>Symbol</TableCell>
-              <TableCell>Next states</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.from(automaton.transitionFunction,
-              ([{ currentState, symbol }, nextStates], transitionIndex) => (
-                <TableRow key={transitionIndex}>
-                  <TableCell>
+      <FormControl component="fieldset">
+        <RadioGroup
+          row
+          aria-label="transitionsView"
+          name="transitionsView"
+          value={transitionsView}
+          onChange={(event) => setTransitionsView(event.target.value as TransitionView)}
+        >
+          <FormControlLabel
+            value="transitions"
+            control={<Radio />}
+            label="Transitions view"
+          />
+          <FormControlLabel
+            value="transitionFunction"
+            control={<Radio />}
+            label="Transition function view"
+          />
+        </RadioGroup>
+      </FormControl>
+      {transitionsView !== "transitionFunction" ? (
+        <TableContainer component={Paper}>
+          <Table aria-label="transitions" size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Current state</TableCell>
+                <TableCell>Symbol</TableCell>
+                <TableCell>Next states</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Array.from(automaton.transitionFunction.values())
+                .map(({ currentState, symbol, nextStates }, transitionIndex) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <TableRow key={transitionIndex}>
+                    <TableCell>
+                      {currentState.name}
+                    </TableCell>
+                    <TableCell>{symbol}</TableCell>
+                    <TableCell>
+                      {nextStates.map((state) => (
+                        <Chip
+                          key={state.id}
+                          label={state.name}
+                          className={classes.chip}
+                        />
+                      ))}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table aria-label="transition function" size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell />
+                {automaton.alphabet.map((symbol: string, index: number) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <TableCell key={index}>{symbol}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {automaton.states.map((currentState: State) => (
+                <TableRow key={currentState.id}>
+                  <TableCell component="th" scope="row">
                     {currentState.name}
                   </TableCell>
-                  <TableCell>{symbol}</TableCell>
-                  <TableCell>
-                    {/* <Paper component="ul" className={classes.root}> */}
-                    {nextStates.map((state) => (
-                      // <li >
-                      <Chip
-                        key={state.id}
-                        label={state.name}
-                        className={classes.chip}
-                      />
-                      // </li>
-                    ))}
-                    {/* </Paper> */}
-                  </TableCell>
+                  {automaton.alphabet.map((symbol: string, index: number) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <TableCell key={index}>
+                      {automaton.transitionFunction.get(new TransitionFunctionKey(
+                        currentState.id,
+                        symbol,
+                      ).toString())?.nextStates.map((nextState) => (
+                        <Chip
+                          key={nextState.id}
+                          label={nextState.name}
+                          className={classes.chip}
+                        />
+                      ))}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </>
   ) : (
     <Alert severity="error">

@@ -157,43 +157,49 @@ export default function View({ automata }: ViewProps) {
           </Table>
         </TableContainer>
       ) : (
-        <TableContainer component={Paper}>
-          <Table aria-label="transition function" size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                {automaton.alphabet.map((symbol: string, index: number) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <TableCell key={index}>{symbol}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {automaton.states.map((currentState: State) => (
-                <TableRow key={currentState.id}>
-                  <TableCell component="th" scope="row" variant="head">
-                    {currentState.name}
-                  </TableCell>
+        <>
+          <TableContainer component={Paper}>
+            <Table aria-label="transition function" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell />
                   {automaton.alphabet.map((symbol: string, index: number) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <TableCell key={index}>
-                      {automaton.transitionFunction.get(new TransitionFunctionKey(
-                        currentState.id,
-                        symbol,
-                      ).toString())?.nextStates.map((nextState) => (
-                        <Chip
-                          key={nextState.id}
-                          label={nextState.name}
-                          className={classes.chip}
-                        />
-                      ))}
-                    </TableCell>
+                    <TableCell key={index}>{symbol}</TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {automaton.states.map((currentState: State) => (
+                  <TableRow key={currentState.id}>
+                    <TableCell component="th" scope="row" variant="head">
+                      {currentState.name}
+                    </TableCell>
+                    {automaton.alphabet.map((symbol: string, index: number) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <TableCell key={index}>
+                        {automaton.transitionFunction.get(new TransitionFunctionKey(
+                          currentState.id,
+                          symbol,
+                        ).toString())?.nextStates.map((nextState) => (
+                          <Chip
+                            key={nextState.id}
+                            label={nextState.name}
+                            className={classes.chip}
+                          />
+                        ))}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <p>
+            The rows correspond to the current state; the columns correspond to the symbol. Each
+            cell contains the next states for the given current state and symbol.
+          </p>
+        </>
       )}
     </>
   ) : (

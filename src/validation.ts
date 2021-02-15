@@ -10,7 +10,7 @@ import {
   isUniqueList,
 } from "./utilities";
 
-export interface Check<T> {
+interface Check<T> {
   isValid: T;
   message: string;
 }
@@ -133,7 +133,7 @@ function createHelperTextList(c: Check<boolean[]>): (string | null)[] {
   return R.map((x) => (x ? null : c.message), c.isValid);
 }
 
-export function createHelperTextMultiple(checks: Check<boolean>[]): string | null {
+function createHelperTextMultiple(checks: Check<boolean>[]): string | null {
   return R.reduce((h: string | null, c: Check<boolean>) => (
     h !== null ? R.reduced(h) : createHelperText(c)
   ), null, checks);
@@ -160,9 +160,9 @@ function createAlertTextList(checks: Check<boolean>[]): string[] {
     R.map((c) => (c.isValid ? null : c.message), checks)) as string[];
 }
 
-export function allValid(checks: Record<string, Check<boolean>>): boolean {
-  return R.all((e: Check<boolean>) => e.isValid, R.values(checks));
-}
+// export function allValid(checks: Record<string, Check<boolean>>): boolean {
+//   return R.all((e: Check<boolean>) => e.isValid, R.values(checks));
+// }
 
 export function validate(alphabet: string[], states: State[], transitions: Transition[],
   initialStateId: string, finalStateIds: string[]) {

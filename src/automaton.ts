@@ -65,4 +65,13 @@ export default class Automaton {
 
       return transitionFunction;
     };
+
+  // static transitionFunctionToTransitions(transitionFunction: TransitionFunction): Transition[] {
+  //   return Array.from(transitionFunction.values()).map((t) => ({
+  //     id: uuidv4(), // TODO: not needed in database (?)
+  //     currentState: t.currentState.id,
+  //     symbol: t.symbol,
+  //     nextStates: t.nextStates.map((s: State) => s.id),
+  //   }));
+  // }
 }

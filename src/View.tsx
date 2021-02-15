@@ -13,13 +13,14 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
-import * as R from "ramda";
+import firebase from "firebase";
 import React from "react";
+import { useObjectVal } from "react-firebase-hooks/database";
 import { useParams } from "react-router-dom";
 import Automaton from "./automaton";
+import Loader from "./Loader";
 import State from "./state";
 import TransitionFunctionKey from "./transitionFunctionKey";
-import { allValid, Check, createHelperTextMultiple } from "./validation";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,34 +42,66 @@ type ViewParams = {
   id: string;
 };
 
-type ViewProps = {
-  automata: Automaton[];
-};
+// type ViewProps = {
+//   automata: any;
+// };
 
-export default function View({ automata }: ViewProps) {
+export default function View() {
   const classes = useStyles();
+
+  const params = useParams<ViewParams>();
+
+  // TODO: Pass as prop instead
+  const automataRef = firebase.database().ref("automata");
+  const [value, loading, error] = useObjectVal(automataRef.child(params.id));
 
   const [transitionsView, setTransitionsView] = React.useState<TransitionView>("transitions");
 
   // Processing parameters
-  const params = useParams<ViewParams>();
-  const parsedParams = { id: parseInt(params.id, 10) };
-  const errors: Record<string, Check<boolean>> = {
-    isIdValidInteger: {
-      isValid: !Number.isNaN(parsedParams.id),
-      message: "Automaton ID must be a valid integer",
-    },
-    isIdValidIndex: {
-      isValid: R.has(parsedParams.id.toString(), automata),
-      message: "Automaton ID does not refer to a valid automaton",
-    },
-  };
-  const valid = allValid(errors);
-  const alertText = createHelperTextMultiple(R.values(errors));
+  // const parsedParams = { id: parseInt(params.id, 10) };
+  // const errors: Record<string, Check<boolean>> = {
+  //   // isIdValidInteger: {
+  //   //   isValid: !Number.isNaN(parsedParams.id),
+  //   //   message: "Automaton ID must be a valid integer",
+  //   // },
+  //   isIdValidIndex: {
+  //     isValid: automataRef.child(params.id).exis,
+  //     message: "Automaton ID does not refer to a valid automaton",
+  //   },
+  // };
+  // const valid = allValid(errors);
+  // const alertText = createHelperTextMultiple(R.values(errors));
 
-  const automaton = automata[parsedParams.id];
+  if (error) {
+    return (
+      <Alert severity="error">
+        {error}
+      </Alert>
+    );
+  }
 
-  return valid ? (
+  if (value == null) {
+    return (
+      <Alert severity="error">
+        Automaton not found
+      </Alert>
+    );
+  }
+
+  // TODO: Can remove after passing automata as prop
+  if (loading) {
+    return <Loader />;
+  }
+
+  const automaton = Automaton.createAutomaton(
+    (value as any).alphabet,
+    (value as any).states,
+    (value as any).transitions,
+    (value as any).initialStateId,
+    (value as any).finalStateIds,
+  );
+
+  return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>
         Automaton
@@ -202,9 +235,5 @@ export default function View({ automata }: ViewProps) {
         </>
       )}
     </>
-  ) : (
-    <Alert severity="error">
-      {alertText}
-    </Alert>
   );
 }

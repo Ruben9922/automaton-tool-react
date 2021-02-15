@@ -21,9 +21,9 @@ import {
 } from "./validation";
 import Transition from "./transition";
 import State from "./state";
-import Automaton from "./automaton";
 import { alphabetPresets } from './alphabetPreset';
 import { getIds } from './utilities';
+import firebase from './firebase';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type InputProps = {
-  addAutomaton: (automaton: Automaton) => void;
+  // addAutomaton: (automaton: Automaton) => void;
   openAutomatonAddedSnackbar: () => void;
   openStateDeletedSnackbar: () => void;
   openTransitionDeletedSnackbar: () => void;
@@ -203,7 +203,7 @@ function reducer(draft: InputState, action: Action) {
 }
 
 export default function Input({
-  addAutomaton,
+  // addAutomaton,
   openAutomatonAddedSnackbar,
   openStateDeletedSnackbar,
   openTransitionDeletedSnackbar,
@@ -322,9 +322,20 @@ export default function Input({
   const handleStep = (stepIndex: number) => (): void => setActiveStepIndex(stepIndex);
 
   const handleFinish = (): void => {
-    const automaton = Automaton.createAutomaton(state.alphabet, state.states, state.transitions,
-      state.initialStateId, state.finalStateIds);
-    addAutomaton(automaton);
+    // const automaton = Automaton.createAutomaton(state.alphabet, state.states, state.transitions,
+    //   state.initialStateId, state.finalStateIds);
+    // addAutomaton(automaton);
+
+    // Add to database
+    const automataRef = firebase.database().ref("automata");
+    automataRef.push({
+      alphabet: state.alphabet,
+      states: state.states,
+      transitions: state.transitions,
+      initialStateId: state.initialStateId,
+      finalStateIds: state.finalStateIds,
+    });
+
     history.push("/");
     openAutomatonAddedSnackbar();
   };

@@ -5,6 +5,8 @@ import * as R from 'ramda';
 import { v4 as uuidv4 } from "uuid";
 import { useList } from 'react-firebase-hooks/database';
 import firebase from 'firebase';
+import Alert from '@material-ui/lab/Alert';
+import Link from '@material-ui/core/Link';
 import Input from "./Input";
 import View from "./View";
 import Home from "./Home";
@@ -36,15 +38,18 @@ export default function App() {
   //   setAutomata((prevAutomata) => R.append(automaton, prevAutomata))
   // );
 
-  if (error) {
-    return <p>Error</p>;
-  }
-
   return (
     <Router>
       <Header />
       <Container maxWidth="md">
-        {loading ? <Loader /> : (
+        {error && (
+          <Alert severity="error">
+            Error: Failed to load data. Try reloading the page. If it persists, please <Link href="https://github.com/Ruben9922/automaton-tool-react/issues">create a new issue</Link>.
+            Error code: {error.code}.
+          </Alert>
+        )}
+        {loading && <Loader />}
+        {!loading && automata && (
           <Switch>
             <Route exact path="/">
               <Home

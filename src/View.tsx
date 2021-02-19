@@ -13,12 +13,9 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
-import firebase from "firebase";
 import React from "react";
-import { useObjectVal } from "react-firebase-hooks/database";
 import { useParams } from "react-router-dom";
 import Automaton from "./automaton";
-import Loader from "./Loader";
 import State from "./state";
 import TransitionFunctionKey from "./transitionFunctionKey";
 
@@ -42,20 +39,26 @@ type ViewParams = {
   id: string;
 };
 
-// type ViewProps = {
-//   automata: any;
-// };
+type ViewProps = {
+  automata: any;
+};
 
-export default function View() {
+export default function View({ automata }: ViewProps) {
   const classes = useStyles();
 
   const params = useParams<ViewParams>();
 
-  // TODO: Pass as prop instead
-  const automataRef = firebase.database().ref("automata");
-  const [value, loading, error] = useObjectVal(automataRef.child(params.id));
-
   const [transitionsView, setTransitionsView] = React.useState<TransitionView>("transitions");
+
+  if (!automata.hasChild(params.id)) {
+    return (
+      <Alert severity="error">
+        Automaton not found
+      </Alert>
+    );
+  }
+
+  const value = automata.child(params.id).val();
 
   // Processing parameters
   // const parsedParams = { id: parseInt(params.id, 10) };
@@ -72,33 +75,12 @@ export default function View() {
   // const valid = allValid(errors);
   // const alertText = createHelperTextMultiple(R.values(errors));
 
-  if (error) {
-    return (
-      <Alert severity="error">
-        {error}
-      </Alert>
-    );
-  }
-
-  if (value == null) {
-    return (
-      <Alert severity="error">
-        Automaton not found
-      </Alert>
-    );
-  }
-
-  // TODO: Can remove after passing automata as prop
-  if (loading) {
-    return <Loader />;
-  }
-
   const automaton = Automaton.createAutomaton(
-    (value as any).alphabet,
-    (value as any).states,
-    (value as any).transitions,
-    (value as any).initialStateId,
-    (value as any).finalStateIds,
+    value.alphabet,
+    value.states,
+    value.transitions,
+    value.initialStateId,
+    value.finalStateIds,
   );
 
   return (

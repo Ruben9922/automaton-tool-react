@@ -12,7 +12,6 @@ import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import * as R from "ramda";
-import firebase from "firebase";
 import Dialog from "./Dialog";
 import Automaton from "./automaton";
 
@@ -46,8 +45,7 @@ export default function Home({
   };
 
   const handleDialogConfirmClick = (): void => {
-    const automataRef = firebase.database().ref("automata");
-    automataRef.child(automatonDeleteId).remove();
+    automata.child(automatonDeleteId).remove();
 
     openSnackbar();
     setDialogOpen(false);
@@ -66,19 +64,18 @@ export default function Home({
         </>
       ) : (
         <List>
-          {automata.map((v: any, index: number) => {
-            const x = v.val();
+          {Object.entries(automata.val()).map(([key, v], index: number) => {
             const automaton = Automaton.createAutomaton(
-              x.alphabet,
-              x.states,
-              x.transitions,
-              x.initialStateId,
-              x.finalStateIds,
+              (v as any).alphabet,
+              (v as any).states,
+              (v as any).transitions,
+              (v as any).initialStateId,
+              (v as any).finalStateIds,
             );
 
             return (
-              <React.Fragment key={v.key}>
-                <Link to={`/automaton/${v.key}`}>
+              <React.Fragment key={key}>
+                <Link to={`/automaton/${key}`}>
                   <ListItem button>
                     <ListItemText
                       primary={`Automaton ${index + 1}`}
@@ -86,7 +83,7 @@ export default function Home({
                     />
                     <ListItemSecondaryAction>
                       <Tooltip title={`Delete Automaton ${index + 1}`}>
-                        <IconButton onClick={() => handleRemoveAutomatonClick(v.key)} aria-label="delete">
+                        <IconButton onClick={() => handleRemoveAutomatonClick(key)} aria-label="delete">
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>

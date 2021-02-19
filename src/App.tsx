@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Container from "@material-ui/core/Container";
 import * as R from 'ramda';
 import { v4 as uuidv4 } from "uuid";
-import { useList } from 'react-firebase-hooks/database';
+import { useObject } from 'react-firebase-hooks/database';
 import firebase from 'firebase';
 import Alert from '@material-ui/lab/Alert';
 import Link from '@material-ui/core/Link';
@@ -24,7 +24,7 @@ const messages: Record<string, string> = {
 };
 
 export default function App() {
-  const [automata, loading, error] = useList(firebase.database().ref("automata"));
+  const [automata, loading, error] = useObject(firebase.database().ref("automata"));
   const [snackbarQueue, setSnackbarQueue] = React.useState<SnackbarMessage[]>([]);
 
   const handleSnackbarOpen = (key: string) => (): void => {
@@ -59,7 +59,7 @@ export default function App() {
               />
             </Route>
             <Route path="/automaton/:id">
-              <View />
+              <View automata={automata} />
             </Route>
             <Route path="/create">
               <Input

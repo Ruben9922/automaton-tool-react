@@ -334,6 +334,7 @@ export default function Input({
       transitions: state.transitions,
       initialStateId: state.initialStateId,
       finalStateIds: state.finalStateIds,
+      timeAdded: Date.now(),
     });
 
     history.push("/");

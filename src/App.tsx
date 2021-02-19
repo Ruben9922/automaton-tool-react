@@ -24,7 +24,7 @@ const messages: Record<string, string> = {
 };
 
 export default function App() {
-  const [automata, loading, error] = useObject(firebase.database().ref("automata"));
+  const [automata, loading, error] = useObject(firebase.database().ref("automata").orderByChild("timeAdded"));
   const [snackbarQueue, setSnackbarQueue] = React.useState<SnackbarMessage[]>([]);
 
   const handleSnackbarOpen = (key: string) => (): void => {

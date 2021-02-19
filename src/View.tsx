@@ -1,3 +1,4 @@
+import Checkbox from "@material-ui/core/Checkbox";
 import Chip from "@material-ui/core/Chip";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -13,6 +14,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
+import * as R from "ramda";
 import React from "react";
 import { useParams } from "react-router-dom";
 import Automaton from "./automaton";
@@ -105,16 +107,38 @@ export default function View({ automata }: ViewProps) {
       <Typography variant="h6" component="h2" gutterBottom>
         States
       </Typography>
-      <Paper component="ul" className={classes.root}>
-        {automaton.states.map((state) => (
-          <li key={state.id}>
-            <Chip
-              label={state.name}
-              className={classes.chip}
-            />
-          </li>
-        ))}
-      </Paper>
+      <TableContainer component={Paper}>
+        <Table aria-label="states" size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>State</TableCell>
+              <TableCell>Initial</TableCell>
+              <TableCell>Final</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {automaton.states.map((state) => (
+              <TableRow key={state.id}>
+                <TableCell>
+                  {state.name}
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    disabled
+                    checked={R.equals(state, automaton.initialState)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    disabled
+                    checked={R.includes(state, automaton.finalStates)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Typography variant="h6" component="h2" gutterBottom>
         Transitions
       </Typography>

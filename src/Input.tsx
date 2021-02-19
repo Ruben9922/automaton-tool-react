@@ -23,6 +23,7 @@ import Transition from "./transition";
 import State from "./state";
 import { alphabetPresets } from './alphabetPreset';
 import { getIds } from './utilities';
+import firebase from './firebase';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type InputProps = {
-  automata: any;
+  // addAutomaton: (automaton: Automaton) => void;
   openAutomatonAddedSnackbar: () => void;
   openStateDeletedSnackbar: () => void;
   openTransitionDeletedSnackbar: () => void;
@@ -202,7 +203,7 @@ function reducer(draft: InputState, action: Action) {
 }
 
 export default function Input({
-  automata,
+  // addAutomaton,
   openAutomatonAddedSnackbar,
   openStateDeletedSnackbar,
   openTransitionDeletedSnackbar,
@@ -326,7 +327,8 @@ export default function Input({
     // addAutomaton(automaton);
 
     // Add to database
-    automata.push({
+    const automataRef = firebase.database().ref("automata");
+    automataRef.push({
       alphabet: state.alphabet,
       states: state.states,
       transitions: state.transitions,

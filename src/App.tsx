@@ -63,7 +63,7 @@ export default function App() {
             </Route>
             <Route path="/create">
               <Input
-                automata={automata}
+                // addAutomaton={addAutomaton}
                 openAutomatonAddedSnackbar={handleSnackbarOpen("automatonAdded")}
                 openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}
                 openTransitionDeletedSnackbar={handleSnackbarOpen("transitionDeleted")}

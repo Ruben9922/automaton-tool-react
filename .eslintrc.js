@@ -45,6 +45,7 @@ module.exports = {
     "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
     quotes: "off",
     "react/jsx-one-expression-per-line": "off",
+    "max-len": ["error", { code: 120 }],
   },
   settings: {
     "import/resolver": {

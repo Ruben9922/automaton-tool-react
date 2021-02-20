@@ -18,6 +18,7 @@ module.exports = {
   plugins: [
     'react',
     '@typescript-eslint',
+    "only-warn",
   ],
   rules: {
     // Fixing TypeScript stuff

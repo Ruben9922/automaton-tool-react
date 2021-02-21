@@ -1,10 +1,5 @@
-export default interface State {
-  id: string;
-  name: string;
-}
+export const generatePlaceholderStateName = (index: number): string => `[State ${index + 1}]`;
 
-const generatePlaceholderStateName = (index: number): string => `[State ${index + 1}]`;
-
-export const createStateDisplayName = (state: State, index: number): string => (
-  state.name === "" ? generatePlaceholderStateName(index) : state.name
+export const createStateDisplayName = (state: string, index: number): string => (
+  state === "" ? generatePlaceholderStateName(index) : state
 );

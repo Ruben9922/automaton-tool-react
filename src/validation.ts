@@ -1,10 +1,7 @@
 import * as R from "ramda";
 import { NIL } from "uuid";
-import State from "./state";
 import Transition from "./transition";
 import {
-  findStateById,
-  getIds,
   isSubset,
   isUnique,
   isUniqueList,
@@ -21,6 +18,7 @@ interface Errors {
     areSymbolsUnique: Check<boolean>;
   };
   states: {
+    // TODO: Change from Check<boolean[]> to Check<Map<string, boolean>>
     areStateNamesNonEmpty: Check<boolean[]>;
     areStateNamesUnique: Check<boolean[]>;
     exactlyOneInitialState: Check<boolean>;
@@ -164,9 +162,10 @@ function createAlertTextList(checks: Check<boolean>[]): string[] {
 //   return R.all((e: Check<boolean>) => e.isValid, R.values(checks));
 // }
 
-export function validate(alphabet: string[], states: State[], transitions: Transition[],
+export function validate(alphabet: string[], states: Map<string, string>, transitions: Transition[],
   initialStateId: string, finalStateIds: string[]) {
-  const stateIds = getIds(states);
+  const stateIds = Array.from(states.keys());
+  const stateNames = Array.from(states.values());
 
   const errors: Errors = {
     alphabet: {
@@ -185,11 +184,11 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         message: "At least one state is required",
       },
       areStateNamesNonEmpty: {
-        isValid: R.map((s) => !R.isEmpty(s.name), states),
+        isValid: R.map((s) => !R.isEmpty(s), stateNames),
         message: "State name cannot be left blank",
       },
       areStateNamesUnique: {
-        isValid: isUniqueList((s1, s2) => s2.name === s1.name, states),
+        isValid: isUniqueList(R.equals, stateNames),
         message: "State name must be unique",
       },
       exactlyOneInitialState: {
@@ -246,8 +245,8 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         // eslint-disable-next-line no-nested-ternary
         message: !R.includes(initialStateId, stateIds) ? "There are no transitions" : (
           R.includes(initialStateId, finalStateIds)
-            ? `There are no transitions and initial state "${findStateById(states, initialStateId)!.name}" is a final state, so all strings will be accepted by the automaton`
-            : `There are no transitions and initial state "${findStateById(states, initialStateId)!.name}" is not a final state, so all strings will be rejected by the automaton`
+            ? `There are no transitions and initial state "${states.get(initialStateId)!}" is a final state, so all strings will be accepted by the automaton`
+            : `There are no transitions and initial state "${states.get(initialStateId)!}" is not a final state, so all strings will be rejected by the automaton`
         ),
       },
     },

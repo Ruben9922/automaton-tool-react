@@ -1,29 +1,39 @@
 import * as R from "ramda";
-import { v4 as uuidv4 } from "uuid";
-import State from "./state";
 import Transition from "./transition";
 import TransitionFunctionKey from "./transitionFunctionKey";
-import { findStateById } from "./utilities";
 
-type TransitionFunction = Map<string, {currentState: State, symbol: string, nextStates: State[]}>;
+type TransitionFunction = Map<string, {currentState: string, symbol: string, nextStates: string[]}>;
+
+const createTransitionFunction = (transitions: Transition[], states: Map<string, string>): TransitionFunction => (
+  // Using type assertions to exclude undefined because state can never be undefined due to the
+  // logic of the application
+  new Map(
+    R.map((t: Transition) => [
+      new TransitionFunctionKey(states.get(t.currentState)!, t.symbol).toString(),
+      {
+        currentState: states.get(t.currentState)!,
+        symbol: t.symbol,
+        nextStates: R.map((id) => states.get(id)!, t.nextStates),
+      },
+    ], transitions),
+  )
+);
 
 // TODO: Replace with interface and factory function (?)
 export default class Automaton {
-  id: string;
   alphabet: string[];
-  states: State[];
+  states: string[];
   transitionFunction: TransitionFunction;
-  initialState: State;
-  finalStates: State[];
+  initialState: string;
+  finalStates: string[];
 
   constructor(
     alphabet: string[],
-    states: State[],
+    states: string[],
     transitionFunction: TransitionFunction,
-    initialState: State,
-    finalStates: State[],
+    initialState: string,
+    finalStates: string[],
   ) {
-    this.id = uuidv4();
     this.alphabet = alphabet;
     this.states = states;
     this.transitionFunction = transitionFunction;
@@ -34,37 +44,19 @@ export default class Automaton {
   // TODO: States in the automaton do not need to contain IDs
   static createAutomaton = (
     alphabet: string[],
-    states: State[],
+    states: Map<string, string>,
     transitions: Transition[],
     initialStateId: string,
     finalStateIds: string[],
   ): Automaton => (
     new Automaton(
       alphabet,
-      states,
-      Automaton.transitionsToTransitionFunction(transitions, states),
-      findStateById(states, initialStateId) as State,
-      states.filter((s) => finalStateIds.includes(s.id)),
+      Array.from(states.values()),
+      createTransitionFunction(transitions, states),
+      states.get(initialStateId)!,
+      R.map((id) => states.get(id)!, finalStateIds),
     )
   );
-
-  static transitionsToTransitionFunction =
-    (transitions: Transition[], states: State[]): TransitionFunction => {
-      // Using type assertions to exclude undefined because state can never be undefined due to the
-      // logic of the application
-      const transitionFunction = new Map(
-        R.map((t: Transition) => [
-          new TransitionFunctionKey(t.currentState, t.symbol).toString(),
-          {
-            currentState: findStateById(states, t.currentState) as State,
-            symbol: t.symbol,
-            nextStates: R.filter((s: State) => R.includes(s.id, t.nextStates), states),
-          },
-        ], transitions),
-      );
-
-      return transitionFunction;
-    };
 
   // static transitionFunctionToTransitions(transitionFunction: TransitionFunction): Transition[] {
   //   return Array.from(transitionFunction.values()).map((t) => ({
@@ -74,4 +66,26 @@ export default class Automaton {
   //     nextStates: t.nextStates.map((s: State) => s.id),
   //   }));
   // }
+
+  // TODO: See if typing can be improved
+  toDb(): any {
+    return {
+      alphabet: this.alphabet,
+      states: this.states,
+      transitionFunction: Object.fromEntries(this.transitionFunction),
+      initialState: this.initialState,
+      finalStates: this.finalStates,
+      timeAdded: Date.now(),
+    };
+  }
+
+  static fromDb(value: any): Automaton {
+    return new Automaton(
+      value.alphabet ?? [],
+      value.states ?? [],
+      value.transitionFunction ? new Map(Object.entries(value.transitionFunction)) : new Map(),
+      value.initialState,
+      value.finalStates ?? [],
+    );
+  }
 }

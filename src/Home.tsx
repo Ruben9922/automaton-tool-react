@@ -53,7 +53,7 @@ export default function Home({
 
   return (
     <>
-      {R.isEmpty(automata) ? (
+      {!automata.hasChildren() ? (
         <>
           <Typography variant="h5" component="h1" gutterBottom>
             Welcome to Automaton Tool!
@@ -64,14 +64,8 @@ export default function Home({
         </>
       ) : (
         <List>
-          {Object.entries(automata.val()).map(([key, v], index: number) => {
-            const automaton = Automaton.createAutomaton(
-              (v as any).alphabet,
-              (v as any).states,
-              (v as any).transitions,
-              (v as any).initialStateId,
-              (v as any).finalStateIds,
-            );
+          {Object.entries(automata.val()).map(([key, value], index: number) => {
+            const automaton = Automaton.fromDb(value);
 
             return (
               <React.Fragment key={key}>

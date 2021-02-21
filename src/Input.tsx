@@ -20,10 +20,9 @@ import {
   validate,
 } from "./validation";
 import Transition from "./transition";
-import State from "./state";
 import { alphabetPresets } from './alphabetPreset';
-import { getIds } from './utilities';
 import firebase from './firebase';
+import Automaton from "./automaton";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -54,7 +53,7 @@ type InputProps = {
 type InputState = {
   alphabet: string[];
   alphabetPresetIndex: number | "";
-  states: State[];
+  states: Map<string, string>;
   transitions: Transition[];
   initialStateId: string;
   finalStateIds: string[];
@@ -64,8 +63,8 @@ type Action =
   | { type: "setAlphabetPresetIndex", index: number | "" }
   | { type: "setAlphabet", alphabetString: string }
   | { type: "addState" }
-  | { type: "removeState", index: number }
-  | { type: "setStateName", index: number, name: string }
+  | { type: "removeState", id: string }
+  | { type: "setStateName", id: string, name: string }
   | { type: "setInitialStateId", id: string }
   | { type: "setFinalStateIds", id: string, isFinal: boolean }
   | { type: "addTransition" }
@@ -78,7 +77,7 @@ type Action =
 const initialState: InputState = {
   alphabet: [],
   alphabetPresetIndex: "",
-  states: [],
+  states: new Map(),
   transitions: [],
   initialStateId: NIL,
   finalStateIds: [],
@@ -143,26 +142,29 @@ function reducer(draft: InputState, action: Action) {
       draft.transitions = fixTransitionSymbols(draft.transitions, draft.alphabet);
       return;
     case "addState":
-      draft.states = R.append({
-        id: uuidv4(),
-        name: "",
-      }, draft.states);
+      draft.states.set(uuidv4(), "");
 
-      draft.transitions = fixTransitionCurrentStates(draft.transitions, getIds(draft.states));
-      draft.transitions = fixTransitionNextStates(draft.transitions, getIds(draft.states));
-      draft.initialStateId = fixInitialStateId(draft.initialStateId, getIds(draft.states));
-      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, getIds(draft.states));
+      draft.transitions = fixTransitionCurrentStates(draft.transitions,
+        Array.from(draft.states.keys()));
+      draft.transitions = fixTransitionNextStates(draft.transitions,
+        Array.from(draft.states.keys()));
+      draft.initialStateId = fixInitialStateId(draft.initialStateId,
+        Array.from(draft.states.keys()));
+      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, Array.from(draft.states.keys()));
       return;
     case "removeState":
-      draft.states = R.remove(action.index, 1, draft.states);
+      draft.states.delete(action.id);
 
-      draft.transitions = fixTransitionCurrentStates(draft.transitions, getIds(draft.states));
-      draft.transitions = fixTransitionNextStates(draft.transitions, getIds(draft.states));
-      draft.initialStateId = fixInitialStateId(draft.initialStateId, getIds(draft.states));
-      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, getIds(draft.states));
+      draft.transitions = fixTransitionCurrentStates(draft.transitions,
+        Array.from(draft.states.keys()));
+      draft.transitions = fixTransitionNextStates(draft.transitions,
+        Array.from(draft.states.keys()));
+      draft.initialStateId = fixInitialStateId(draft.initialStateId,
+        Array.from(draft.states.keys()));
+      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, Array.from(draft.states.keys()));
       return;
     case "setStateName":
-      draft.states[action.index].name = action.name;
+      draft.states.set(action.id, action.name);
       return;
     case "setInitialStateId":
       draft.initialStateId = action.id;
@@ -239,12 +241,12 @@ export default function Input({
       errorAlertText={errorAlertText.states}
       warningAlertText={warningAlertText.states}
       onAddState={() => dispatch({ type: "addState" })}
-      onRemoveState={(index) => {
-        dispatch({ type: "removeState", index });
+      onRemoveState={(id) => {
+        dispatch({ type: "removeState", id });
         openStateDeletedSnackbar();
       }}
       onRemoveIncidentTransitions={(stateId) => dispatch({ type: "removeIncidentTransitions", stateId })}
-      onSetStateName={(index, name) => dispatch({ type: "setStateName", index, name })}
+      onSetStateName={(id, name) => dispatch({ type: "setStateName", id, name })}
       onSetInitialStateId={(id) => dispatch({ type: "setInitialStateId", id })}
       onSetFinalStateIds={(id, isFinal) => dispatch({ type: "setFinalStateIds", id, isFinal })}
     />,
@@ -322,20 +324,13 @@ export default function Input({
   const handleStep = (stepIndex: number) => (): void => setActiveStepIndex(stepIndex);
 
   const handleFinish = (): void => {
-    // const automaton = Automaton.createAutomaton(state.alphabet, state.states, state.transitions,
-    //   state.initialStateId, state.finalStateIds);
+    const automaton = Automaton.createAutomaton(state.alphabet, state.states, state.transitions, state.initialStateId,
+      state.finalStateIds);
     // addAutomaton(automaton);
 
     // Add to database
     const automataRef = firebase.database().ref("automata");
-    automataRef.push({
-      alphabet: state.alphabet,
-      states: state.states,
-      transitions: state.transitions,
-      initialStateId: state.initialStateId,
-      finalStateIds: state.finalStateIds,
-      timeAdded: Date.now(),
-    });
+    automataRef.push(automaton.toDb());
 
     history.push("/");
     openAutomatonAddedSnackbar();

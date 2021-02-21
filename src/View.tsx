@@ -18,7 +18,6 @@ import * as R from "ramda";
 import React from "react";
 import { useParams } from "react-router-dom";
 import Automaton from "./automaton";
-import State from "./state";
 import TransitionFunctionKey from "./transitionFunctionKey";
 
 const useStyles = makeStyles((theme) => ({
@@ -61,6 +60,7 @@ export default function View({ automata }: ViewProps) {
   }
 
   const value = automata.child(params.id).val();
+  const automaton = Automaton.fromDb(value);
 
   // Processing parameters
   // const parsedParams = { id: parseInt(params.id, 10) };
@@ -76,14 +76,6 @@ export default function View({ automata }: ViewProps) {
   // };
   // const valid = allValid(errors);
   // const alertText = createHelperTextMultiple(R.values(errors));
-
-  const automaton = Automaton.createAutomaton(
-    value.alphabet,
-    value.states,
-    value.transitions,
-    value.initialStateId,
-    value.finalStateIds,
-  );
 
   return (
     <>
@@ -118,9 +110,9 @@ export default function View({ automata }: ViewProps) {
           </TableHead>
           <TableBody>
             {automaton.states.map((state) => (
-              <TableRow key={state.id}>
+              <TableRow key={state}>
                 <TableCell>
-                  {state.name}
+                  {state}
                 </TableCell>
                 <TableCell>
                   <Checkbox
@@ -178,14 +170,14 @@ export default function View({ automata }: ViewProps) {
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={transitionIndex}>
                     <TableCell>
-                      {currentState.name}
+                      {currentState}
                     </TableCell>
                     <TableCell>{symbol}</TableCell>
                     <TableCell>
-                      {nextStates.map((state) => (
+                      {nextStates.map((nextState) => (
                         <Chip
-                          key={state.id}
-                          label={state.name}
+                          key={nextState}
+                          label={nextState}
                           className={classes.chip}
                         />
                       ))}
@@ -209,21 +201,21 @@ export default function View({ automata }: ViewProps) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {automaton.states.map((currentState: State) => (
-                  <TableRow key={currentState.id}>
+                {automaton.states.map((currentState: string) => (
+                  <TableRow key={currentState}>
                     <TableCell component="th" scope="row" variant="head">
-                      {currentState.name}
+                      {currentState}
                     </TableCell>
                     {automaton.alphabet.map((symbol: string, index: number) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <TableCell key={index}>
                         {automaton.transitionFunction.get(new TransitionFunctionKey(
-                          currentState.id,
+                          currentState,
                           symbol,
                         ).toString())?.nextStates.map((nextState) => (
                           <Chip
-                            key={nextState.id}
-                            label={nextState.name}
+                            key={nextState}
+                            label={nextState}
                             className={classes.chip}
                           />
                         ))}

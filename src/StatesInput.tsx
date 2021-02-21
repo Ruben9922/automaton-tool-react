@@ -11,7 +11,6 @@ import Button from "@material-ui/core/Button";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import * as R from "ramda";
-import State from "./state";
 import { StatesErrorState, StatesHelperText } from "./validation";
 import Dialog from "./Dialog";
 import Transition from "./transition";
@@ -30,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type StatesInputProps = {
-  states: State[];
+  states: Map<string, string>;
   transitions: Transition[];
   initialStateId: string;
   finalStateIds: string[];
@@ -39,9 +38,9 @@ type StatesInputProps = {
   errorAlertText: string[];
   warningAlertText: string[];
   onAddState: () => void;
-  onRemoveState: (index: number) => void;
+  onRemoveState: (id: string) => void;
   onRemoveIncidentTransitions: (stateId: string) => void;
-  onSetStateName: (index: number, name: string) => void;
+  onSetStateName: (id: string, name: string) => void;
   onSetInitialStateId: (id: string) => void;
   onSetFinalStateIds: (id: string, isFinal: boolean) => void;
 };
@@ -65,27 +64,26 @@ export default function StatesInput({
   const classes = useStyles();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [stateDeleteIndex, setStateDeleteIndex] = React.useState<number | null>(null);
-  const [stateDelete, setStateDelete] = React.useState<State | null>(null);
+  const [stateDeleteKey, setStateDeleteKey] = React.useState<string | null>(null);
 
   return (
     <>
       <form className={classes.root} autoComplete="off">
-        {states.map((state: State, index: number) => (
-          <React.Fragment key={state.id}>
+        {Array.from(states.entries()).map(([key, state]: [string, string], index: number) => (
+          <React.Fragment key={key}>
             <TextField
-              id={`state-name-${index + 1}`}
+              id={`state-name-${key}`}
               label={`State ${index + 1} name`}
-              value={state.name}
-              onChange={(event) => onSetStateName(index, event.target.value)}
+              value={state}
+              onChange={(event) => onSetStateName(key, event.target.value)}
               error={errorState.stateName[index]}
               helperText={helperText.stateName[index]}
             />
             <FormControlLabel
               control={(
                 <Radio
-                  checked={initialStateId === state.id}
-                  value={state.id}
+                  checked={initialStateId === key}
+                  value={key}
                   onChange={(event) => onSetInitialStateId(event.target.value)}
                 />
               )}
@@ -94,8 +92,8 @@ export default function StatesInput({
             <FormControlLabel
               control={(
                 <Checkbox
-                  checked={R.includes(state.id, finalStateIds)}
-                  onChange={(event) => onSetFinalStateIds(state.id, event.target.checked)}
+                  checked={R.includes(key, finalStateIds)}
+                  onChange={(event) => onSetFinalStateIds(key, event.target.checked)}
                   name={`state-${index + 1}-final`}
                 />
               )}
@@ -104,18 +102,17 @@ export default function StatesInput({
             <Tooltip title={`Delete State ${index + 1}`}>
               <IconButton
                 onClick={() => {
-                  const isUsedInTransitions = R.includes(state.id, R.chain((t: Transition) => (
+                  const isUsedInTransitions = R.includes(key, R.chain((t: Transition) => (
                     R.append(t.currentState, t.nextStates)
                   ), transitions));
 
                   if (isUsedInTransitions) {
                     // Show dialog asking whether to remove incident transitions as well
-                    setStateDelete(state);
-                    setStateDeleteIndex(index);
+                    setStateDeleteKey(key);
                     setDialogOpen(true);
                   } else {
                     // Just remove the state
-                    onRemoveState(index);
+                    onRemoveState(key);
                   }
                 }}
                 aria-label="delete"
@@ -164,7 +161,7 @@ export default function StatesInput({
           {
             content: "State only",
             onClick: () => {
-              onRemoveState(stateDeleteIndex as number);
+              onRemoveState(stateDeleteKey!);
               setDialogOpen(false);
             },
             color: "primary",
@@ -174,8 +171,8 @@ export default function StatesInput({
             content: "State and transitions",
             onClick: () => {
               // TODO: Maybe merge this into one action (?)
-              onRemoveIncidentTransitions((stateDelete as State).id);
-              onRemoveState(stateDeleteIndex as number);
+              onRemoveIncidentTransitions(stateDeleteKey!);
+              onRemoveState(stateDeleteKey!);
               setDialogOpen(false);
             },
             color: "primary",

@@ -23,6 +23,7 @@ import Transition from "./transition";
 import { alphabetPresets } from './alphabetPreset';
 import firebase from './firebase';
 import Automaton from "./automaton";
+import AutomatonDetailsInput from "./AutomatonDetailsInput";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -62,6 +63,7 @@ type InputState = {
 };
 
 type Action =
+  | { type: "setName", name: string }
   | { type: "setAlphabetPresetIndex", index: number | "" }
   | { type: "setAlphabet", alphabetString: string }
   | { type: "addState" }
@@ -131,6 +133,10 @@ function fixTransitionNextStates(transitions: Transition[], stateIds: string[]):
 
 function reducer(draft: InputState, action: Action) {
   switch (action.type) {
+    case "setName":
+      draft.name = action.name;
+
+      return;
     case "setAlphabetPresetIndex":
       draft.alphabetPresetIndex = action.index;
 
@@ -270,6 +276,11 @@ export default function Input({
       onSymbolChange={(index, symbol) => dispatch({ type: "symbolChange", index, symbol })}
       onNextStatesChange={(index, stateIds) => dispatch({ type: "nextStatesChange", index, stateIds })}
     />,
+    <AutomatonDetailsInput
+      name={state.name}
+      placeholderName={Automaton.generatePlaceholderName(automatonIndex)}
+      onNameChange={(name) => dispatch({ type: "setName", name })}
+    />,
   ];
 
   // TODO: Maybe find a better way of doing this
@@ -308,6 +319,13 @@ export default function Input({
       completed: countErrors(errorState.transitions, errorAlertText.transitions) === 0,
       errorCount: countErrors(errorState.transitions, errorAlertText.transitions),
       warningCount: warningAlertText.transitions.length,
+    },
+    {
+      id: uuidv4(),
+      label: "Specify final details",
+      completed: true,
+      errorCount: 0,
+      warningCount: 0,
     },
   ];
 

@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type InputProps = {
+  automatonIndex: number;
   // addAutomaton: (automaton: Automaton) => void;
   openAutomatonAddedSnackbar: () => void;
   openStateDeletedSnackbar: () => void;
@@ -51,6 +52,7 @@ type InputProps = {
 };
 
 type InputState = {
+  name: string;
   alphabet: string[];
   alphabetPresetIndex: number | "";
   states: Map<string, string>;
@@ -75,6 +77,7 @@ type Action =
   | { type: "nextStatesChange", index: number, stateIds: string[] };
 
 const initialState: InputState = {
+  name: "",
   alphabet: [],
   alphabetPresetIndex: "",
   states: new Map(),
@@ -205,6 +208,7 @@ function reducer(draft: InputState, action: Action) {
 }
 
 export default function Input({
+  automatonIndex,
   // addAutomaton,
   openAutomatonAddedSnackbar,
   openStateDeletedSnackbar,
@@ -324,8 +328,9 @@ export default function Input({
   const handleStep = (stepIndex: number) => (): void => setActiveStepIndex(stepIndex);
 
   const handleFinish = (): void => {
-    const automaton = Automaton.createAutomaton(state.alphabet, state.states, state.transitions, state.initialStateId,
-      state.finalStateIds);
+    const name = state.name || Automaton.generatePlaceholderName(automatonIndex);
+    const automaton = Automaton.createAutomaton(name, state.alphabet, state.states, state.transitions,
+      state.initialStateId, state.finalStateIds);
     // addAutomaton(automaton);
 
     // Add to database

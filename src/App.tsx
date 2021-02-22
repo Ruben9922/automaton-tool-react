@@ -63,6 +63,7 @@ export default function App() {
             </Route>
             <Route path="/create">
               <Input
+                automatonIndex={automata.numChildren()}
                 // addAutomaton={addAutomaton}
                 openAutomatonAddedSnackbar={handleSnackbarOpen("automatonAdded")}
                 openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}

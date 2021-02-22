@@ -72,7 +72,7 @@ export default function Home({
                 <Link to={`/automaton/${key}`}>
                   <ListItem button>
                     <ListItemText
-                      primary={`Automaton ${index + 1}`}
+                      primary={automaton.name}
                       secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
                     />
                     <ListItemSecondaryAction>

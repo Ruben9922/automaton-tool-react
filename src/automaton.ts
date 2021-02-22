@@ -21,6 +21,7 @@ const createTransitionFunction = (transitions: Transition[], states: Map<string,
 
 // TODO: Replace with interface and factory function (?)
 export default class Automaton {
+  name: string;
   alphabet: string[];
   states: string[];
   transitionFunction: TransitionFunction;
@@ -28,12 +29,14 @@ export default class Automaton {
   finalStates: string[];
 
   constructor(
+    name: string,
     alphabet: string[],
     states: string[],
     transitionFunction: TransitionFunction,
     initialState: string,
     finalStates: string[],
   ) {
+    this.name = name;
     this.alphabet = alphabet;
     this.states = states;
     this.transitionFunction = transitionFunction;
@@ -43,6 +46,7 @@ export default class Automaton {
 
   // TODO: States in the automaton do not need to contain IDs
   static createAutomaton = (
+    name: string,
     alphabet: string[],
     states: Map<string, string>,
     transitions: Transition[],
@@ -50,6 +54,7 @@ export default class Automaton {
     finalStateIds: string[],
   ): Automaton => (
     new Automaton(
+      name,
       alphabet,
       Array.from(states.values()),
       createTransitionFunction(transitions, states),
@@ -70,6 +75,7 @@ export default class Automaton {
   // TODO: See if typing can be improved
   toDb(): any {
     return {
+      name: this.name,
       alphabet: this.alphabet,
       states: this.states,
       transitionFunction: Object.fromEntries(this.transitionFunction),
@@ -81,11 +87,16 @@ export default class Automaton {
 
   static fromDb(value: any): Automaton {
     return new Automaton(
+      value.name,
       value.alphabet ?? [],
       value.states ?? [],
       value.transitionFunction ? new Map(Object.entries(value.transitionFunction)) : new Map(),
       value.initialState,
       value.finalStates ?? [],
     );
+  }
+
+  static generatePlaceholderName(index: number): string {
+    return `Automaton ${index + 1}`;
   }
 }

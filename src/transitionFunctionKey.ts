@@ -1,14 +1,14 @@
 // TODO: Maybe replace this with just a function
 export default class TransitionFunctionKey {
-  currentStateId: string;
+  currentState: string;
   symbol: string;
 
-  constructor(currentStateId: string, symbol: string) {
-    this.currentStateId = currentStateId;
+  constructor(currentState: string, symbol: string) {
+    this.currentState = currentState;
     this.symbol = symbol;
   }
 
   toString() {
-    return `TransitionFunctionKey(currentStateId=${this.currentStateId}, symbol=${this.symbol})`;
+    return `TransitionFunctionKey(currentStateId=${this.currentState}, symbol=${this.symbol})`;
   }
 }

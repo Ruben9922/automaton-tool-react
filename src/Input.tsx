@@ -75,7 +75,7 @@ type Action =
   | { type: "removeTransition", index: number }
   | { type: "removeIncidentTransitions", stateId: string }
   | { type: "currentStateChange", index: number, stateId: string }
-  | { type: "symbolChange", index: number, symbol: string }
+  | { type: "symbolChange", index: number, symbol: string | null }
   | { type: "nextStatesChange", index: number, stateIds: string[] };
 
 const initialState: InputState = {
@@ -121,7 +121,7 @@ function fixTransitionCurrentStates(transitions: Transition[], stateIds: string[
 
 function fixTransitionSymbols(transitions: Transition[], alphabet: string[]): Transition[] {
   return R.forEach((t) => {
-    t.symbol = R.includes(t.symbol, alphabet) ? t.symbol : "";
+    t.symbol = t.symbol === null || R.includes(t.symbol, alphabet) ? t.symbol : "";
   }, transitions);
 }
 

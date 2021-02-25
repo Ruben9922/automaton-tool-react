@@ -2,7 +2,7 @@ import * as R from "ramda";
 import Transition from "./transition";
 import TransitionFunctionKey from "./transitionFunctionKey";
 
-type TransitionFunction = Map<string, {currentState: string, symbol: string, nextStates: string[]}>;
+type TransitionFunction = Map<string, {currentState: string, symbol: string | null, nextStates: string[]}>;
 
 const createTransitionFunction = (transitions: Transition[], states: Map<string, string>): TransitionFunction => (
   // Using type assertions to exclude undefined because state can never be undefined due to the

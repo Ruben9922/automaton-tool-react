@@ -62,6 +62,8 @@ export default function View({ automata }: ViewProps) {
   const value = automata.child(params.id).val();
   const automaton = Automaton.fromDb(value);
 
+  const symbols = R.prepend(null, automaton.alphabet);
+
   // Processing parameters
   // const parsedParams = { id: parseInt(params.id, 10) };
   // const errors: Record<string, Check<boolean>> = {
@@ -194,9 +196,9 @@ export default function View({ automata }: ViewProps) {
               <TableHead>
                 <TableRow>
                   <TableCell />
-                  {automaton.alphabet.map((symbol: string, index: number) => (
+                  {symbols.map((symbol: string | null, index: number) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <TableCell key={index}>{symbol}</TableCell>
+                    <TableCell key={index}>{symbol ?? "ε"}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -206,7 +208,7 @@ export default function View({ automata }: ViewProps) {
                     <TableCell component="th" scope="row" variant="head">
                       {currentState}
                     </TableCell>
-                    {automaton.alphabet.map((symbol: string, index: number) => (
+                    {symbols.map((symbol: string | null, index: number) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <TableCell key={index}>
                         {automaton.transitionFunction.get(new TransitionFunctionKey(

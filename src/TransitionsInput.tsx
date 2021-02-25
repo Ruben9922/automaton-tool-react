@@ -17,7 +17,7 @@ import clsx from "clsx";
 import * as R from "ramda";
 import Transition from "./transition";
 import { createStateDisplayName } from "./state";
-import {computeStateIndex} from "./utilities";
+import { computeStateIndex } from "./utilities";
 import { TransitionsErrorState, TransitionsHelperText } from "./validation";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -56,7 +56,7 @@ type TransitionsInputProps = {
   onAddTransition: () => void;
   onRemoveTransition: (index: number) => void;
   onCurrentStateChange: (index: number, stateId: string) => void;
-  onSymbolChange: (index: number, symbol: string) => void;
+  onSymbolChange: (index: number, symbol: string | null) => void;
   onNextStatesChange: (index: number, stateIds: string[]) => void;
 };
 
@@ -74,6 +74,9 @@ export default function TransitionsInput({
   onNextStatesChange,
 }: TransitionsInputProps) {
   const classes = useStyles();
+
+  // TODO: Add ID to alphabet
+  const symbols = R.prepend(null, alphabet);
 
   return (
     <>
@@ -109,18 +112,17 @@ export default function TransitionsInput({
             <FormControl
               className={classes.formControl}
               error={errorState.symbol[transitionIndex]}
-              disabled={R.isEmpty(alphabet)}
             >
               <InputLabel id={`transition-symbol-${transitionIndex + 1}-label`}>Symbol</InputLabel>
               <Select
                 labelId={`transition-symbol-${transitionIndex + 1}-label`}
                 id={`transition-symbol-${transitionIndex + 1}`}
-                value={transition.symbol}
-                onChange={(event) => onSymbolChange(transitionIndex, event.target.value as string)}
+                value={transition.symbol ?? "<<epsilon>>"}
+                onChange={(event) => onSymbolChange(transitionIndex, (event.target.value as string) === "<<epsilon>>" ? null : event.target.value as string)}
               >
-                {alphabet.map((symbol: string, index: number) => (
+                {symbols.map((symbol: string | null, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
-                  <MenuItem key={index} value={symbol}>{symbol}</MenuItem>
+                  <MenuItem key={index} value={symbol ?? "<<epsilon>>"}>{symbol ?? "ε"}</MenuItem>
                 ))}
               </Select>
               <FormHelperText>{helperText.symbol[transitionIndex]}</FormHelperText>

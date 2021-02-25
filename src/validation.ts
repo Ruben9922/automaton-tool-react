@@ -210,7 +210,7 @@ export function validate(alphabet: string[], states: Map<string, string>, transi
         message: "Symbol cannot be left blank",
       },
       areSymbolsValid: {
-        isValid: R.map((transition) => alphabet.includes(transition.symbol), transitions),
+        isValid: R.map((transition) => transition.symbol === null || alphabet.includes(transition.symbol), transitions),
         message: "Symbol does not exist in alphabet",
       },
       areNextStatesNonEmpty: {

@@ -174,7 +174,7 @@ export default function View({ automata }: ViewProps) {
                     <TableCell>
                       {currentState}
                     </TableCell>
-                    <TableCell>{symbol}</TableCell>
+                    <TableCell>{symbol ?? "ε"}</TableCell>
                     <TableCell>
                       {nextStates.map((nextState) => (
                         <Chip

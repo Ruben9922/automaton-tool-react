@@ -84,6 +84,9 @@ export default function View({ automata }: ViewProps) {
       <Typography variant="h5" component="h1" gutterBottom>
         Automaton
       </Typography>
+      <Typography variant="subtitle1" gutterBottom>
+        {automaton.name}
+      </Typography>
       <Typography variant="h6" component="h2" gutterBottom>
         Alphabet
       </Typography>

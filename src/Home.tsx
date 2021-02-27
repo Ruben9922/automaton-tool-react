@@ -68,23 +68,19 @@ export default function Home({
             const automaton = Automaton.fromDb(value);
 
             return (
-              <React.Fragment key={key}>
-                <Link to={`/automaton/${key}`}>
-                  <ListItem button>
-                    <ListItemText
-                      primary={automaton.name}
-                      secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
-                    />
-                    <ListItemSecondaryAction>
-                      <Tooltip title={`Delete Automaton ${index + 1}`}>
-                        <IconButton onClick={() => handleRemoveAutomatonClick(key)} aria-label="delete">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                </Link>
-              </React.Fragment>
+              <ListItem key={key} button component={Link} to={`/automaton/${key}`}>
+                <ListItemText
+                  primary={automaton.name}
+                  secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
+                />
+                <ListItemSecondaryAction>
+                  <Tooltip title={`Delete Automaton ${index + 1}`}>
+                    <IconButton onClick={() => handleRemoveAutomatonClick(key)} aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </ListItemSecondaryAction>
+              </ListItem>
             );
           })}
         </List>

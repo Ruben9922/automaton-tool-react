@@ -31,7 +31,6 @@ export default class Automaton {
     this.finalStates = finalStates;
   }
 
-  // TODO: States in the automaton do not need to contain IDs
   static fromInputState(inputState: Omit<InputState, "alphabetPresetIndex">, index: number): Automaton {
     return new Automaton(
       inputState.name || Automaton.generatePlaceholderName(index),

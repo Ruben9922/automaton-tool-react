@@ -77,11 +77,21 @@ export default class Automaton {
   }
 
   static fromDb(value: any): Automaton {
+    const transitionFunction = value.transitionFunction
+      ? new Map(Object.entries(value.transitionFunction))
+      : new Map();
+
+    for (const entry of transitionFunction) {
+      if (entry[1].symbol === undefined) {
+        entry[1].symbol = null;
+      }
+    }
+
     return new Automaton(
       value.name,
       value.alphabet ?? [],
       value.states ?? [],
-      value.transitionFunction ? new Map(Object.entries(value.transitionFunction)) : new Map(),
+      transitionFunction,
       value.initialState,
       value.finalStates ?? [],
     );

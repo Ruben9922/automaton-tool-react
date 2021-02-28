@@ -108,6 +108,7 @@ function fixFinalStateIds(finalStateIds: string[], stateIds: string[]): string[]
   return R.intersection(finalStateIds, stateIds);
 }
 
+// TODO: Maybe use mergeLeft() instead of forEach()
 function fixTransitionCurrentStates(transitions: Transition[], stateIds: string[]): Transition[] {
   return R.forEach((t) => {
     t.currentState = R.includes(t.currentState, stateIds) ? t.currentState : "";

@@ -38,7 +38,7 @@ export default function Home({
   const classes = useStyles();
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [automatonDeleteId, setAutomatonDeleteId] = React.useState<string>("");
+  const [automatonDeleteId, setAutomatonDeleteId] = React.useState<string | null>(null);
 
   const handleRemoveAutomatonClick = (id: string): void => {
     setAutomatonDeleteId(id);
@@ -51,6 +51,8 @@ export default function Home({
     openSnackbar();
     setDialogOpen(false);
   };
+
+  const automaton = automatonDeleteId ? Automaton.fromDb(automata.child(automatonDeleteId).val()) : null;
 
   return (
     <>
@@ -100,7 +102,7 @@ export default function Home({
         open={dialogOpen}
         setOpen={setDialogOpen}
         title="Delete automaton?"
-        message={`Are you sure you wish to permanently delete Automaton ${automatonDeleteId! + 1}? This cannot be undone.`}
+        message={`Are you sure you wish to permanently delete Automaton "${automaton?.name}"? This cannot be undone.`}
         buttons={[
           {
             content: "Cancel",

@@ -17,8 +17,11 @@ import Loader from './Loader';
 
 // TODO: Maybe just remove this and hardcode the messages
 const messages: Record<string, string> = {
-  automatonAdded: "Automaton created",
+  automatonAddedSuccess: "Automaton created",
+  automatonAddedFailed: "Failed to create automaton",
   automatonDeleted: "Automaton deleted",
+  automatonUpdatedSuccess: "Automaton updated",
+  automatonUpdatedFailed: "Failed to update automaton",
   stateDeleted: "State deleted",
   transitionDeleted: "Transition deleted",
 };
@@ -63,9 +66,18 @@ export default function App() {
             </Route>
             <Route path="/create">
               <Input
-                automatonIndex={automata.numChildren()}
+                automata={automata}
                 // addAutomaton={addAutomaton}
-                openAutomatonAddedSnackbar={handleSnackbarOpen("automatonAdded")}
+                onSnackbarOpen={handleSnackbarOpen}
+                openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}
+                openTransitionDeletedSnackbar={handleSnackbarOpen("transitionDeleted")}
+              />
+            </Route>
+            <Route path="/edit/:id">
+              <Input
+                automata={automata}
+                // addAutomaton={addAutomaton}
+                onSnackbarOpen={handleSnackbarOpen}
                 openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}
                 openTransitionDeletedSnackbar={handleSnackbarOpen("transitionDeleted")}
               />

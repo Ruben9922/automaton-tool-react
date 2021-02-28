@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import Step from "@material-ui/core/Step";
 import StepButton from "@material-ui/core/StepButton";
 import Stepper from "@material-ui/core/Stepper";
-import { useHistory } from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import { StepLabel } from "@material-ui/core";
 import { NIL, v4 as uuidv4 } from "uuid";
 import { useImmerReducer } from "use-immer";
@@ -24,6 +24,7 @@ import { alphabetPresets } from './alphabetPreset';
 import firebase from './firebase';
 import Automaton from "./automaton";
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,14 +46,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type InputProps = {
-  automatonIndex: number;
+  automata: any;
   // addAutomaton: (automaton: Automaton) => void;
-  openAutomatonAddedSnackbar: () => void;
+  onSnackbarOpen: (key: string) => void;
   openStateDeletedSnackbar: () => void;
   openTransitionDeletedSnackbar: () => void;
 };
 
-type InputState = {
+export type InputState = {
   name: string;
   alphabet: string[];
   alphabetPresetIndex: number | "";
@@ -60,6 +61,10 @@ type InputState = {
   transitions: Transition[];
   initialStateId: string;
   finalStateIds: string[];
+};
+
+type InputParams = {
+  id: string;
 };
 
 type Action =
@@ -77,16 +82,6 @@ type Action =
   | { type: "currentStateChange", index: number, stateId: string }
   | { type: "symbolChange", index: number, symbol: string | null }
   | { type: "nextStatesChange", index: number, stateIds: string[] };
-
-const initialState: InputState = {
-  name: "",
-  alphabet: [],
-  alphabetPresetIndex: "",
-  states: new Map(),
-  transitions: [],
-  initialStateId: NIL,
-  finalStateIds: [],
-};
 
 function alphabetToAlphabetPresetIndex(a: string[]): number {
   // Check if the entered alphabet matches the alphabet of a preset
@@ -214,15 +209,48 @@ function reducer(draft: InputState, action: Action) {
 }
 
 export default function Input({
-  automatonIndex,
+  automata,
   // addAutomaton,
-  openAutomatonAddedSnackbar,
+  onSnackbarOpen,
   openStateDeletedSnackbar,
   openTransitionDeletedSnackbar,
 }: InputProps) {
   const classes = useStyles();
 
   const history = useHistory();
+
+  const params = useParams<InputParams>();
+
+  let automaton: Automaton | null;
+  let automatonIndex: number;
+  if (params.id) {
+    if (!automata.hasChild(params.id)) {
+      return (
+        <Alert severity="error">
+          Automaton not found.
+        </Alert>
+      );
+    }
+
+    const value = automata.child(params.id).val();
+    automaton = Automaton.fromDb(value);
+    automatonIndex = R.indexOf(params.id, R.keys(automata.val()));
+  } else {
+    automaton = null;
+    automatonIndex = automata.numChildren();
+  }
+
+  const initialState: InputState = automaton ? R.mergeLeft(automaton.toInputState(), {
+    alphabetPresetIndex: alphabetToAlphabetPresetIndex(automaton.toInputState().alphabet),
+  }) : {
+    name: "",
+    alphabet: [],
+    alphabetPresetIndex: "",
+    states: new Map(),
+    transitions: [],
+    initialStateId: NIL,
+    finalStateIds: [],
+  };
 
   const [state, dispatch] = useImmerReducer(reducer, initialState);
   const [activeStepIndex, setActiveStepIndex] = React.useState(0);
@@ -346,17 +374,25 @@ export default function Input({
   const handleStep = (stepIndex: number) => (): void => setActiveStepIndex(stepIndex);
 
   const handleFinish = (): void => {
-    const name = state.name || Automaton.generatePlaceholderName(automatonIndex);
-    const automaton = Automaton.createAutomaton(name, state.alphabet, state.states, state.transitions,
-      state.initialStateId, state.finalStateIds);
+    const updatedAutomaton = Automaton.fromInputState(state, automatonIndex);
     // addAutomaton(automaton);
 
     // Add to database
     const automataRef = firebase.database().ref("automata");
-    automataRef.push(automaton.toDb());
+    if (automaton) {
+      automataRef.child(params.id).update(R.mergeLeft(updatedAutomaton.toDb(), {
+        timeUpdated: Date.now(),
+      }))
+        .then(() => onSnackbarOpen("automatonUpdatedSuccess"), () => onSnackbarOpen("automatonUpdatedFailed"));
+    } else {
+      automataRef.push(R.mergeLeft(updatedAutomaton.toDb(), {
+        timeAdded: Date.now(),
+        timeUpdated: Date.now(),
+      }))
+        .then(() => onSnackbarOpen("automatonAddedSuccess"), () => onSnackbarOpen("automatonAddedFailed"));
+    }
 
     history.push("/");
-    openAutomatonAddedSnackbar();
   };
 
   return (

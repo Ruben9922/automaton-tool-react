@@ -11,6 +11,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 import * as R from "ramda";
 import Dialog from "./Dialog";
 import Automaton from "./automaton";
@@ -68,12 +69,17 @@ export default function Home({
             const automaton = Automaton.fromDb(value);
 
             return (
-              <ListItem key={key} button component={Link} to={`/automaton/${key}`}>
+              <ListItem key={key} button component={Link} to={`/automaton/${key}`} style={{ paddingRight: 100 }}>
                 <ListItemText
                   primary={automaton.name}
                   secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
                 />
                 <ListItemSecondaryAction>
+                  <Tooltip title={`Edit Automaton ${index + 1}`}>
+                    <IconButton component={Link} to={`/edit/${key}`} aria-label="edit">
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title={`Delete Automaton ${index + 1}`}>
                     <IconButton onClick={() => handleRemoveAutomatonClick(key)} aria-label="delete">
                       <DeleteIcon />

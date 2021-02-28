@@ -1,23 +1,10 @@
 import * as R from "ramda";
-import Transition from "./transition";
-import TransitionFunctionKey from "./transitionFunctionKey";
-
-type TransitionFunction = Map<string, {currentState: string, symbol: string | null, nextStates: string[]}>;
-
-const createTransitionFunction = (transitions: Transition[], states: Map<string, string>): TransitionFunction => (
-  // Using type assertions to exclude undefined because state can never be undefined due to the
-  // logic of the application
-  new Map(
-    R.map((t: Transition) => [
-      new TransitionFunctionKey(states.get(t.currentState)!, t.symbol).toString(),
-      {
-        currentState: states.get(t.currentState)!,
-        symbol: t.symbol,
-        nextStates: R.map((id) => states.get(id)!, t.nextStates),
-      },
-    ], transitions),
-  )
-);
+import { v4 as uuidv4 } from "uuid";
+import { InputState } from "./Input";
+import TransitionFunction, {
+  transitionFunctionToTransitions,
+  transitionsToTransitionFunction
+} from "./transitionFunction";
 
 // TODO: Replace with interface and factory function (?)
 export default class Automaton {
@@ -45,32 +32,38 @@ export default class Automaton {
   }
 
   // TODO: States in the automaton do not need to contain IDs
-  static createAutomaton = (
-    name: string,
-    alphabet: string[],
-    states: Map<string, string>,
-    transitions: Transition[],
-    initialStateId: string,
-    finalStateIds: string[],
-  ): Automaton => (
-    new Automaton(
-      name,
-      alphabet,
-      Array.from(states.values()),
-      createTransitionFunction(transitions, states),
-      states.get(initialStateId)!,
-      R.map((id) => states.get(id)!, finalStateIds),
-    )
-  );
+  static fromInputState(inputState: Omit<InputState, "alphabetPresetIndex">, index: number): Automaton {
+    return new Automaton(
+      inputState.name || Automaton.generatePlaceholderName(index),
+      inputState.alphabet,
+      Array.from(inputState.states.values()),
+      transitionsToTransitionFunction(inputState.transitions, inputState.states),
+      inputState.states.get(inputState.initialStateId)!,
+      R.map((id) => inputState.states.get(id)!, inputState.finalStateIds),
+    );
+  }
 
-  // static transitionFunctionToTransitions(transitionFunction: TransitionFunction): Transition[] {
-  //   return Array.from(transitionFunction.values()).map((t) => ({
-  //     id: uuidv4(), // TODO: not needed in database (?)
-  //     currentState: t.currentState.id,
-  //     symbol: t.symbol,
-  //     nextStates: t.nextStates.map((s: State) => s.id),
-  //   }));
-  // }
+  toInputState(): Omit<InputState, "alphabetPresetIndex"> {
+    // Generate a UUID for each of the states
+    // Store this as a list of objects
+    const l = R.map((s: string) => ({
+      name: s,
+      id: uuidv4(),
+    }), this.states);
+
+    // Based on this list of objects, create maps mapping from state IDs to state names and vice versa
+    const states = new Map(R.map((o) => [o.id, o.name], l));
+    const stateIds = new Map(R.map((o) => [o.name, o.id], l));
+
+    return {
+      name: this.name,
+      alphabet: this.alphabet,
+      states,
+      transitions: transitionFunctionToTransitions(this.transitionFunction, stateIds),
+      initialStateId: stateIds.get(this.initialState)!,
+      finalStateIds: R.map((state) => stateIds.get(state)!, this.finalStates),
+    };
+  }
 
   // TODO: See if typing can be improved
   toDb(): any {
@@ -81,7 +74,6 @@ export default class Automaton {
       transitionFunction: Object.fromEntries(this.transitionFunction),
       initialState: this.initialState,
       finalStates: this.finalStates,
-      timeAdded: Date.now(),
     };
   }
 

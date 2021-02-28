@@ -54,7 +54,7 @@ export default function View({ automata }: ViewProps) {
   if (!automata.hasChild(params.id)) {
     return (
       <Alert severity="error">
-        Automaton not found
+        Automaton not found.
       </Alert>
     );
   }

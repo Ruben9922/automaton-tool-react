@@ -15,6 +15,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import * as R from "ramda";
 import Dialog from "./Dialog";
 import Automaton from "./automaton";
+import firebase from "./firebase";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -46,9 +47,11 @@ export default function Home({
   };
 
   const handleDialogConfirmClick = (): void => {
-    automata.child(automatonDeleteId).remove();
+    const automataRef = firebase.database().ref("automata");
+    automataRef.child(automatonDeleteId!).remove(); // TODO: Implement .then()
 
-    openSnackbar();
+    setAutomatonDeleteId(null); // Put in .then()
+    openSnackbar(); // Put in .then()
     setDialogOpen(false);
   };
 

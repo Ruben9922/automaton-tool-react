@@ -61,10 +61,10 @@ export default function App() {
                 openSnackbar={handleSnackbarOpen("automatonDeleted")}
               />
             </Route>
-            <Route path="/automaton/:id">
+            <Route path="/view/:id">
               <View automata={automata} />
             </Route>
-            <Route path="/create">
+            <Route path="/new">
               <Input
                 automata={automata}
                 // addAutomaton={addAutomaton}

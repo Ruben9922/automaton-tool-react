@@ -91,13 +91,11 @@ export default function Home({
           })}
         </List>
       )}
-      <Link to="/new">
-        <Tooltip title="Add automaton" className={classes.fab}>
-          <Fab color="primary" aria-label="add">
-            <AddIcon />
-          </Fab>
-        </Tooltip>
-      </Link>
+      <Tooltip title="Add automaton" className={classes.fab}>
+        <Fab component={Link} to="/new" color="primary" aria-label="add">
+          <AddIcon />
+        </Fab>
+      </Tooltip>
       <Dialog
         open={dialogOpen}
         setOpen={setDialogOpen}

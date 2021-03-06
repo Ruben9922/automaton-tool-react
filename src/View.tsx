@@ -19,6 +19,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import Automaton from "./automaton";
 import TransitionFunctionKey from "./transitionFunctionKey";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
   },
   chip: {
     margin: theme.spacing(0.5),
+  },
+  button: {
+    margin: theme.spacing(1),
   },
 }));
 
@@ -237,6 +241,18 @@ export default function View({ automata }: ViewProps) {
           </p>
         </>
       )}
+      <Typography variant="h6" component="h2" gutterBottom>
+        Actions
+      </Typography>
+      <Button variant="contained" className={classes.button}>
+        Run
+      </Button>
+      <Button variant="contained" className={classes.button}>
+        Determinise
+      </Button>
+      <Button variant="contained" className={classes.button}>
+        Minimise
+      </Button>
     </>
   );
 }

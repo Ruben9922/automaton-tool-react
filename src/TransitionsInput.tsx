@@ -19,6 +19,8 @@ import Transition from "./transition";
 import { createStateDisplayName } from "./state";
 import { computeStateIndex } from "./utilities";
 import { TransitionsErrorState, TransitionsHelperText } from "./validation";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from "@material-ui/icons/Add";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -43,6 +45,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   selected: {
     fontWeight: theme.typography.fontWeightMedium,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(4),
+    right: theme.spacing(4),
   },
 }));
 
@@ -181,8 +188,12 @@ export default function TransitionsInput({
             </Tooltip>
           </React.Fragment>
         ))}
-        <Button onClick={onAddTransition} variant="contained">Add transition</Button>
       </form>
+      <Tooltip title="Add transition" className={classes.fab}>
+        <Fab onClick={onAddTransition} color="primary" aria-label="add">
+          <AddIcon />
+        </Fab>
+      </Tooltip>
       {R.isEmpty(warningAlertText) || (
         <Alert severity="warning">
           <AlertTitle>{warningAlertText.length === 1 ? "Warning" : "Warnings"}</AlertTitle>

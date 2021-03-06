@@ -14,6 +14,8 @@ import * as R from "ramda";
 import { StatesErrorState, StatesHelperText } from "./validation";
 import Dialog from "./Dialog";
 import Transition from "./transition";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from "@material-ui/icons/Add";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -25,6 +27,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(4),
+    right: theme.spacing(4),
   },
 }));
 
@@ -122,7 +129,6 @@ export default function StatesInput({
             </Tooltip>
           </React.Fragment>
         ))}
-        <Button onClick={onAddState} variant="contained">Add state</Button>
       </form>
       {R.isEmpty(errorAlertText) || (
         <Alert severity="error">
@@ -146,6 +152,11 @@ export default function StatesInput({
           </ul>
         </Alert>
       )}
+      <Tooltip title="Add state" className={classes.fab}>
+        <Fab onClick={onAddState} color="primary" aria-label="add">
+          <AddIcon />
+        </Fab>
+      </Tooltip>
       <Dialog
         open={dialogOpen}
         setOpen={setDialogOpen}

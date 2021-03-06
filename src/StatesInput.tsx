@@ -28,11 +28,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
-  fab: {
-    position: 'absolute',
-    bottom: theme.spacing(4),
-    right: theme.spacing(4),
-  },
 }));
 
 type StatesInputProps = {
@@ -44,7 +39,6 @@ type StatesInputProps = {
   helperText: StatesHelperText;
   errorAlertText: string[];
   warningAlertText: string[];
-  onAddState: () => void;
   onRemoveState: (id: string) => void;
   onRemoveIncidentTransitions: (stateId: string) => void;
   onSetStateName: (id: string, name: string) => void;
@@ -61,7 +55,6 @@ export default function StatesInput({
   helperText,
   errorAlertText,
   warningAlertText,
-  onAddState,
   onRemoveState,
   onRemoveIncidentTransitions,
   onSetStateName,
@@ -152,11 +145,6 @@ export default function StatesInput({
           </ul>
         </Alert>
       )}
-      <Tooltip title="Add state" className={classes.fab}>
-        <Fab onClick={onAddState} color="primary" aria-label="add">
-          <AddIcon />
-        </Fab>
-      </Tooltip>
       <Dialog
         open={dialogOpen}
         setOpen={setDialogOpen}

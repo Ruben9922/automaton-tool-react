@@ -25,6 +25,8 @@ import firebase from './firebase';
 import Automaton from "./automaton";
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
 import Alert from "@material-ui/lab/Alert";
+import MultipleFabs, {FabProps} from "./MultipleFabs";
+import AddIcon from "@material-ui/icons/Add";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -279,7 +281,6 @@ export default function Input({
       helperText={helperText.states}
       errorAlertText={errorAlertText.states}
       warningAlertText={warningAlertText.states}
-      onAddState={() => dispatch({ type: "addState" })}
       onRemoveState={(id) => {
         dispatch({ type: "removeState", id });
         openStateDeletedSnackbar();
@@ -296,7 +297,6 @@ export default function Input({
       errorState={errorState.transitions}
       helperText={helperText.transitions}
       warningAlertText={warningAlertText.transitions}
-      onAddTransition={() => dispatch({ type: "addTransition" })}
       onRemoveTransition={(index) => {
         dispatch({ type: "removeTransition", index });
         openTransitionDeletedSnackbar();
@@ -325,6 +325,7 @@ export default function Input({
     completed: boolean;
     errorCount: number;
     warningCount: number;
+    fab?: FabProps;
   }
 
   const steps: InputStep[] = [
@@ -341,6 +342,12 @@ export default function Input({
       completed: countErrors(errorState.states, errorAlertText.states) === 0,
       errorCount: countErrors(errorState.states, errorAlertText.states),
       warningCount: warningAlertText.states.length,
+      fab: {
+        tooltip: "Add state",
+        icon: <AddIcon />,
+        action: () => dispatch({ type: "addState" }),
+        label: "add-state",
+      },
     },
     {
       id: uuidv4(),
@@ -348,6 +355,12 @@ export default function Input({
       completed: countErrors(errorState.transitions, errorAlertText.transitions) === 0,
       errorCount: countErrors(errorState.transitions, errorAlertText.transitions),
       warningCount: warningAlertText.transitions.length,
+      fab: {
+        tooltip: "Add transition",
+        icon: <AddIcon />,
+        action: () => dispatch({ type: "addTransition" }),
+        label: "add-transition",
+      },
     },
     {
       id: uuidv4(),
@@ -435,6 +448,7 @@ export default function Input({
       <Button variant="contained" color="primary" onClick={handleFinish} disabled={!allStepsCompleted()}>
         Finish
       </Button>
+      <MultipleFabs fabs={R.map((s) => s.fab, steps)} openFabIndex={activeStepIndex} />
     </div>
   );
 }

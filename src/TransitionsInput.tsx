@@ -46,11 +46,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   selected: {
     fontWeight: theme.typography.fontWeightMedium,
   },
-  fab: {
-    position: 'absolute',
-    bottom: theme.spacing(4),
-    right: theme.spacing(4),
-  },
 }));
 
 type TransitionsInputProps = {
@@ -60,7 +55,6 @@ type TransitionsInputProps = {
   errorState: TransitionsErrorState;
   helperText: TransitionsHelperText;
   warningAlertText: string[];
-  onAddTransition: () => void;
   onRemoveTransition: (index: number) => void;
   onCurrentStateChange: (index: number, stateId: string) => void;
   onSymbolChange: (index: number, symbol: string | null) => void;
@@ -74,7 +68,6 @@ export default function TransitionsInput({
   errorState,
   helperText,
   warningAlertText,
-  onAddTransition,
   onRemoveTransition,
   onCurrentStateChange,
   onSymbolChange,
@@ -189,11 +182,6 @@ export default function TransitionsInput({
           </React.Fragment>
         ))}
       </form>
-      <Tooltip title="Add transition" className={classes.fab}>
-        <Fab onClick={onAddTransition} color="primary" aria-label="add">
-          <AddIcon />
-        </Fab>
-      </Tooltip>
       {R.isEmpty(warningAlertText) || (
         <Alert severity="warning">
           <AlertTitle>{warningAlertText.length === 1 ? "Warning" : "Warnings"}</AlertTitle>

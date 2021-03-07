@@ -74,14 +74,14 @@ export default function Home({
             const automaton = Automaton.fromDb(value);
 
             return (
-              <ListItem key={key} button component={Link} to={`/view/${key}`} style={{ paddingRight: 100 }}>
+              <ListItem key={key} button component={Link} to={`/automata/${key}`} style={{ paddingRight: 100 }}>
                 <ListItemText
                   primary={automaton.name}
                   secondary={`${R.length(automaton.alphabet)} symbols, ${R.length(automaton.states)} states, ${automaton.transitionFunction.size} transitions`}
                 />
                 <ListItemSecondaryAction>
                   <Tooltip title={`Edit Automaton ${index + 1}`}>
-                    <IconButton component={Link} to={`/edit/${key}`} aria-label="edit">
+                    <IconButton component={Link} to={`/automata/${key}/edit`} aria-label="edit">
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
@@ -97,7 +97,7 @@ export default function Home({
         </List>
       )}
       <Tooltip title="Add automaton" className={classes.fab}>
-        <Fab component={Link} to="/new" color="primary" aria-label="add">
+        <Fab component={Link} to="/automata/new" color="primary" aria-label="add">
           <AddIcon />
         </Fab>
       </Tooltip>

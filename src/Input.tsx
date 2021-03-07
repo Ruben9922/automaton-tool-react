@@ -5,28 +5,22 @@ import Typography from "@material-ui/core/Typography";
 import Step from "@material-ui/core/Step";
 import StepButton from "@material-ui/core/StepButton";
 import Stepper from "@material-ui/core/Stepper";
-import {useHistory, useParams} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { StepLabel } from "@material-ui/core";
 import { NIL, v4 as uuidv4 } from "uuid";
 import { useImmerReducer } from "use-immer";
 import * as R from "ramda";
+import AddIcon from "@material-ui/icons/Add";
 import AlphabetInput from "./AlphabetInput";
 import TransitionsInput from "./TransitionsInput";
 import StatesInput from "./StatesInput";
-import {
-  AlphabetErrorState,
-  StatesErrorState,
-  TransitionsErrorState,
-  validate,
-} from "./validation";
+import {AlphabetErrorState, StatesErrorState, TransitionsErrorState, validate,} from "./validation";
 import Transition from "./transition";
-import { alphabetPresets } from './alphabetPreset';
+import {alphabetPresets} from './alphabetPreset';
 import firebase from './firebase';
 import Automaton from "./automaton";
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
-import Alert from "@material-ui/lab/Alert";
-import MultipleFabs, {FabProps} from "./MultipleFabs";
-import AddIcon from "@material-ui/icons/Add";
+import MultipleFabs, { FabProps } from "./MultipleFabs";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -48,7 +42,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type InputProps = {
-  automata: any;
+  automaton: Automaton | null;
+  automatonIndex: number;
+  automatonId: string | null;
   // addAutomaton: (automaton: Automaton) => void;
   onSnackbarOpen: (key: string) => void;
   openStateDeletedSnackbar: () => void;
@@ -63,10 +59,6 @@ export type InputState = {
   transitions: Transition[];
   initialStateId: string;
   finalStateIds: string[];
-};
-
-type InputParams = {
-  id: string;
 };
 
 type Action =
@@ -212,7 +204,9 @@ function reducer(draft: InputState, action: Action) {
 }
 
 export default function Input({
-  automata,
+  automaton,
+  automatonIndex,
+  automatonId,
   // addAutomaton,
   onSnackbarOpen,
   openStateDeletedSnackbar,
@@ -221,27 +215,6 @@ export default function Input({
   const classes = useStyles();
 
   const history = useHistory();
-
-  const params = useParams<InputParams>();
-
-  let automaton: Automaton | null;
-  let automatonIndex: number;
-  if (params.id) {
-    if (!automata.hasChild(params.id)) {
-      return (
-        <Alert severity="error">
-          Automaton not found.
-        </Alert>
-      );
-    }
-
-    const value = automata.child(params.id).val();
-    automaton = Automaton.fromDb(value);
-    automatonIndex = R.indexOf(params.id, R.keys(automata.val()));
-  } else {
-    automaton = null;
-    automatonIndex = automata.numChildren();
-  }
 
   const initialState: InputState = automaton ? R.mergeLeft(automaton.toInputState(), {
     alphabetPresetIndex: alphabetToAlphabetPresetIndex(automaton.toInputState().alphabet),
@@ -393,8 +366,8 @@ export default function Input({
 
     // Add to database
     const automataRef = firebase.database().ref("automata");
-    if (automaton) {
-      automataRef.child(params.id).update(R.mergeLeft(updatedAutomaton.toDb(), {
+    if (automaton && automatonId) {
+      automataRef.child(automatonId).update(R.mergeLeft(updatedAutomaton.toDb(), {
         timeUpdated: Date.now(),
       }))
         .then(() => onSnackbarOpen("automatonUpdatedSuccess"), () => onSnackbarOpen("automatonUpdatedFailed"));

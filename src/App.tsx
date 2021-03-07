@@ -14,6 +14,7 @@ import Header from "./Header";
 import Snackbar from './Snackbar';
 import SnackbarMessage from './snackbarMessage';
 import Loader from './Loader';
+import Automata from "./Automata";
 
 // TODO: Maybe just remove this and hardcode the messages
 const messages: Record<string, string> = {
@@ -61,25 +62,10 @@ export default function App() {
                 openSnackbar={handleSnackbarOpen("automatonDeleted")}
               />
             </Route>
-            <Route path="/view/:id">
-              <View automata={automata} />
-            </Route>
-            <Route path="/new">
-              <Input
+            <Route path="/automata">
+              <Automata
                 automata={automata}
-                // addAutomaton={addAutomaton}
                 onSnackbarOpen={handleSnackbarOpen}
-                openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}
-                openTransitionDeletedSnackbar={handleSnackbarOpen("transitionDeleted")}
-              />
-            </Route>
-            <Route path="/edit/:id">
-              <Input
-                automata={automata}
-                // addAutomaton={addAutomaton}
-                onSnackbarOpen={handleSnackbarOpen}
-                openStateDeletedSnackbar={handleSnackbarOpen("stateDeleted")}
-                openTransitionDeletedSnackbar={handleSnackbarOpen("transitionDeleted")}
               />
             </Route>
           </Switch>

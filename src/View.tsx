@@ -40,31 +40,14 @@ const useStyles = makeStyles((theme) => ({
 
 type TransitionView = "transitions" | "transitionFunction";
 
-type ViewParams = {
-  id: string;
-};
-
 type ViewProps = {
-  automata: any;
+  automaton: Automaton;
 };
 
-export default function View({ automata }: ViewProps) {
+export default function View({ automaton }: ViewProps) {
   const classes = useStyles();
 
-  const params = useParams<ViewParams>();
-
   const [transitionsView, setTransitionsView] = React.useState<TransitionView>("transitions");
-
-  if (!automata.hasChild(params.id)) {
-    return (
-      <Alert severity="error">
-        Automaton not found.
-      </Alert>
-    );
-  }
-
-  const value = automata.child(params.id).val();
-  const automaton = Automaton.fromDb(value);
 
   const symbols = R.prepend(null, automaton.alphabet);
 

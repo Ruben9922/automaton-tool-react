@@ -3,7 +3,7 @@ import {
 } from "react-router-dom";
 import Alert from "@material-ui/lab/Alert";
 import React from "react";
-import Automaton from "./automaton";
+import Automaton from "../core/automaton";
 import View from "./View";
 import Input from "./Input";
 import * as R from "ramda";

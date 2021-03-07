@@ -14,11 +14,11 @@ import AddIcon from "@material-ui/icons/Add";
 import AlphabetInput from "./AlphabetInput";
 import TransitionsInput from "./TransitionsInput";
 import StatesInput from "./StatesInput";
-import {AlphabetErrorState, StatesErrorState, TransitionsErrorState, validate,} from "./validation";
-import Transition from "./transition";
-import {alphabetPresets} from './alphabetPreset';
-import firebase from './firebase';
-import Automaton from "./automaton";
+import {AlphabetErrorState, StatesErrorState, TransitionsErrorState, validate,} from "../core/validation";
+import Transition from "../core/transition";
+import {alphabetPresets} from '../core/alphabetPreset';
+import firebase from '../firebase';
+import Automaton from "../core/automaton";
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
 import MultipleFabs, { FabProps } from "./MultipleFabs";
 

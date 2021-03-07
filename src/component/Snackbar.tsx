@@ -5,7 +5,7 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import * as R from "ramda";
-import SnackbarMessage from "./snackbarMessage";
+import SnackbarMessage from "../core/snackbarMessage";
 
 const useStyles = makeStyles((theme: Theme) => ({
   close: {

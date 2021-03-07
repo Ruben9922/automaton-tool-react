@@ -6,13 +6,13 @@ import { v4 as uuidv4 } from "uuid";
 import { useObject } from 'react-firebase-hooks/database';
 import Alert from '@material-ui/lab/Alert';
 import Link from '@material-ui/core/Link';
-import firebase from './firebase';
+import firebase from '../firebase';
 import Input from "./Input";
 import View from "./View";
 import Home from "./Home";
 import Header from "./Header";
 import Snackbar from './Snackbar';
-import SnackbarMessage from './snackbarMessage';
+import SnackbarMessage from '../core/snackbarMessage';
 import Loader from './Loader';
 import Automata from "./Automata";
 

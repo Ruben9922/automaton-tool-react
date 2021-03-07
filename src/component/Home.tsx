@@ -14,8 +14,8 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import * as R from "ramda";
 import Dialog from "./Dialog";
-import Automaton from "./automaton";
-import firebase from "./firebase";
+import Automaton from "../core/automaton";
+import firebase from "../firebase";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {

@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import { v4 as uuidv4 } from "uuid";
-import { InputState } from "./Input";
+import { InputState } from "../component/Input";
 import TransitionFunction, {
   transitionFunctionToTransitions,
   transitionsToTransitionFunction

@@ -15,10 +15,10 @@ import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import clsx from "clsx";
 import * as R from "ramda";
-import Transition from "./transition";
-import { createStateDisplayName } from "./state";
-import { computeStateIndex } from "./utilities";
-import { TransitionsErrorState, TransitionsHelperText } from "./validation";
+import Transition from "../core/transition";
+import { createStateDisplayName } from "../core/state";
+import { computeStateIndex } from "../core/utilities";
+import { TransitionsErrorState, TransitionsHelperText } from "../core/validation";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 

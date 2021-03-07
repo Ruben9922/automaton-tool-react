@@ -11,9 +11,9 @@ import Button from "@material-ui/core/Button";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import * as R from "ramda";
-import { StatesErrorState, StatesHelperText } from "./validation";
+import { StatesErrorState, StatesHelperText } from "../core/validation";
 import Dialog from "./Dialog";
-import Transition from "./transition";
+import Transition from "../core/transition";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 

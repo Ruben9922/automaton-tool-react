@@ -17,8 +17,8 @@ import Alert from "@material-ui/lab/Alert";
 import * as R from "ramda";
 import React from "react";
 import { useParams } from "react-router-dom";
-import Automaton from "./automaton";
-import TransitionFunctionKey from "./transitionFunctionKey";
+import Automaton from "../core/automaton";
+import TransitionFunctionKey from "../core/transitionFunctionKey";
 import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({

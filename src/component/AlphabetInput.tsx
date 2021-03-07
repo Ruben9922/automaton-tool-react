@@ -5,8 +5,8 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { AlphabetErrorState, AlphabetHelperText } from "./validation";
-import { alphabetPresets } from "./alphabetPreset";
+import { AlphabetErrorState, AlphabetHelperText } from "../core/validation";
+import { alphabetPresets } from "../core/alphabetPreset";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

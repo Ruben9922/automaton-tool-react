@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import { enableMapSet } from 'immer';
-import App from './App';
+import App from './component/App';
 import reportWebVitals from './reportWebVitals';
 
 // Enable support for native Map and Set in Immer

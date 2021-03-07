@@ -5,6 +5,8 @@ import TransitionFunction, {
   transitionFunctionToTransitions,
   transitionsToTransitionFunction
 } from "./transitionFunction";
+import TransitionFunctionKey from "./transitionFunctionKey";
+import {Run} from "./run";
 
 // TODO: Replace with interface and factory function (?)
 export default class Automaton {
@@ -100,4 +102,50 @@ export default class Automaton {
   static generatePlaceholderName(index: number): string {
     return `Automaton ${index + 1}`;
   }
+
+  computeEpsilonClosure(states: string[]): string[] {
+    let closure = [...states];
+    let changed: boolean;
+    let newlyVisited = [...states];
+
+    do {
+      newlyVisited = R.chain((state1) => (
+        this.transitionFunction.get(new TransitionFunctionKey(state1, null).toString())?.nextStates ?? []
+      ), newlyVisited);
+      const updatedClosure = R.union(closure, newlyVisited);
+      changed = !R.equals(closure, updatedClosure);
+      closure = updatedClosure;
+    } while (changed);
+
+    return closure;
+  }
+
+  run(input: string): Run {
+    let currentStates = this.computeEpsilonClosure([this.initialState]);
+    let visitedStates: Run = [
+      {
+        states: currentStates,
+        symbol: null,
+      },
+    ];
+
+    // TODO: Maybe rewrite using R.reduce
+    // TODO: Maybe remove currentStates variable
+    for (const symbol of input) {
+      let nextStatesUnion = R.chain((state) => (
+        this.transitionFunction.get(new TransitionFunctionKey(state, symbol).toString())?.nextStates ?? []
+      ), currentStates);
+      nextStatesUnion = this.computeEpsilonClosure(nextStatesUnion);
+
+      currentStates = nextStatesUnion;
+      visitedStates = R.append({
+        states: currentStates,
+        symbol,
+      }, visitedStates);
+    }
+
+    return visitedStates;
+  }
+
+  // TODO: Run (tree version)
 }

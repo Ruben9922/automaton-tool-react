@@ -16,7 +16,7 @@ import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import * as R from "ramda";
 import React from "react";
-import { useParams } from "react-router-dom";
+import {Link, useParams, useRouteMatch} from "react-router-dom";
 import Automaton from "../core/automaton";
 import TransitionFunctionKey from "../core/transitionFunctionKey";
 import Button from "@material-ui/core/Button";
@@ -46,6 +46,8 @@ type ViewProps = {
 
 export default function View({ automaton }: ViewProps) {
   const classes = useStyles();
+
+  const { url } = useRouteMatch();
 
   const [transitionsView, setTransitionsView] = React.useState<TransitionView>("transitions");
 
@@ -227,7 +229,7 @@ export default function View({ automaton }: ViewProps) {
       <Typography variant="h6" component="h2" gutterBottom>
         Actions
       </Typography>
-      <Button variant="contained" className={classes.button}>
+      <Button component={Link} to={`${url}/run`} variant="contained" className={classes.button}>
         Run
       </Button>
       <Button variant="contained" className={classes.button}>

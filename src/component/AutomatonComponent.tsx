@@ -7,6 +7,7 @@ import Automaton from "../core/automaton";
 import View from "./View";
 import Input from "./Input";
 import * as R from "ramda";
+import Run from "./RunComponent";
 
 type AutomatonParams = {
   automatonId: string;
@@ -51,6 +52,9 @@ export default function AutomatonComponent({
           openStateDeletedSnackbar={() => onSnackbarOpen("stateDeleted")}
           openTransitionDeletedSnackbar={() => onSnackbarOpen("transitionDeleted")}
         />
+      </Route>
+      <Route path={`${url}/run`}>
+        <Run automaton={automaton} />
       </Route>
     </Switch>
   );

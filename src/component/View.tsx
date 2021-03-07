@@ -68,6 +68,8 @@ export default function View({ automaton }: ViewProps) {
   // const valid = allValid(errors);
   // const alertText = createHelperTextMultiple(R.values(errors));
 
+  // TODO: Edit button in Actions section
+
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>

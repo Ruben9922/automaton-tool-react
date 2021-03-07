@@ -9,6 +9,7 @@ export default class TransitionFunctionKey {
   }
 
   toString() {
+    // TODO: Make this string nicer
     return `TransitionFunctionKey(currentStateId=${this.currentState}, symbol=${this.symbol})`;
   }
 }

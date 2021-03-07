@@ -57,6 +57,7 @@ export default function Home({
 
   const automaton = automatonDeleteId ? Automaton.fromDb(automata.child(automatonDeleteId).val()) : null;
 
+  // TODO: Replace "/automata" link with url variable
   return (
     <>
       {!automata.hasChildren() ? (

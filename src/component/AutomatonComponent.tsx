@@ -14,7 +14,7 @@ type AutomatonParams = {
 
 type AutomatonProps = {
   automata: any;
-  onSnackbarOpen: (key: string) => () => void;
+  onSnackbarOpen: (key: string) => void;
 };
 
 export default function AutomatonComponent({
@@ -48,8 +48,8 @@ export default function AutomatonComponent({
           automatonId={automatonId}
           // addAutomaton={addAutomaton}
           onSnackbarOpen={onSnackbarOpen}
-          openStateDeletedSnackbar={onSnackbarOpen("stateDeleted")}
-          openTransitionDeletedSnackbar={onSnackbarOpen("transitionDeleted")}
+          openStateDeletedSnackbar={() => onSnackbarOpen("stateDeleted")}
+          openTransitionDeletedSnackbar={() => onSnackbarOpen("transitionDeleted")}
         />
       </Route>
     </Switch>

@@ -6,7 +6,7 @@ import Input from "./Input";
 
 type AutomataProps = {
   automata: any;
-  onSnackbarOpen: (key: string) => () => void;
+  onSnackbarOpen: (key: string) => void;
 };
 
 export default function Automata({
@@ -21,7 +21,7 @@ export default function Automata({
         <Home
           automata={automata}
           // onAutomataChange={setAutomata}
-          openSnackbar={onSnackbarOpen("automatonDeleted")}
+          openSnackbar={() => onSnackbarOpen("automatonDeleted")}
         />
       </Route>
       <Route path={`${url}/new`}>
@@ -31,8 +31,8 @@ export default function Automata({
           automatonId={null}
           // addAutomaton={addAutomaton}
           onSnackbarOpen={onSnackbarOpen}
-          openStateDeletedSnackbar={onSnackbarOpen("stateDeleted")}
-          openTransitionDeletedSnackbar={onSnackbarOpen("transitionDeleted")}
+          openStateDeletedSnackbar={() => onSnackbarOpen("stateDeleted")}
+          openTransitionDeletedSnackbar={() => onSnackbarOpen("transitionDeleted")}
         />
       </Route>
       <Route path={`${url}/:automatonId`}>

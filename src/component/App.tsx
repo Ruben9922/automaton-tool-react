@@ -31,7 +31,7 @@ export default function App() {
   const [automata, loading, error] = useObject(firebase.database().ref("automata").orderByChild("timeAdded"));
   const [snackbarQueue, setSnackbarQueue] = React.useState<SnackbarMessage[]>([]);
 
-  const handleSnackbarOpen = (key: string) => (): void => {
+  const handleSnackbarOpen = (key: string): void => {
     setSnackbarQueue((prevSnackPack) => R.append({
       id: uuidv4(),
       message: messages[key],
@@ -59,7 +59,7 @@ export default function App() {
               <Home
                 automata={automata}
                 // onAutomataChange={setAutomata}
-                openSnackbar={handleSnackbarOpen("automatonDeleted")}
+                openSnackbar={() => handleSnackbarOpen("automatonDeleted")}
               />
             </Route>
             <Route path="/automata">

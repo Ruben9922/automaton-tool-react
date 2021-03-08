@@ -46,7 +46,7 @@ export default function RunComponent({ automaton }: RunProps) {
         defaultExpandIcon={<ChevronRightIcon />}
       >
         {run?.map((runItem, runItemIndex) => (
-          <TreeItem nodeId={runItemIndex.toString()} key={runItemIndex} label={runItem.symbol}>
+          <TreeItem nodeId={runItemIndex.toString()} key={runItemIndex} label={runItem.symbol || "[Initial]"}>
             {runItem.states.map((state, stateIndex) => (
               <TreeItem nodeId={`${runItemIndex}-${stateIndex}`} key={stateIndex} label={state} />
             ))}

@@ -43,6 +43,7 @@ export default function RunComponent({ automaton }: RunProps) {
 
   // TODO: Check input only contains symbols in the automaton's alphabet
   // TODO: Maybe add options for epsilion closure - e.g. display effect of epsilon closure after each input symbol
+  // TODO: Show run result (i.e. "accepted" or "rejected")
   return (
     <>
       <form className={classes.root} autoComplete="off">

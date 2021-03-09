@@ -36,7 +36,7 @@ export default function RunComponent({ automaton }: RunProps) {
   const [runView, setRunView] = React.useState<RunView>("setView");
 
   const renderTree = (tree: RunTree) => tree.map((node) => (
-    <TreeItem key={node.id} nodeId={node.id} label={`${node.state} (${node.symbol})`}>
+    <TreeItem key={node.id} nodeId={node.id} label={`${node.state} (${node.symbol ?? "Initial"})`}>
       {renderTree(node.children)}
     </TreeItem>
   ));

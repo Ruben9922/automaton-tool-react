@@ -28,6 +28,7 @@ export default function RunComponent({ automaton }: RunProps) {
   const [run, setRun] = React.useState<Run | null>(null);
 
   // TODO: Check input only contains symbols in the automaton's alphabet
+  // TODO: Maybe add options for epsilion closure - e.g. display effect of epsilon closure after each input symbol
   return (
     <>
       <form className={classes.root} autoComplete="off">

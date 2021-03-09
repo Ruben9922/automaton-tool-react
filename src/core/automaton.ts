@@ -6,7 +6,7 @@ import TransitionFunction, {
   transitionsToTransitionFunction
 } from "./transitionFunction";
 import TransitionFunctionKey from "./transitionFunctionKey";
-import {Run} from "./run";
+import {Run, RunTree, RunTreeNode} from "./run";
 
 // TODO: Replace with interface and factory function (?)
 export default class Automaton {
@@ -147,5 +147,32 @@ export default class Automaton {
     return visitedStates;
   }
 
-  // TODO: Run (tree version)
+  runTree(input: string): RunTree {
+    const createTree = (state: string, symbol: string | null): RunTreeNode => ({
+      id: uuidv4(),
+      state,
+      symbol,
+      children: [],
+    });
+
+    let roots = R.map(R.partialRight(createTree, [null]), this.computeEpsilonClosure([this.initialState]));
+    let currentLevel = [...roots];
+
+    for (const symbol of input) {
+      let nextLevel: RunTreeNode[] = [];
+      for (const node of currentLevel) {
+        let nextStates = this.transitionFunction.get(new TransitionFunctionKey(node.state, symbol).toString())?.nextStates ?? [];
+        nextStates = this.computeEpsilonClosure(nextStates);
+
+        const newNodes = R.map(R.partialRight(createTree, [symbol]), nextStates);
+
+        node.children = newNodes;
+
+        nextLevel = [...nextLevel, ...newNodes];
+      }
+      currentLevel = nextLevel;
+    }
+
+    return roots;
+  }
 }

@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type TransitionView = "transitions" | "transitionFunction";
+type TransitionsView = "transitions" | "transitionFunction";
 
 type ViewProps = {
   automaton: Automaton;
@@ -49,7 +49,7 @@ export default function View({ automaton }: ViewProps) {
 
   const { url } = useRouteMatch();
 
-  const [transitionsView, setTransitionsView] = React.useState<TransitionView>("transitions");
+  const [transitionsView, setTransitionsView] = React.useState<TransitionsView>("transitions");
 
   const symbols = R.prepend(null, automaton.alphabet);
 
@@ -136,7 +136,7 @@ export default function View({ automaton }: ViewProps) {
           aria-label="transitionsView"
           name="transitionsView"
           value={transitionsView}
-          onChange={(event) => setTransitionsView(event.target.value as TransitionView)}
+          onChange={(event) => setTransitionsView(event.target.value as TransitionsView)}
         >
           <FormControlLabel
             value="transitions"

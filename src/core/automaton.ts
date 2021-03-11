@@ -175,4 +175,8 @@ export default class Automaton {
 
     return roots;
   }
+
+  accepts(run: Run): boolean {
+    return !R.isEmpty(R.intersection(R.last(run)?.states ?? [], this.finalStates));
+  }
 }

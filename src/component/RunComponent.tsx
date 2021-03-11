@@ -11,6 +11,9 @@ import FormControl from "@material-ui/core/FormControl";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
+import Paper from "@material-ui/core/Paper";
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -18,6 +21,18 @@ const useStyles = makeStyles((theme: Theme) => ({
       margin: theme.spacing(1),
       width: '25ch',
     },
+  },
+  paper: {
+    margin: theme.spacing(1),
+    // padding: theme.spacing(1),
+    // display: "inline-block",
+    width: theme.spacing(16),
+    height: theme.spacing(16),
+    textAlign: "center",
+    // padding: theme.spacing(3),
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 }));
 
@@ -43,7 +58,6 @@ export default function RunComponent({ automaton }: RunProps) {
 
   // TODO: Check input only contains symbols in the automaton's alphabet
   // TODO: Maybe add options for epsilion closure - e.g. display effect of epsilon closure after each input symbol
-  // TODO: Show run result (i.e. "accepted" or "rejected")
   // TODO: Maybe rename "set view"
   // TODO: Add explanation
   // TODO: Expand all & collapse all buttons
@@ -86,6 +100,14 @@ export default function RunComponent({ automaton }: RunProps) {
           />
         </RadioGroup>
       </FormControl>
+      {run && (
+        <Paper className={classes.paper}>
+          <div>
+            {automaton.accepts(run) ? <CheckIcon fontSize="large" /> : <CloseIcon fontSize="large" />}
+            <p style={{ margin: 0 }}>{automaton.accepts(run) ? "Accepted" : "Rejected"}</p>
+          </div>
+        </Paper>
+      )}
       {runView !== "treeView" ? (
         <TreeView
           defaultCollapseIcon={<ExpandMoreIcon />}

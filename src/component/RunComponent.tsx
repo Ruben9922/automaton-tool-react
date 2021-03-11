@@ -45,6 +45,8 @@ export default function RunComponent({ automaton }: RunProps) {
   // TODO: Maybe add options for epsilion closure - e.g. display effect of epsilon closure after each input symbol
   // TODO: Show run result (i.e. "accepted" or "rejected")
   // TODO: Maybe rename "set view"
+  // TODO: Add explanation
+  // TODO: Expand all & collapse all buttons
   return (
     <>
       <form className={classes.root} autoComplete="off">

@@ -54,6 +54,7 @@ module.exports = {
       ignoreRegExpLiterals: true,
     }],
     "react/no-array-index-key": "off",
+    "no-underscore-dangle": ["error", { allow: ["__"] }],
   },
   settings: {
     "import/resolver": {

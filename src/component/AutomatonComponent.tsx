@@ -56,6 +56,9 @@ export default function AutomatonComponent({
       <Route path={`${url}/run`}>
         <Run automaton={automaton} />
       </Route>
+      <Route path={`${url}/determinized`}>
+        <View automaton={automaton.determinize()} />
+      </Route>
     </Switch>
   );
 }

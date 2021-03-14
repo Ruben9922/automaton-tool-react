@@ -179,4 +179,81 @@ export default class Automaton {
   accepts(run: Run): boolean {
     return !R.isEmpty(R.intersection(R.last(run)?.states ?? [], this.finalStates));
   }
+
+  static flatten(states: string[]): string {
+    return `{${states.join(", ")}}`;
+  }
+
+  determinize(): Automaton {
+    const dfaInitialState = this.computeEpsilonClosure([this.initialState]);
+
+    let dfaStatesFlattened: string[] = [];
+    let dfaFinalStatesFlattened: string[] = [];
+    const dfaTransitionFunction: TransitionFunction = new Map();
+
+    let unexpandedDfaStates: string[][] = [];
+    unexpandedDfaStates = R.append(dfaInitialState, unexpandedDfaStates);
+    let expandedDfaStates: string[][] = [];
+
+    while (!R.isEmpty(unexpandedDfaStates)) {
+      // Pick any element from the unexpanded set and remove it
+      const dfaCurrentState = R.head(unexpandedDfaStates)!;
+      unexpandedDfaStates = R.tail(unexpandedDfaStates); // TODO: Think this is not necessary
+
+      // Add it to the expanded set
+      expandedDfaStates = R.union(expandedDfaStates, [dfaCurrentState]);
+
+      // Note that flattening is done on-the-fly, therefore there is no full un-flattened version of the DFA
+      const dfaCurrentStateFlattened = Automaton.flatten(dfaCurrentState);
+      dfaStatesFlattened = R.union(dfaStatesFlattened, [dfaCurrentStateFlattened]);
+
+      // Add the (flattened) DFA state to the (flattened) final states set if it is final
+      // The DFA state is final if any of the contained NFA states is final
+      const isFinalState = R.any(R.includes(R.__, this.finalStates), dfaCurrentState);
+      if (isFinalState) {
+        dfaFinalStatesFlattened = R.union(dfaFinalStatesFlattened, [dfaCurrentStateFlattened]);
+      }
+
+      for (const symbol of this.alphabet) {
+        let dfaNextState = R.chain((nfaState) => this.transitionFunction.get(new TransitionFunctionKey(nfaState, symbol).toString())?.nextStates ?? [], dfaCurrentState);
+        dfaNextState = this.computeEpsilonClosure(dfaNextState);
+
+        // Add DFA state (flattened version)
+        const dfaNextStateFlattened = Automaton.flatten(dfaNextState);
+        dfaStatesFlattened = R.union(dfaStatesFlattened, [dfaNextStateFlattened]);
+
+        // Add DFA transition - note its current and next states are the flattened versions
+        dfaTransitionFunction.set(new TransitionFunctionKey(dfaCurrentStateFlattened, symbol).toString(), {
+          currentState: dfaCurrentStateFlattened,
+          symbol,
+          nextStates: [dfaNextStateFlattened],
+        });
+
+        // Add next states ready to expanded in future iteration
+        unexpandedDfaStates = R.union(unexpandedDfaStates, [dfaNextState]);
+      }
+
+      // Remove any expanded states from the unexpanded set
+      // Needed as the computed DFA next state may be the same as one expanded previously
+      unexpandedDfaStates = R.difference(unexpandedDfaStates, expandedDfaStates);
+    }
+
+    console.log(new Automaton(
+      `${this.name} [Determinised]`,
+      this.alphabet,
+      dfaStatesFlattened,
+      dfaTransitionFunction,
+      Automaton.flatten(dfaInitialState),
+      dfaFinalStatesFlattened,
+    ));
+
+    return new Automaton(
+      `${this.name} [Determinised]`,
+      this.alphabet,
+      dfaStatesFlattened,
+      dfaTransitionFunction,
+      Automaton.flatten(dfaInitialState),
+      dfaFinalStatesFlattened,
+    );
+  }
 }

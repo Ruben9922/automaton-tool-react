@@ -234,7 +234,7 @@ export default function View({ automaton }: ViewProps) {
       <Button component={Link} to={`${url}/run`} variant="contained" className={classes.button}>
         Run
       </Button>
-      <Button variant="contained" className={classes.button}>
+      <Button component={Link} to={`${url}/determinized`} variant="contained" className={classes.button}>
         Determinise
       </Button>
       <Button variant="contained" className={classes.button}>

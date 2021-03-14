@@ -238,15 +238,6 @@ export default class Automaton {
       unexpandedDfaStates = R.difference(unexpandedDfaStates, expandedDfaStates);
     }
 
-    console.log(new Automaton(
-      `${this.name} [Determinised]`,
-      this.alphabet,
-      dfaStatesFlattened,
-      dfaTransitionFunction,
-      Automaton.flatten(dfaInitialState),
-      dfaFinalStatesFlattened,
-    ));
-
     return new Automaton(
       `${this.name} [Determinised]`,
       this.alphabet,

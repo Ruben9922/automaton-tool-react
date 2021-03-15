@@ -103,7 +103,7 @@ export default class Automaton {
     return `Automaton ${index + 1}`;
   }
 
-  computeEpsilonClosure(states: string[]): string[] {
+  private computeEpsilonClosure(states: string[]): string[] {
     let closure = [...states];
     let changed: boolean;
     let newlyVisited = [...states];
@@ -180,7 +180,7 @@ export default class Automaton {
     return !R.isEmpty(R.intersection(R.last(run)?.states ?? [], this.finalStates));
   }
 
-  static flatten(states: string[]): string {
+  private static flatten(states: string[]): string {
     return `{${states.join(", ")}}`;
   }
 

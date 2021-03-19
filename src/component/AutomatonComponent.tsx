@@ -59,6 +59,9 @@ export default function AutomatonComponent({
       <Route path={`${url}/determinized`}>
         <View automaton={automaton.determinize()} />
       </Route>
+      <Route path={`${url}/minimized`}>
+        <View automaton={automaton.minimize()} />
+      </Route>
     </Switch>
   );
 }

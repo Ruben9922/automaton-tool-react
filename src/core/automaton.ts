@@ -7,8 +7,10 @@ import TransitionFunction, {
 } from "./transitionFunction";
 import TransitionFunctionKey from "./transitionFunctionKey";
 import {Run, RunTree, RunTreeNode} from "./run";
+import {isSubset} from "./utilities";
 
 // TODO: Replace with interface and factory function (?)
+// TODO: Look into Immer with classes
 export default class Automaton {
   name: string;
   alphabet: string[];
@@ -209,6 +211,7 @@ export default class Automaton {
 
       // Add the (flattened) DFA state to the (flattened) final states set if it is final
       // The DFA state is final if any of the contained NFA states is final
+      // TODO: Maybe replace with a map() at the end of the method
       const isFinalState = R.any(R.includes(R.__, this.finalStates), dfaCurrentState);
       if (isFinalState) {
         dfaFinalStatesFlattened = R.union(dfaFinalStatesFlattened, [dfaCurrentStateFlattened]);
@@ -246,5 +249,152 @@ export default class Automaton {
       Automaton.flatten(dfaInitialState),
       dfaFinalStatesFlattened,
     );
+  }
+
+  // This doesn't take into account epsilon transitions as I only intend this to be run as part of DFA minimization
+  private removeUnreachableStates(): Automaton {
+    // TODO: Check if automaton is DFA / doesn't have epsilon transitions
+    let reachableStates: string[] = [this.initialState];
+    let unexpandedStates: string[] = [this.initialState];
+
+    while (!R.isEmpty(unexpandedStates)) {
+      // Pick any element from unexpanded set
+      let currentState = R.head(unexpandedStates)!;
+
+      reachableStates = R.union(reachableStates, [currentState]);
+
+      for (const symbol of this.alphabet) {
+        const nextStates = this.transitionFunction.get(new TransitionFunctionKey(currentState, symbol).toString())?.nextStates ?? [];
+        unexpandedStates = R.union(unexpandedStates, nextStates);
+      }
+
+      unexpandedStates = R.difference(unexpandedStates, reachableStates);
+    }
+
+    // Only keep transitions involving only reachable states - i.e. its current state and next states are ALL reachable
+    // states
+    // Need to convert to/from an array to be able to filter the map's entries
+    let updatedTransitionFunction = new Map(R.filter(([, v]) => (
+      R.includes(v.currentState, reachableStates) && isSubset(v.nextStates, reachableStates)
+    ), Array.from(this.transitionFunction.entries())));
+
+    let updatedFinalStates = R.intersection(this.finalStates, reachableStates);
+
+    return new Automaton(
+      this.name,
+      this.alphabet,
+      reachableStates,
+      updatedTransitionFunction,
+      this.initialState, // Initial state is reachable by definition,
+      updatedFinalStates,
+    );
+  }
+
+  private mergeIndistinguishableStates(): Automaton {
+    // TODO: Check if deterministic somehow
+    // Step 1: Partition the original DFA's states into groups of equivalent states, using Hopcroft's algorithm
+    // Implement partition as a set of sets of states - each inner set is a group of equivalent states
+    let partition: string[][] = [];
+
+    // Initially partition states into final and non-final states
+    let finalStates: string[] = R.clone(this.finalStates);
+    let nonFinalStates: string[] = R.difference(this.states, this.finalStates);
+    if (!R.isEmpty(finalStates)) {
+      partition = R.append(finalStates, partition);
+    }
+    if (!R.isEmpty(nonFinalStates)) {
+      partition = R.append(nonFinalStates, partition);
+    }
+
+    let changed: boolean;
+    do {
+      let newPartition: string[][] = R.clone(partition);
+      for (const group of partition) {
+        if (R.length(group) <= 1) {
+          continue;
+        }
+
+        // For each symbol, check if all transitions from that symbol and each state in the group go to a state also in
+        // the group; if not create another group
+        // Set of states where all transitions from states in the current group lead to states also in current group
+        let statesToThisGroup: string[] = [];
+        // Set of states where the above is not the case
+        let statesToOtherGroup: string[] = [];
+        for (const state of group) {
+          let toSameGroup: boolean = R.all((symbol) => {
+            let nextStates: string[] = this.transitionFunction.get(new TransitionFunctionKey(state, symbol).toString())?.nextStates ?? [];
+
+            // TODO: Might be able to remove as would have already checked that this automaton is a DFA
+            if (R.length(nextStates) !== 1) {
+              // TODO: Error
+            }
+
+            let nextState = R.head(nextStates)!;
+            return R.includes(nextState, group);
+          }, this.alphabet);
+
+          if (toSameGroup) {
+            statesToThisGroup = R.union(statesToThisGroup, [state]);
+          } else {
+            statesToOtherGroup = R.union(statesToOtherGroup, [state]);
+          }
+        }
+
+        // Replace current group with the two new groups
+        newPartition = R.difference(newPartition, [group]);
+        if (!R.isEmpty(statesToThisGroup)) {
+          newPartition = R.union(newPartition, [statesToThisGroup]);
+        }
+        if (!R.isEmpty(statesToOtherGroup)) {
+          newPartition = R.union(newPartition, [statesToOtherGroup]);
+        }
+      }
+
+      // If the partition has changed, overwrite `partition` with `newPartition` ready for the next iteration
+      changed = !R.equals(partition, newPartition);
+      if (changed) {
+        partition = newPartition;
+      }
+    } while (changed);
+
+    // Step 2: "Flatten" the groups of equivalent states into states and store in a map for use by Steps 2 and 4
+    // let groupsToFlattenedStatesMap = new Map(R.map((group) => [
+    //   group,
+    //   Automaton.flatten(group),
+    // ], partition));
+
+    // Step 2: Obtain the minimised DFA's states
+    let minimizedStates = R.map(Automaton.flatten, partition);
+
+    // Step 3: Create a map with each of the original DFA's states mapped to its group in the partition, for use by Step 4
+    let statesToGroupsMap = new Map(R.chain((group) => R.map((state) => [state, group], group), partition));
+
+    // Step 4: Create transitions of minimised DFA
+    // For each transition t_o in the original DFA, create a transition t_m in the minimised DFA, where t_m's current
+    // state and next state are the flattened versions of the groups containing t_o's current state and next state
+    // respectively
+    // TODO: Maybe put converting transition function to/from an array into its own function
+    let minimizedTransitionFunction = new Map(R.map(([k, v]) => [
+      k,
+      ({
+        currentState: Automaton.flatten(statesToGroupsMap.get(v.currentState) ?? []),
+        symbol: v.symbol,
+        nextStates: [Automaton.flatten(statesToGroupsMap.get(R.head(v.nextStates)!) ?? [])],
+      }),
+    ], Array.from(this.transitionFunction.entries())));
+
+    // The minimised DFA has the same alphabet as the original DFA, but has the merged states and transitions computed above
+    return new Automaton(
+      this.name,
+      this.alphabet,
+      minimizedStates,
+      minimizedTransitionFunction,
+      Automaton.flatten(statesToGroupsMap.get(this.initialState) ?? []),
+      R.map((s) => Automaton.flatten(statesToGroupsMap.get(s) ?? []), this.finalStates),
+    );
+  }
+
+  minimize(): Automaton {
+    return this.removeUnreachableStates().mergeIndistinguishableStates();
   }
 }

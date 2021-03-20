@@ -14,6 +14,7 @@ import Radio from "@material-ui/core/Radio";
 import Paper from "@material-ui/core/Paper";
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
+import {isSubset} from "../core/utilities";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -56,7 +57,8 @@ export default function RunComponent({ automaton }: RunProps) {
     </TreeItem>
   ));
 
-  // TODO: Check input only contains symbols in the automaton's alphabet
+  const inputValid = isSubset(input.split(""), automaton.alphabet);
+
   // TODO: Maybe add options for epsilion closure - e.g. display effect of epsilon closure after each input symbol
   // TODO: Maybe rename "set view"
   // TODO: Add explanation
@@ -69,6 +71,8 @@ export default function RunComponent({ automaton }: RunProps) {
           label="Input"
           value={input}
           onChange={(event) => setInput(event.target.value)}
+          error={!inputValid}
+          helperText={inputValid ? "" : "Input can only contain alphabet symbols"}
         />
         <Button
           variant="contained"
@@ -76,6 +80,7 @@ export default function RunComponent({ automaton }: RunProps) {
             setRun(automaton.run(input));
             setRunTree(automaton.runTree(input));
           }}
+          disabled={!inputValid}
         >
           Run
         </Button>

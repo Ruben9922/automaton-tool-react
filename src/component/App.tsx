@@ -15,6 +15,11 @@ import Snackbar from './Snackbar';
 import SnackbarMessage from '../core/snackbarMessage';
 import Loader from './Loader';
 import Automata from "./Automata";
+import PrivateRoute from "./PrivateRoute";
+import {useAuthState} from "react-firebase-hooks/auth";
+import PublicRoute from "./PublicRoute";
+import SignUp from "./SignUp";
+import Login from "./Login";
 
 // TODO: Maybe just remove this and hardcode the messages
 const messages: Record<string, string> = {
@@ -28,8 +33,11 @@ const messages: Record<string, string> = {
 };
 
 export default function App() {
-  const [automata, loading, error] = useObject(firebase.database().ref("automata").orderByChild("timeAdded"));
+  const [automata, databaseLoading, databaseError] = useObject(firebase.database().ref("automata").orderByChild("timeAdded"));
+  const [user, authLoading, authError] = useAuthState(firebase.auth());
   const [snackbarQueue, setSnackbarQueue] = React.useState<SnackbarMessage[]>([]);
+
+  const authenticated = user !== null && user !== undefined;
 
   const handleSnackbarOpen = (key: string): void => {
     setSnackbarQueue((prevSnackPack) => R.append({
@@ -44,30 +52,42 @@ export default function App() {
 
   return (
     <Router>
-      <Header />
+      <Header authenticated={authenticated} />
       <Container maxWidth="md">
-        {error && (
+        {databaseError && (
           <Alert severity="error">
             Error: Failed to load data. Try reloading the page. If it persists, please <Link href="https://github.com/Ruben9922/automaton-tool-react/issues">create a new issue</Link>.
-            Error code: {error.code}.
+            Error code: {databaseError.code}.
           </Alert>
         )}
-        {loading && <Loader />}
-        {!loading && automata && (
+        {authError && (
+          <Alert severity="error">
+            Error: Failed to authenticate. Try reloading the page. If it persists, please <Link href="https://github.com/Ruben9922/automaton-tool-react/issues">create a new issue</Link>.
+            Error code: {authError.code}.
+          </Alert>
+        )}
+        {(databaseLoading || authLoading) && <Loader />}
+        {!databaseLoading && !authLoading && automata && (
           <Switch>
-            <Route exact path="/">
+            <PrivateRoute authenticated={authenticated} exact path="/">
               <Home
                 automata={automata}
                 // onAutomataChange={setAutomata}
                 openSnackbar={() => handleSnackbarOpen("automatonDeleted")}
               />
-            </Route>
-            <Route path="/automata">
+            </PrivateRoute>
+            <PrivateRoute authenticated={authenticated} path="/automata">
               <Automata
                 automata={automata}
                 onSnackbarOpen={handleSnackbarOpen}
               />
-            </Route>
+            </PrivateRoute>
+            <PublicRoute authenticated={authenticated} path="/sign-up">
+              <SignUp />
+            </PublicRoute>
+            <PublicRoute authenticated={authenticated} path="/login">
+              <Login />
+            </PublicRoute>
           </Switch>
         )}
         <Snackbar

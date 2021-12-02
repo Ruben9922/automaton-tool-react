@@ -18,7 +18,6 @@ import Automata from "./Automata";
 import PrivateRoute from "./PrivateRoute";
 import {useAuthState} from "react-firebase-hooks/auth";
 import PublicRoute from "./PublicRoute";
-import SignUp from "./SignUp";
 import Login from "./Login";
 
 // TODO: Maybe just remove this and hardcode the messages
@@ -82,9 +81,6 @@ export default function App() {
                 onSnackbarOpen={handleSnackbarOpen}
               />
             </PrivateRoute>
-            <PublicRoute authenticated={authenticated} path="/sign-up">
-              <SignUp />
-            </PublicRoute>
             <PublicRoute authenticated={authenticated} path="/login">
               <Login />
             </PublicRoute>

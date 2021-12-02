@@ -5,11 +5,9 @@ import Typography from "@material-ui/core/Typography";
 
 // Configure FirebaseUI
 const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: 'popup',
+  signInFlow: 'redirect',
   // Redirect to / after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
   signInSuccessUrl: '/',
-  // We will display Google and Facebook as auth providers.
   signInOptions: [
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     firebase.auth.FacebookAuthProvider.PROVIDER_ID,
@@ -18,7 +16,7 @@ const uiConfig = {
   ],
 };
 
-export default function SignInOld() {
+export default function Login() {
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>

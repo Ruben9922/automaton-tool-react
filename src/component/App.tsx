@@ -53,7 +53,7 @@ export default function App() {
     <Router>
       <Header authenticated={authenticated} />
       <Container maxWidth="md">
-        {databaseError && (
+        {authenticated && databaseError && (
           <Alert severity="error">
             Error: Failed to load data. Try reloading the page. If it persists, please <Link href="https://github.com/Ruben9922/automaton-tool-react/issues">create a new issue</Link>.
             Error code: {databaseError.code}.
@@ -66,7 +66,7 @@ export default function App() {
           </Alert>
         )}
         {(databaseLoading || authLoading) && <Loader />}
-        {!databaseLoading && !authLoading && automata && (
+        {!databaseLoading && !authLoading && (
           <Switch>
             <PrivateRoute authenticated={authenticated} exact path="/">
               <Home

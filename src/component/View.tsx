@@ -130,102 +130,110 @@ export default function View({ automaton }: ViewProps) {
       <Typography variant="h6" component="h2" gutterBottom>
         Transitions
       </Typography>
-      <FormControl component="fieldset">
-        <RadioGroup
-          row
-          aria-label="transitionsView"
-          name="transitionsView"
-          value={transitionsView}
-          onChange={(event) => setTransitionsView(event.target.value as TransitionsView)}
-        >
-          <FormControlLabel
-            value="transitions"
-            control={<Radio />}
-            label="Transitions view"
-          />
-          <FormControlLabel
-            value="transitionFunction"
-            control={<Radio />}
-            label="Transition function view"
-          />
-        </RadioGroup>
-      </FormControl>
-      {transitionsView !== "transitionFunction" ? (
-        <TableContainer component={Paper}>
-          <Table aria-label="transitions" size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Current state</TableCell>
-                <TableCell>Symbol</TableCell>
-                <TableCell>Next states</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Array.from(automaton.transitionFunction.values())
-                .map(({ currentState, symbol, nextStates }, transitionIndex) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <TableRow key={transitionIndex}>
-                    <TableCell>
-                      {currentState}
-                    </TableCell>
-                    <TableCell>{symbol ?? "ε"}</TableCell>
-                    <TableCell>
-                      {nextStates.map((nextState) => (
-                        <Chip
-                          key={nextState}
-                          label={nextState}
-                          className={classes.chip}
-                        />
-                      ))}
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      {automaton.transitionFunction.size === 0 ? (
+        <p>
+          No transitions.
+        </p>
       ) : (
         <>
-          <TableContainer component={Paper}>
-            <Table aria-label="transition function" size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell />
-                  {symbols.map((symbol: string | null, index: number) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <TableCell key={index}>{symbol ?? "ε"}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {automaton.states.map((currentState: string) => (
-                  <TableRow key={currentState}>
-                    <TableCell component="th" scope="row" variant="head">
-                      {currentState}
-                    </TableCell>
-                    {symbols.map((symbol: string | null, index: number) => (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <TableCell key={index}>
-                        {automaton.transitionFunction.get(new TransitionFunctionKey(
-                          currentState,
-                          symbol,
-                        ).toString())?.nextStates.map((nextState) => (
-                          <Chip
-                            key={nextState}
-                            label={nextState}
-                            className={classes.chip}
-                          />
-                        ))}
-                      </TableCell>
-                    ))}
+          <FormControl component="fieldset">
+            <RadioGroup
+              row
+              aria-label="transitionsView"
+              name="transitionsView"
+              value={transitionsView}
+              onChange={(event) => setTransitionsView(event.target.value as TransitionsView)}
+            >
+              <FormControlLabel
+                value="transitions"
+                control={<Radio />}
+                label="Transitions view"
+              />
+              <FormControlLabel
+                value="transitionFunction"
+                control={<Radio />}
+                label="Transition function view"
+              />
+            </RadioGroup>
+          </FormControl>
+          {transitionsView !== "transitionFunction" ? (
+            <TableContainer component={Paper}>
+              <Table aria-label="transitions" size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Current state</TableCell>
+                    <TableCell>Symbol</TableCell>
+                    <TableCell>Next states</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <p>
-            The rows correspond to the current state; the columns correspond to the symbol. Each
-            cell contains the next states for the given current state and symbol.
-          </p>
+                </TableHead>
+                <TableBody>
+                  {Array.from(automaton.transitionFunction.values())
+                    .map(({ currentState, symbol, nextStates }, transitionIndex) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <TableRow key={transitionIndex}>
+                        <TableCell>
+                          {currentState}
+                        </TableCell>
+                        <TableCell>{symbol ?? "ε"}</TableCell>
+                        <TableCell>
+                          {nextStates.map((nextState) => (
+                            <Chip
+                              key={nextState}
+                              label={nextState}
+                              className={classes.chip}
+                            />
+                          ))}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <>
+              <TableContainer component={Paper}>
+                <Table aria-label="transition function" size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell />
+                      {symbols.map((symbol: string | null, index: number) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <TableCell key={index}>{symbol ?? "ε"}</TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {automaton.states.map((currentState: string) => (
+                      <TableRow key={currentState}>
+                        <TableCell component="th" scope="row" variant="head">
+                          {currentState}
+                        </TableCell>
+                        {symbols.map((symbol: string | null, index: number) => (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <TableCell key={index}>
+                            {automaton.transitionFunction.get(new TransitionFunctionKey(
+                              currentState,
+                              symbol,
+                            ).toString())?.nextStates.map((nextState) => (
+                              <Chip
+                                key={nextState}
+                                label={nextState}
+                                className={classes.chip}
+                              />
+                            ))}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <p>
+                The rows correspond to the current state; the columns correspond to the symbol. Each
+                cell contains the next states for the given current state and symbol.
+              </p>
+            </>
+          )}
         </>
       )}
       <Typography variant="h6" component="h2" gutterBottom>

@@ -1,9 +1,7 @@
-import {
-  Route, Switch, useParams, useRouteMatch,
-} from "react-router-dom";
+import {Route, Switch, useParams, useRouteMatch,} from "react-router-dom";
 import Alert from "@material-ui/lab/Alert";
 import React from "react";
-import Automaton from "../core/automaton";
+import {dbToAutomaton, determinize, minimize} from "../core/automaton";
 import View from "./View";
 import Input from "./Input";
 import * as R from "ramda";
@@ -34,7 +32,7 @@ export default function AutomatonComponent({
   }
 
   const value = automata.child(automatonId).val();
-  const automaton = Automaton.fromDb(value);
+  const automaton = dbToAutomaton(value);
   const automatonIndex = R.indexOf(automatonId, R.keys(automata.val()));
 
   return (
@@ -57,10 +55,10 @@ export default function AutomatonComponent({
         <Run automaton={automaton} />
       </Route>
       <Route path={`${url}/determinized`}>
-        <View automaton={automaton.determinize()} />
+        <View automaton={determinize(automaton)} />
       </Route>
       <Route path={`${url}/minimized`}>
-        <View automaton={automaton.minimize()} />
+        <View automaton={minimize(automaton)} />
       </Route>
     </Switch>
   );

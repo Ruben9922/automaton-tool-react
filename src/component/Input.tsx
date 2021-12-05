@@ -1,14 +1,14 @@
 import React from 'react';
-import { makeStyles, Theme } from "@material-ui/core/styles";
+import {makeStyles, Theme} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Step from "@material-ui/core/Step";
 import StepButton from "@material-ui/core/StepButton";
 import Stepper from "@material-ui/core/Stepper";
-import { useHistory } from "react-router-dom";
-import { StepLabel } from "@material-ui/core";
-import { NIL, v4 as uuidv4 } from "uuid";
-import { useImmerReducer } from "use-immer";
+import {useHistory} from "react-router-dom";
+import {StepLabel} from "@material-ui/core";
+import {NIL, v4 as uuidv4} from "uuid";
+import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
 import AddIcon from "@material-ui/icons/Add";
 import AlphabetInput from "./AlphabetInput";
@@ -18,9 +18,14 @@ import {AlphabetErrorState, StatesErrorState, TransitionsErrorState, validate,} 
 import Transition from "../core/transition";
 import {alphabetPresets} from '../core/alphabetPreset';
 import firebase from '../firebase';
-import Automaton from "../core/automaton";
+import Automaton, {
+  automatonToDb,
+  automatonToInputState,
+  generatePlaceholderName,
+  inputStateToAutomaton
+} from "../core/automaton";
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
-import MultipleFabs, { FabProps } from "./MultipleFabs";
+import MultipleFabs, {FabProps} from "./MultipleFabs";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -216,8 +221,8 @@ export default function Input({
 
   const history = useHistory();
 
-  const initialState: InputState = automaton ? R.mergeLeft(automaton.toInputState(), {
-    alphabetPresetIndex: alphabetToAlphabetPresetIndex(automaton.toInputState().alphabet),
+  const initialState: InputState = automaton ? R.mergeLeft(automatonToInputState(automaton), {
+    alphabetPresetIndex: alphabetToAlphabetPresetIndex(automatonToInputState(automaton).alphabet),
   }) : {
     name: "",
     alphabet: [],
@@ -280,7 +285,7 @@ export default function Input({
     />,
     <AutomatonDetailsInput
       name={state.name}
-      placeholderName={Automaton.generatePlaceholderName(automatonIndex)}
+      placeholderName={generatePlaceholderName(automatonIndex)}
       onNameChange={(name) => dispatch({ type: "setName", name })}
     />,
   ];
@@ -361,18 +366,18 @@ export default function Input({
   const handleStep = (stepIndex: number) => (): void => setActiveStepIndex(stepIndex);
 
   const handleFinish = (): void => {
-    const updatedAutomaton = Automaton.fromInputState(state, automatonIndex);
+    const updatedAutomaton = inputStateToAutomaton(state, automatonIndex);
     // addAutomaton(automaton);
 
     // Add to database
     const automataRef = firebase.database().ref("automata");
     if (automaton && automatonId) {
-      automataRef.child(automatonId).update(R.mergeLeft(updatedAutomaton.toDb(), {
+      automataRef.child(automatonId).update(R.mergeLeft(automatonToDb(updatedAutomaton), {
         timeUpdated: Date.now(),
       }))
         .then(() => onSnackbarOpen("automatonUpdatedSuccess"), () => onSnackbarOpen("automatonUpdatedFailed"));
     } else {
-      automataRef.push(R.mergeLeft(updatedAutomaton.toDb(), {
+      automataRef.push(R.mergeLeft(automatonToDb(updatedAutomaton), {
         timeAdded: Date.now(),
         timeUpdated: Date.now(),
       }))

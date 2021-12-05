@@ -2,8 +2,8 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from '@material-ui/icons/Add';
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
+import {makeStyles, Theme} from "@material-ui/core/styles";
+import {Link} from "react-router-dom";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -14,7 +14,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import * as R from "ramda";
 import Dialog from "./Dialog";
-import Automaton from "../core/automaton";
+import {dbToAutomaton} from "../core/automaton";
 import firebase from "../firebase";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -55,7 +55,7 @@ export default function Home({
     setDialogOpen(false);
   };
 
-  const automaton = automatonDeleteId ? Automaton.fromDb(automata.child(automatonDeleteId).val()) : null;
+  const automaton = automatonDeleteId ? dbToAutomaton(automata.child(automatonDeleteId).val()) : null;
 
   // TODO: Replace "/automata" link with url variable
   return (
@@ -72,7 +72,7 @@ export default function Home({
       ) : (
         <List>
           {Object.entries(automata.val()).map(([key, value], index: number) => {
-            const automaton = Automaton.fromDb(value);
+            const automaton = dbToAutomaton(value);
 
             return (
               <ListItem key={key} button component={Link} to={`/automata/${key}`} style={{ paddingRight: 100 }}>

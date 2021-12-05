@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {makeStyles, Theme} from "@material-ui/core/styles";
-import Automaton from "../core/automaton";
+import Automaton, {accepts, computeRun, computeRunTree} from "../core/automaton";
 import {Run, RunTree} from "../core/run";
 import {TreeItem, TreeView} from "@material-ui/lab";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -77,8 +77,8 @@ export default function RunComponent({ automaton }: RunProps) {
         <Button
           variant="contained"
           onClick={() => {
-            setRun(automaton.run(input));
-            setRunTree(automaton.runTree(input));
+            setRun(computeRun(automaton, input));
+            setRunTree(computeRunTree(automaton, input));
           }}
           disabled={!inputValid}
         >
@@ -108,8 +108,8 @@ export default function RunComponent({ automaton }: RunProps) {
       {run && (
         <Paper className={classes.paper}>
           <div>
-            {automaton.accepts(run) ? <CheckIcon fontSize="large" /> : <CloseIcon fontSize="large" />}
-            <p style={{ margin: 0 }}>{automaton.accepts(run) ? "Accepted" : "Rejected"}</p>
+            {accepts(automaton, run) ? <CheckIcon fontSize="large" /> : <CloseIcon fontSize="large" />}
+            <p style={{ margin: 0 }}>{accepts(automaton, run) ? "Accepted" : "Rejected"}</p>
           </div>
         </Paper>
       )}

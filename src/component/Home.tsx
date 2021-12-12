@@ -104,7 +104,7 @@ export default function Home({
       </Tooltip>
       <Dialog
         open={dialogOpen}
-        setOpen={setDialogOpen}
+        onClose={() => setDialogOpen(false)}
         title="Delete automaton?"
         message={`Are you sure you wish to permanently delete Automaton "${automaton?.name}"? This cannot be undone.`}
         buttons={[

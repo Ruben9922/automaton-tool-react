@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import MuiDialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -15,7 +15,7 @@ interface DialogButton {
 
 type DialogProps = {
   open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
   title: string;
   message: string;
   buttons: DialogButton[];
@@ -23,7 +23,7 @@ type DialogProps = {
 
 export default function Dialog({
   open,
-  setOpen,
+  onClose,
   title,
   message,
   buttons,
@@ -31,7 +31,7 @@ export default function Dialog({
   return (
     <MuiDialog
       open={open}
-      onClose={() => setOpen(false)}
+      onClose={onClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >

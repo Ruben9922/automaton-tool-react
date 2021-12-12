@@ -2,6 +2,7 @@ import * as R from "ramda";
 import {NIL} from "uuid";
 import Transition from "./transition";
 import {isSubset, isUnique, isUniqueList,} from "./utilities";
+import State, {stateIdToStateName} from "./state";
 
 interface Check<T> {
   isValid: T;
@@ -152,10 +153,9 @@ function createAlertTextList(checks: Check<boolean>[]): string[] {
 //   return R.all((e: Check<boolean>) => e.isValid, R.values(checks));
 // }
 
-export function validate(alphabet: string[], states: Map<string, string>, transitions: Transition[],
-  initialStateId: string, finalStateIds: string[]) {
-  const stateIds = Array.from(states.keys());
-  const stateNames = Array.from(states.values());
+export function validate(alphabet: string[], states: State[], transitions: Transition[], initialStateId: string, finalStateIds: string[]) {
+  const stateIds = R.map((state) => state.id, states);
+  const stateNames = R.map((state) => state.name, states);
 
   const errors: Errors = {
     alphabet: {
@@ -235,8 +235,8 @@ export function validate(alphabet: string[], states: Map<string, string>, transi
         // eslint-disable-next-line no-nested-ternary
         message: !R.includes(initialStateId, stateIds) ? "There are no transitions" : (
           R.includes(initialStateId, finalStateIds)
-            ? `There are no transitions and initial state "${states.get(initialStateId)!}" is a final state, so all strings will be accepted by the automaton`
-            : `There are no transitions and initial state "${states.get(initialStateId)!}" is not a final state, so all strings will be rejected by the automaton`
+            ? `There are no transitions and initial state "${stateIdToStateName(initialStateId, states)!}" is a final state, so all strings will be accepted by the automaton`
+            : `There are no transitions and initial state "${stateIdToStateName(initialStateId, states)!}" is not a final state, so all strings will be rejected by the automaton`
         ),
       },
     },

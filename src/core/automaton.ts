@@ -8,6 +8,7 @@ import TransitionFunction, {
 import TransitionFunctionKey from "./transitionFunctionKey";
 import {Run, RunTree, RunTreeNode} from "./run";
 import {isSubset} from "./utilities";
+import {stateIdToStateName, stateNameToStateId} from "./state";
 
 export default interface Automaton {
   name: string;
@@ -19,35 +20,33 @@ export default interface Automaton {
 }
 
 export function inputStateToAutomaton(inputState: Omit<InputState, "alphabetPresetIndex">, index: number): Automaton {
+  const automatonStates = R.map((state) => state.name, inputState.states);
+
   return {
     name: inputState.name || generatePlaceholderName(index),
     alphabet: inputState.alphabet,
-    states: Array.from(inputState.states.values()),
+    states: automatonStates,
     transitionFunction: transitionsToTransitionFunction(inputState.transitions, inputState.states),
-    initialState: inputState.states.get(inputState.initialStateId)!,
-    finalStates: R.map((id) => inputState.states.get(id)!, inputState.finalStateIds),
+    initialState: stateIdToStateName(inputState.initialStateId, inputState.states),
+    finalStates: R.map((finalStateId) => stateIdToStateName(finalStateId, inputState.states), inputState.finalStateIds),
   };
 }
 
 export function automatonToInputState(automaton: Automaton): Omit<InputState, "alphabetPresetIndex"> {
   // Generate a UUID for each of the states
   // Store this as a list of objects
-  const l = R.map((s: string) => ({
+  const states = R.map((s: string) => ({
     name: s,
     id: uuidv4(),
   }), automaton.states);
-
-  // Based on this list of objects, create maps mapping from state IDs to state names and vice versa
-  const states = new Map(R.map((o) => [o.id, o.name], l));
-  const stateIds = new Map(R.map((o) => [o.name, o.id], l));
 
   return {
     name: automaton.name,
     alphabet: automaton.alphabet,
     states,
-    transitions: transitionFunctionToTransitions(automaton.transitionFunction, stateIds),
-    initialStateId: stateIds.get(automaton.initialState)!,
-    finalStateIds: R.map((state) => stateIds.get(state)!, automaton.finalStates),
+    transitions: transitionFunctionToTransitions(automaton.transitionFunction, states),
+    initialStateId: stateNameToStateId(automaton.initialState, states),
+    finalStateIds: R.map((finalStateName) => stateNameToStateId(finalStateName, states), automaton.finalStates),
   };
 }
 

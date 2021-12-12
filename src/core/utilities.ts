@@ -1,9 +1,5 @@
 import * as R from "ramda";
 
-export function computeStateIndex(states: Map<string, string>, id: string): number {
-  return R.indexOf(id, Array.from(states.values()));
-}
-
 export function isUnique<T>(l: T[]): boolean {
   return R.equals(l, R.uniq(l));
 }

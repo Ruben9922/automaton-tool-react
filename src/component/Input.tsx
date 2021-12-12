@@ -22,6 +22,7 @@ import AutomatonDetailsInput from "./AutomatonDetailsInput";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import Typography from "@material-ui/core/Typography";
+import State from "../core/state";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -56,7 +57,7 @@ export type InputState = {
   name: string;
   alphabet: string[];
   alphabetPresetIndex: number | "";
-  states: Map<string, string>;
+  states: State[];
   transitions: Transition[];
   initialStateId: string;
   finalStateIds: string[];
@@ -67,8 +68,8 @@ type Action =
   | { type: "setAlphabetPresetIndex", index: number | "" }
   | { type: "setAlphabet", alphabetString: string }
   | { type: "addState" }
-  | { type: "removeState", id: string }
-  | { type: "setStateName", id: string, name: string }
+  | { type: "removeState", index: number }
+  | { type: "setStateName", index: number, name: string }
   | { type: "setInitialStateId", id: string }
   | { type: "setFinalStateIds", id: string, isFinal: boolean }
   | { type: "addTransition" }
@@ -95,18 +96,18 @@ function alphabetToAlphabetPresetIndex(a: string[]): number {
   return updatedAlphabetPresetIndex;
 }
 
-function fixInitialStateId(initialStateId: string, stateIds: string[]): string {
-  return R.includes(initialStateId, stateIds) ? initialStateId : NIL;
+function fixInitialStateId(initialStateId: string, states: State[]): string {
+  return R.includes(initialStateId, R.map((state) => state.id, states)) ? initialStateId : NIL;
 }
 
-function fixFinalStateIds(finalStateIds: string[], stateIds: string[]): string[] {
-  return R.intersection(finalStateIds, stateIds);
+function fixFinalStateIds(finalStateIds: string[], states: State[]): string[] {
+  return R.intersection(finalStateIds, R.map((state) => state.id, states));
 }
 
 // TODO: Maybe use mergeLeft() instead of forEach()
-function fixTransitionCurrentStates(transitions: Transition[], stateIds: string[]): Transition[] {
+function fixTransitionCurrentStates(transitions: Transition[], states: State[]): Transition[] {
   return R.forEach((t) => {
-    t.currentState = R.includes(t.currentState, stateIds) ? t.currentState : "";
+    t.currentState = R.includes(t.currentState, R.map((state) => state.id, states)) ? t.currentState : "";
   }, transitions);
 }
 
@@ -116,9 +117,9 @@ function fixTransitionSymbols(transitions: Transition[], alphabet: string[]): Tr
   }, transitions);
 }
 
-function fixTransitionNextStates(transitions: Transition[], stateIds: string[]): Transition[] {
+function fixTransitionNextStates(transitions: Transition[], states: State[]): Transition[] {
   return R.forEach((t) => {
-    t.nextStates = R.intersection(t.nextStates, stateIds);
+    t.nextStates = R.intersection(t.nextStates, R.map((state) => state.id, states));
   }, transitions);
 }
 
@@ -142,29 +143,26 @@ function reducer(draft: InputState, action: Action) {
       draft.transitions = fixTransitionSymbols(draft.transitions, draft.alphabet);
       return;
     case "addState":
-      draft.states.set(uuidv4(), "");
+      draft.states = R.append({
+        id: uuidv4(),
+        name: "",
+      }, draft.states);
 
-      draft.transitions = fixTransitionCurrentStates(draft.transitions,
-        Array.from(draft.states.keys()));
-      draft.transitions = fixTransitionNextStates(draft.transitions,
-        Array.from(draft.states.keys()));
-      draft.initialStateId = fixInitialStateId(draft.initialStateId,
-        Array.from(draft.states.keys()));
-      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, Array.from(draft.states.keys()));
+      draft.transitions = fixTransitionCurrentStates(draft.transitions, draft.states);
+      draft.transitions = fixTransitionNextStates(draft.transitions, draft.states);
+      draft.initialStateId = fixInitialStateId(draft.initialStateId, draft.states);
+      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, draft.states);
       return;
     case "removeState":
-      draft.states.delete(action.id);
+      draft.states = R.remove(action.index, 1, draft.states);
 
-      draft.transitions = fixTransitionCurrentStates(draft.transitions,
-        Array.from(draft.states.keys()));
-      draft.transitions = fixTransitionNextStates(draft.transitions,
-        Array.from(draft.states.keys()));
-      draft.initialStateId = fixInitialStateId(draft.initialStateId,
-        Array.from(draft.states.keys()));
-      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, Array.from(draft.states.keys()));
+      draft.transitions = fixTransitionCurrentStates(draft.transitions, draft.states);
+      draft.transitions = fixTransitionNextStates(draft.transitions, draft.states);
+      draft.initialStateId = fixInitialStateId(draft.initialStateId, draft.states);
+      draft.finalStateIds = fixFinalStateIds(draft.finalStateIds, draft.states);
       return;
     case "setStateName":
-      draft.states.set(action.id, action.name);
+      draft.states[action.index].name = action.name;
       return;
     case "setInitialStateId":
       draft.initialStateId = action.id;
@@ -223,7 +221,7 @@ export default function Input({
     name: "",
     alphabet: [],
     alphabetPresetIndex: "",
-    states: new Map(),
+    states: [],
     transitions: [],
     initialStateId: NIL,
     finalStateIds: [],
@@ -290,12 +288,12 @@ export default function Input({
         errorState={errorState.states}
         helperText={helperText.states}
         onAddState={() => dispatch({ type: "addState" })}
-        onRemoveState={(id) => {
-          dispatch({ type: "removeState", id });
+        onRemoveState={(index) => {
+          dispatch({ type: "removeState", index });
           openStateDeletedSnackbar();
         }}
         onRemoveIncidentTransitions={(stateId) => dispatch({ type: "removeIncidentTransitions", stateId })}
-        onSetStateName={(id, name) => dispatch({ type: "setStateName", id, name })}
+        onSetStateName={(index, name) => dispatch({ type: "setStateName", index, name })}
         onSetInitialStateId={(id) => dispatch({ type: "setInitialStateId", id })}
         onSetFinalStateIds={(id, isFinal) => dispatch({ type: "setFinalStateIds", id, isFinal })}
       />

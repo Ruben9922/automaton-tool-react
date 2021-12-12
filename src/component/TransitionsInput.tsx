@@ -14,8 +14,7 @@ import {FormHelperText} from "@material-ui/core";
 import clsx from "clsx";
 import * as R from "ramda";
 import Transition from "../core/transition";
-import {createStateDisplayName} from "../core/state";
-import {computeStateIndex} from "../core/utilities";
+import State, {createStateDisplayName, stateIdToStateIndex, stateIdToStateName} from "../core/state";
 import {TransitionsErrorState, TransitionsHelperText} from "../core/validation";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -47,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 type TransitionsInputProps = {
   transitions: Transition[];
   alphabet: string[];
-  states: Map<string, string>;
+  states: State[];
   errorState: TransitionsErrorState;
   helperText: TransitionsHelperText;
   onAddTransition: () => void;
@@ -93,13 +92,13 @@ export default function TransitionsInput({
                   onCurrentStateChange(transitionIndex, event.target.value as string)
                 )}
               >
-                {Array.from(states.entries()).map(([key, state]: [string, string], stateIndex: number) => (
+                {states.map((state: State, stateIndex: number) => (
                   <MenuItem
-                    key={key}
-                    value={key}
-                    className={clsx({ [classes.placeholderStateName]: state === "" })}
+                    key={state.id}
+                    value={state.id}
+                    className={clsx({ [classes.placeholderStateName]: state.name === "" })}
                   >
-                    {createStateDisplayName(state, stateIndex)}
+                    {createStateDisplayName(state.name, stateIndex)}
                   </MenuItem>
                 ))}
               </Select>
@@ -133,7 +132,7 @@ export default function TransitionsInput({
                 labelId={`transition-next-states-${transitionIndex + 1}-label`}
                 id={`transition-next-states-${transitionIndex + 1}`}
                 multiple
-                value={R.sortBy(R.curry(computeStateIndex)(states), transition.nextStates)}
+                value={R.sortBy(R.curry(stateIdToStateIndex)(states), transition.nextStates)}
                 onChange={(event) => onNextStatesChange(transitionIndex, event.target.value as string[])}
                 input={<Input id="transition-next-states-select" />}
                 renderValue={(value: unknown) => {
@@ -141,13 +140,13 @@ export default function TransitionsInput({
                   return (
                     <div className={classes.chips}>
                       {nextStateIds.map((nextStateId: string) => {
-                        const state = states.get(nextStateId)!;
-                        const stateIndex = computeStateIndex(states, nextStateId);
+                        const stateName = stateIdToStateName(nextStateId, states);
+                        const stateIndex = stateIdToStateIndex(states, nextStateId);
                         return (
                           <Chip
                             key={nextStateId}
-                            label={createStateDisplayName(state, stateIndex)}
-                            className={clsx(classes.chip, { [classes.placeholderStateName]: state === "" })}
+                            label={createStateDisplayName(stateName, stateIndex)}
+                            className={clsx(classes.chip, { [classes.placeholderStateName]: stateName === "" })}
                           />
                         );
                       })}
@@ -155,16 +154,16 @@ export default function TransitionsInput({
                   );
                 }}
               >
-                {Array.from(states.entries()).map(([key, state]: [string, string], stateIndex: number) => (
+                {states.map((state: State, stateIndex: number) => (
                   <MenuItem
-                    key={key}
-                    value={key}
+                    key={state.id}
+                    value={state.id}
                     className={clsx({
-                      [classes.placeholderStateName]: state === "",
-                      [classes.selected]: transition.nextStates.includes(key),
+                      [classes.placeholderStateName]: state.name === "",
+                      [classes.selected]: transition.nextStates.includes(state.id),
                     })}
                   >
-                    {createStateDisplayName(state, stateIndex)}
+                    {createStateDisplayName(state.name, stateIndex)}
                   </MenuItem>
                 ))}
               </Select>

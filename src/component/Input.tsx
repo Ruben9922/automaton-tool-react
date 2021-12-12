@@ -318,6 +318,9 @@ export default function Input({
       <Button variant="contained" color="primary" onClick={handleFinish}>
         Create
       </Button>
+      <Button variant="contained" color="default" onClick={() => history.push("/")}>
+        Cancel
+      </Button>
       {R.isEmpty(errorAlertText) || (
         <Alert severity="error">
           <AlertTitle>{errorAlertText.length === 1 ? "Error" : "Errors"}</AlertTitle>

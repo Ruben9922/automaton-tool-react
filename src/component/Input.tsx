@@ -323,7 +323,7 @@ export default function Input({
       </Button>
       {R.isEmpty(errorAlertText) || (
         <Alert severity="error">
-          <AlertTitle>{errorAlertText.length === 1 ? "Error" : "Errors"}</AlertTitle>
+          <AlertTitle>{errorAlertText.length} {errorAlertText.length === 1 ? "error" : "errors"}</AlertTitle>
           <ul>
             {errorAlertText.map((message: string, index: number) => (
               // eslint-disable-next-line react/no-array-index-key
@@ -334,7 +334,7 @@ export default function Input({
       )}
       {R.isEmpty(warningAlertText) || (
         <Alert severity="warning">
-          <AlertTitle>{warningAlertText.length === 1 ? "Warning" : "Warnings"}</AlertTitle>
+          <AlertTitle>{warningAlertText.length} {warningAlertText.length === 1 ? "warning" : "warnings"}</AlertTitle>
           <ul>
             {warningAlertText.map((message: string, index) => (
               // eslint-disable-next-line react/no-array-index-key

@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles, Theme } from "@material-ui/core/styles";
+import {makeStyles, Theme} from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -10,17 +10,13 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
-import { FormHelperText } from "@material-ui/core";
-import Alert from "@material-ui/lab/Alert";
-import AlertTitle from "@material-ui/lab/AlertTitle";
+import {FormHelperText} from "@material-ui/core";
 import clsx from "clsx";
 import * as R from "ramda";
 import Transition from "../core/transition";
-import { createStateDisplayName } from "../core/state";
-import { computeStateIndex } from "../core/utilities";
-import { TransitionsErrorState, TransitionsHelperText } from "../core/validation";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
+import {createStateDisplayName} from "../core/state";
+import {computeStateIndex} from "../core/utilities";
+import {TransitionsErrorState, TransitionsHelperText} from "../core/validation";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -54,7 +50,7 @@ type TransitionsInputProps = {
   states: Map<string, string>;
   errorState: TransitionsErrorState;
   helperText: TransitionsHelperText;
-  warningAlertText: string[];
+  onAddTransition: () => void;
   onRemoveTransition: (index: number) => void;
   onCurrentStateChange: (index: number, stateId: string) => void;
   onSymbolChange: (index: number, symbol: string | null) => void;
@@ -67,7 +63,7 @@ export default function TransitionsInput({
   states,
   errorState,
   helperText,
-  warningAlertText,
+  onAddTransition,
   onRemoveTransition,
   onCurrentStateChange,
   onSymbolChange,
@@ -181,18 +177,8 @@ export default function TransitionsInput({
             </Tooltip>
           </React.Fragment>
         ))}
+        <Button onClick={onAddTransition} variant="contained">Add transition</Button>
       </form>
-      {R.isEmpty(warningAlertText) || (
-        <Alert severity="warning">
-          <AlertTitle>{warningAlertText.length === 1 ? "Warning" : "Warnings"}</AlertTitle>
-          <ul>
-            {warningAlertText.map((message, index) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
     </>
   );
 }

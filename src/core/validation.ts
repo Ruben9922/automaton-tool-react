@@ -1,11 +1,7 @@
 import * as R from "ramda";
-import { NIL } from "uuid";
+import {NIL} from "uuid";
 import Transition from "./transition";
-import {
-  isSubset,
-  isUnique,
-  isUniqueList,
-} from "./utilities";
+import {isSubset, isUnique, isUniqueList,} from "./utilities";
 
 interface Check<T> {
   isValid: T;
@@ -91,12 +87,6 @@ interface HelperText {
   alphabet: AlphabetHelperText;
   states: StatesHelperText;
   transitions: TransitionsHelperText;
-}
-
-interface AlertText {
-  alphabet: string[];
-  states: string[];
-  transitions: string[];
 }
 
 // For single boolean values, can compute error state by doing !(x1 && ... && xn)
@@ -342,25 +332,17 @@ export function validate(alphabet: string[], states: Map<string, string>, transi
   // List of error messages to display in an alert
   // Some errors can't be associated with an input - e.g. states or transitions list being empty
   // Hence these are displayed in an alert
-  const errorAlertText: AlertText = {
-    alphabet: [],
-    states: createAlertTextList([
-      errors.states.isNonEmpty,
-      errors.states.exactlyOneInitialState,
-    ]),
-    transitions: [],
-  };
+  const errorAlertText: string[] = createAlertTextList([
+    errors.states.isNonEmpty,
+    errors.states.exactlyOneInitialState,
+  ]);
 
   // List of warning messages to display in an alert
-  const warningAlertText: AlertText = {
-    alphabet: [],
-    states: createAlertTextList([
-      warnings.states.atLeastOneFinalState,
-    ]),
-    transitions: createAlertTextList([
-      warnings.transitions.isNonEmpty,
-    ]),
-  };
+  const warningAlertText: string[] = R.concat(createAlertTextList([
+    warnings.states.atLeastOneFinalState,
+  ]), createAlertTextList([
+    warnings.transitions.isNonEmpty,
+  ]));
 
   return {
     errorState,

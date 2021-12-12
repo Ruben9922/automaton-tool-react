@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles, Theme } from "@material-ui/core/styles";
+import {makeStyles, Theme} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
@@ -8,14 +8,10 @@ import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
-import Alert from "@material-ui/lab/Alert";
-import AlertTitle from "@material-ui/lab/AlertTitle";
 import * as R from "ramda";
-import { StatesErrorState, StatesHelperText } from "../core/validation";
+import {StatesErrorState, StatesHelperText} from "../core/validation";
 import Dialog from "./Dialog";
 import Transition from "../core/transition";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -37,8 +33,7 @@ type StatesInputProps = {
   finalStateIds: string[];
   errorState: StatesErrorState;
   helperText: StatesHelperText;
-  errorAlertText: string[];
-  warningAlertText: string[];
+  onAddState: () => void;
   onRemoveState: (id: string) => void;
   onRemoveIncidentTransitions: (stateId: string) => void;
   onSetStateName: (id: string, name: string) => void;
@@ -53,8 +48,7 @@ export default function StatesInput({
   finalStateIds,
   errorState,
   helperText,
-  errorAlertText,
-  warningAlertText,
+  onAddState,
   onRemoveState,
   onRemoveIncidentTransitions,
   onSetStateName,
@@ -122,29 +116,8 @@ export default function StatesInput({
             </Tooltip>
           </React.Fragment>
         ))}
+        <Button onClick={onAddState} variant="contained">Add state</Button>
       </form>
-      {R.isEmpty(errorAlertText) || (
-        <Alert severity="error">
-          <AlertTitle>{errorAlertText.length === 1 ? "Error" : "Errors"}</AlertTitle>
-          <ul>
-            {errorAlertText.map((message: string, index: number) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
-      {R.isEmpty(warningAlertText) || (
-        <Alert severity="warning">
-          <AlertTitle>{warningAlertText.length === 1 ? "Warning" : "Warnings"}</AlertTitle>
-          <ul>
-            {warningAlertText.map((message: string, index) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
       <Dialog
         open={dialogOpen}
         setOpen={setDialogOpen}

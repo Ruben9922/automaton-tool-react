@@ -21,6 +21,7 @@ import Automaton, {
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -259,6 +260,17 @@ export default function Input({
 
   return (
     <div className={classes.root}>
+      <Typography variant="h5" component="h1" gutterBottom>
+        Create Automaton
+      </Typography>
+      <AutomatonDetailsInput
+        name={state.name}
+        placeholderName={generatePlaceholderName(automatonIndex)}
+        onNameChange={(name) => dispatch({ type: "setName", name })}
+      />
+      <Typography variant="h6" component="h2" gutterBottom>
+        Alphabet
+      </Typography>
       <AlphabetInput
         alphabet={state.alphabet}
         alphabetPresetIndex={state.alphabetPresetIndex}
@@ -267,6 +279,9 @@ export default function Input({
         onSetAlphabetPresetIndex={(index) => dispatch({ type: "setAlphabetPresetIndex", index })}
         onSetAlphabet={(alphabetString) => dispatch({ type: "setAlphabet", alphabetString })}
       />
+      <Typography variant="h6" component="h2" gutterBottom>
+        States
+      </Typography>
       <StatesInput
         states={state.states}
         transitions={state.transitions}
@@ -284,6 +299,9 @@ export default function Input({
         onSetInitialStateId={(id) => dispatch({ type: "setInitialStateId", id })}
         onSetFinalStateIds={(id, isFinal) => dispatch({ type: "setFinalStateIds", id, isFinal })}
       />
+      <Typography variant="h6" component="h2" gutterBottom>
+        Transitions
+      </Typography>
       <TransitionsInput
         transitions={state.transitions}
         alphabet={state.alphabet}
@@ -298,11 +316,6 @@ export default function Input({
         onCurrentStateChange={(index, stateId) => dispatch({ type: "currentStateChange", index, stateId })}
         onSymbolChange={(index, symbol) => dispatch({ type: "symbolChange", index, symbol })}
         onNextStatesChange={(index, stateIds) => dispatch({ type: "nextStatesChange", index, stateIds })}
-      />
-      <AutomatonDetailsInput
-        name={state.name}
-        placeholderName={generatePlaceholderName(automatonIndex)}
-        onNameChange={(name) => dispatch({ type: "setName", name })}
       />
       <Button variant="contained" color="primary" onClick={handleFinish}>
         Create

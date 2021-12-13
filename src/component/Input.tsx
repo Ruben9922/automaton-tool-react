@@ -315,7 +315,7 @@ export default function Input({
         onSymbolChange={(index, symbol) => dispatch({ type: "symbolChange", index, symbol })}
         onNextStatesChange={(index, stateIds) => dispatch({ type: "nextStatesChange", index, stateIds })}
       />
-      <Button variant="contained" color="primary" onClick={handleFinish}>
+      <Button variant="contained" color="primary" onClick={handleFinish} disabled={!R.isEmpty(errorAlertText)}>
         Create
       </Button>
       <Button variant="contained" color="default" onClick={() => history.push("/")}>

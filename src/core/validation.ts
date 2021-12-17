@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import {NIL} from "uuid";
 import Transition from "./transition";
-import {isSubset, isUnique, isUniqueList,} from "./utilities";
+import {isSubset, isUnique, isUniqueList} from "./utilities";
 import State, {stateIdToStateName} from "./state";
 
 interface Check<T> {
@@ -36,6 +36,7 @@ interface Errors {
 interface Warnings {
   states: {
     atLeastOneFinalState: Check<boolean>; // Warning
+    // atLeastOneNonFinalState: Check<boolean>; // Warning
   };
   transitions: {
     isNonEmpty: Check<boolean>; // Warning
@@ -333,8 +334,29 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
   // Some errors can't be associated with an input - e.g. states or transitions list being empty
   // Hence these are displayed in an alert
   const errorAlertText: string[] = createAlertTextList([
+    errors.alphabet.isNonEmpty,
+    errors.alphabet.areSymbolsUnique,
     errors.states.isNonEmpty,
     errors.states.exactlyOneInitialState,
+    ...R.map((x: Check<boolean[]>): Check<boolean> => ({
+      isValid: R.all(R.identity, x.isValid),
+      message: `${x.message} (states: ${R.join(", ", R.filter((y) => y !== null, R.zipWith((index, isValid) => (isValid ? null : index), R.range(1, x.isValid.length + 1), x.isValid)))})`,
+    }), [
+      errors.states.areStateNamesNonEmpty,
+      errors.states.areStateNamesUnique,
+    ]),
+    ...R.map((x: Check<boolean[]>): Check<boolean> => ({
+      isValid: R.all(R.identity, x.isValid),
+      message: `${x.message} (transitions: ${R.join(", ", R.filter((y) => y !== null, R.zipWith((index, isValid) => (isValid ? null : index), R.range(1, x.isValid.length + 1), x.isValid)))})`,
+    }), [
+      errors.transitions.areCurrentStatesNonEmpty,
+      errors.transitions.areCurrentStatesValid,
+      errors.transitions.areSymbolsNonEmpty,
+      errors.transitions.areSymbolsValid,
+      errors.transitions.areTransitionsUnique,
+      errors.transitions.areNextStatesNonEmpty,
+      errors.transitions.areNextStatesValid,
+    ]),
   ]);
 
   // List of warning messages to display in an alert

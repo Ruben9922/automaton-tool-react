@@ -75,6 +75,7 @@ export default function RunComponent({ automaton }: RunProps) {
           helperText={inputValid ? "" : "Input can only contain alphabet symbols"}
         />
         <Button
+          type="submit"
           variant="contained"
           onClick={() => {
             setRun(computeRun(automaton, input));

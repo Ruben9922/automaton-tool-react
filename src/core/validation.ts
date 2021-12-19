@@ -115,6 +115,24 @@ function createErrorStateList(checks: Check<boolean[]>[], disabled?: Check<boole
   return l;
 }
 
+function createSummaryCheck(check: Check<boolean>, dependencies: boolean[] = []): Check<boolean> {
+  return {
+    isValid: R.reduceRight((dependency: boolean, acc: boolean) => !dependency || acc, check.isValid, dependencies),
+    message: check.message,
+  };
+}
+
+function createSummaryCheckList(check: Check<boolean[]>, listPrefix: string, dependencies: boolean[][] = []): Check<boolean> {
+  const isValid = R.reduceRight((dependency: boolean[], acc: boolean[]) => (
+    R.zipWith((dependencyItem: boolean, accItem: boolean) => !dependencyItem || accItem, dependency, acc)
+  ), check.isValid, dependencies);
+
+  return {
+    isValid: R.all(R.identity, isValid),
+    message: `${check.message} (${listPrefix}: ${R.join(", ", R.filter((y) => y !== null, R.zipWith((index, isValid) => (isValid ? null : index), R.range(1, isValid.length + 1), isValid)))})`,
+  };
+}
+
 function createHelperText(c: Check<boolean>): string | null {
   return c.isValid ? null : c.message;
 }
@@ -341,32 +359,38 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
     errors.alphabet.isNonEmpty,
     errors.alphabet.areSymbolsUnique,
     errors.states.isNonEmpty,
-    errors.states.exactlyOneInitialState,
-    ...R.map((x: Check<boolean[]>): Check<boolean> => ({
-      isValid: R.all(R.identity, x.isValid),
-      message: `${x.message} (states: ${R.join(", ", R.filter((y) => y !== null, R.zipWith((index, isValid) => (isValid ? null : index), R.range(1, x.isValid.length + 1), x.isValid)))})`,
-    }), [
-      errors.states.areStateNamesNonEmpty,
-      errors.states.areStateNamesUnique,
+    createSummaryCheck(errors.states.exactlyOneInitialState, [errors.states.isNonEmpty.isValid]),
+    createSummaryCheckList(errors.states.areStateNamesNonEmpty, "states"),
+    createSummaryCheckList(errors.states.areStateNamesUnique, "states", [errors.states.areStateNamesNonEmpty.isValid]),
+    createSummaryCheckList(errors.transitions.areCurrentStatesNonEmpty, "transitions", [disabled.transitions.currentState.isValid]),
+    createSummaryCheckList(errors.transitions.areCurrentStatesValid, "transitions", [
+      disabled.transitions.currentState.isValid,
+      errors.transitions.areCurrentStatesNonEmpty.isValid,
     ]),
-    ...R.map((x: Check<boolean[]>): Check<boolean> => ({
-      isValid: R.all(R.identity, x.isValid),
-      message: `${x.message} (transitions: ${R.join(", ", R.filter((y) => y !== null, R.zipWith((index, isValid) => (isValid ? null : index), R.range(1, x.isValid.length + 1), x.isValid)))})`,
-    }), [
-      errors.transitions.areCurrentStatesNonEmpty,
-      errors.transitions.areCurrentStatesValid,
-      errors.transitions.areSymbolsNonEmpty,
-      errors.transitions.areSymbolsValid,
-      errors.transitions.areTransitionsUnique,
-      errors.transitions.areNextStatesNonEmpty,
-      errors.transitions.areNextStatesValid,
+    createSummaryCheckList(errors.transitions.areSymbolsNonEmpty, "transitions", [disabled.transitions.symbol.isValid]),
+    createSummaryCheckList(errors.transitions.areSymbolsValid, "transitions", [
+      disabled.transitions.symbol.isValid,
+      errors.transitions.areSymbolsNonEmpty.isValid,
+    ]),
+    createSummaryCheckList(errors.transitions.areTransitionsUnique, "transitions", [
+      disabled.transitions.currentState.isValid,
+      disabled.transitions.symbol.isValid,
+      errors.transitions.areCurrentStatesNonEmpty.isValid,
+      errors.transitions.areCurrentStatesValid.isValid,
+      errors.transitions.areSymbolsNonEmpty.isValid,
+      errors.transitions.areSymbolsValid.isValid,
+    ]),
+    createSummaryCheckList(errors.transitions.areNextStatesNonEmpty, "transitions", [disabled.transitions.nextStates.isValid]),
+    createSummaryCheckList(errors.transitions.areNextStatesValid, "transitions", [
+      disabled.transitions.nextStates.isValid,
+      errors.transitions.areNextStatesNonEmpty.isValid,
     ]),
   ]);
 
   // List of warning messages to display in an alert
   const warningAlertText: string[] = R.concat(createAlertTextList([
-    warnings.states.atLeastOneFinalState,
-    warnings.states.atLeastOneNonFinalState,
+    createSummaryCheck(warnings.states.atLeastOneFinalState, [errors.states.isNonEmpty.isValid]),
+    createSummaryCheck(warnings.states.atLeastOneNonFinalState, [errors.states.isNonEmpty.isValid]),
   ]), createAlertTextList([
     warnings.transitions.isNonEmpty,
   ]));

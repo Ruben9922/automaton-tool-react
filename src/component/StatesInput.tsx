@@ -62,7 +62,7 @@ export default function StatesInput({
 
   return (
     <>
-      <form className={classes.root} autoComplete="off">
+      <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         {states.map((state, index) => (
           <React.Fragment key={state.id}>
             <TextField

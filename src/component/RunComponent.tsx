@@ -65,7 +65,7 @@ export default function RunComponent({ automaton }: RunProps) {
   // TODO: Expand all & collapse all buttons
   return (
     <>
-      <form className={classes.root} autoComplete="off">
+      <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         <TextField
           id="input"
           label="Input"

@@ -75,7 +75,7 @@ export default function TransitionsInput({
 
   return (
     <>
-      <form className={classes.root} autoComplete="off">
+      <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         {transitions.map((transition: Transition, transitionIndex: number) => (
           <React.Fragment key={transition.id}>
             <FormControl

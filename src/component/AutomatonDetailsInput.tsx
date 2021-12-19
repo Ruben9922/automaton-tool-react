@@ -29,7 +29,7 @@ export default function AutomatonDetailsInput({
   const classes = useStyles();
 
   return (
-    <form className={classes.root}>
+    <form className={classes.root} onSubmit={(event) => event.preventDefault()}>
       <TextField
         id="name"
         label="Automaton name"

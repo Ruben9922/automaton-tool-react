@@ -36,7 +36,7 @@ interface Errors {
 interface Warnings {
   states: {
     atLeastOneFinalState: Check<boolean>; // Warning
-    // atLeastOneNonFinalState: Check<boolean>; // Warning
+    atLeastOneNonFinalState: Check<boolean>; // Warning
   };
   transitions: {
     isNonEmpty: Check<boolean>; // Warning
@@ -229,6 +229,10 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         isValid: !R.isEmpty(finalStateIds),
         message: "No state is selected as the final state, so all strings will be rejected by the automaton",
       },
+      atLeastOneNonFinalState: {
+        isValid: !R.equals(stateIds, finalStateIds),
+        message: "All states are selected as final states, so all strings will be accepted by the automaton",
+      },
     },
     transitions: {
       isNonEmpty: {
@@ -362,6 +366,7 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
   // List of warning messages to display in an alert
   const warningAlertText: string[] = R.concat(createAlertTextList([
     warnings.states.atLeastOneFinalState,
+    warnings.states.atLeastOneNonFinalState,
   ]), createAlertTextList([
     warnings.transitions.isNonEmpty,
   ]));

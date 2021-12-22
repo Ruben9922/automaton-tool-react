@@ -19,9 +19,9 @@ export default function Diagram({ automaton }: DiagramProps) {
   const dot = `digraph finite_state_machine {
 \trankdir=LR;
 \tsize="8,5"
-\tnode [shape = doublecircle]; ${R.join(" ", automaton.finalStates)};
-\tnode [shape = circle]; ${R.join(" ", R.difference(automaton.states, automaton.finalStates))};
-\t${R.join("\n\t", R.map((value) => R.map((nextState) => `${value.currentState} -> ${nextState} [label = "${value.symbol ?? "ε"}"];`, value.nextStates), Array.from(automaton.transitionFunction.values())))}
+\tnode [shape = doublecircle]; ${R.join(" ", R.map((stateName) => `"${stateName}"`, automaton.finalStates))};
+\tnode [shape = circle]; ${R.join(" ", R.map((stateName) => `"${stateName}"`, R.difference(automaton.states, automaton.finalStates)))};
+\t${R.join("\n\t", R.map((value) => R.map((nextState) => `"${value.currentState}" -> "${nextState}" [label = "${value.symbol ?? "ε"}"];`, value.nextStates), Array.from(automaton.transitionFunction.values())))}
 }`;
 
   return (

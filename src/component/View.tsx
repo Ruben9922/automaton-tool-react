@@ -20,6 +20,7 @@ import Automaton from "../core/automaton";
 import TransitionFunctionKey from "../core/transitionFunctionKey";
 import Button from "@material-ui/core/Button";
 import Diagram from "./Diagram";
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -243,6 +244,9 @@ export default function View({ automaton }: ViewProps) {
       <Typography variant="h6" component="h2" gutterBottom>
         Actions
       </Typography>
+      <Button component={Link} to={`${url}/edit`} variant="contained" className={classes.button} startIcon={<EditIcon />}>
+        Edit
+      </Button>
       <Button component={Link} to={`${url}/run`} variant="contained" className={classes.button}>
         Run
       </Button>

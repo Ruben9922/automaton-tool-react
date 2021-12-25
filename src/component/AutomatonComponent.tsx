@@ -1,10 +1,12 @@
-import {Route, Switch, useParams, useRouteMatch,} from "react-router-dom";
+import {
+  Route, Switch, useParams, useRouteMatch,
+} from "react-router-dom";
 import Alert from "@material-ui/lab/Alert";
 import React from "react";
-import {dbToAutomaton, determinize, minimize} from "../core/automaton";
+import * as R from "ramda";
+import { dbToAutomaton, determinize, minimize } from "../core/automaton";
 import View from "./View";
 import Input from "./Input";
-import * as R from "ramda";
 import Run from "./RunComponent";
 
 type AutomatonParams = {

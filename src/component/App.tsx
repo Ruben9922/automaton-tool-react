@@ -1,14 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import Container from "@material-ui/core/Container";
 import * as R from 'ramda';
 import { v4 as uuidv4 } from "uuid";
 import { useObject } from 'react-firebase-hooks/database';
 import Alert from '@material-ui/lab/Alert';
 import Link from '@material-ui/core/Link';
+import { useAuthState } from "react-firebase-hooks/auth";
 import firebase from '../firebase';
-import Input from "./Input";
-import View from "./View";
 import Home from "./Home";
 import Header from "./Header";
 import Snackbar from './Snackbar';
@@ -16,7 +15,6 @@ import SnackbarMessage from '../core/snackbarMessage';
 import Loader from './Loader';
 import Automata from "./Automata";
 import PrivateRoute from "./PrivateRoute";
-import {useAuthState} from "react-firebase-hooks/auth";
 import PublicRoute from "./PublicRoute";
 import Login from "./Login";
 

@@ -1,27 +1,27 @@
 import React from 'react';
-import {makeStyles, Theme} from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import {useHistory} from "react-router-dom";
-import {NIL, v4 as uuidv4} from "uuid";
-import {useImmerReducer} from "use-immer";
+import { useHistory } from "react-router-dom";
+import { NIL, v4 as uuidv4 } from "uuid";
+import { useImmerReducer } from "use-immer";
 import * as R from "ramda";
+import Alert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import Typography from "@material-ui/core/Typography";
 import AlphabetInput from "./AlphabetInput";
 import TransitionsInput from "./TransitionsInput";
 import StatesInput from "./StatesInput";
-import {validate,} from "../core/validation";
+import { validate } from "../core/validation";
 import Transition from "../core/transition";
-import {alphabetPresets} from '../core/alphabetPreset';
+import { alphabetPresets } from '../core/alphabetPreset';
 import firebase from '../firebase';
 import Automaton, {
   automatonToDb,
   automatonToInputState,
   generatePlaceholderName,
-  inputStateToAutomaton
+  inputStateToAutomaton,
 } from "../core/automaton";
 import AutomatonDetailsInput from "./AutomatonDetailsInput";
-import Alert from "@material-ui/lab/Alert";
-import AlertTitle from "@material-ui/lab/AlertTitle";
-import Typography from "@material-ui/core/Typography";
 import State from "../core/state";
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -1,8 +1,8 @@
 import * as R from "ramda";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import Transition from "./transition";
 import TransitionFunctionKey from "./transitionFunctionKey";
-import State, {stateIdToStateName, stateNameToStateId} from "./state";
+import State, { stateIdToStateName, stateNameToStateId } from "./state";
 
 type TransitionFunction = Map<string, {currentState: string, symbol: string | null, nextStates: string[]}>;
 

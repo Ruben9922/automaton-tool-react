@@ -1,7 +1,7 @@
 import React from 'react';
-import firebase from '../firebase';
-import {StyledFirebaseAuth} from "react-firebaseui";
+import { StyledFirebaseAuth } from "react-firebaseui";
 import Typography from "@material-ui/core/Typography";
+import firebase from '../firebase';
 
 // Configure FirebaseUI
 const uiConfig = {

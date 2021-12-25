@@ -1,5 +1,5 @@
 import React from "react";
-import {makeStyles, Theme} from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
@@ -9,7 +9,7 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
 import * as R from "ramda";
-import {StatesErrorState, StatesHelperText} from "../core/validation";
+import { StatesErrorState, StatesHelperText } from "../core/validation";
 import Dialog from "./Dialog";
 import Transition from "../core/transition";
 import State from "../core/state";

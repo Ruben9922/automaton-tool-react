@@ -1,7 +1,7 @@
 import React from "react";
-import {Graphviz} from "graphviz-react";
-import Automaton from "../core/automaton";
+import { Graphviz } from "graphviz-react";
 import * as R from "ramda";
+import Automaton from "../core/automaton";
 
 type DiagramProps = {
   automaton: Automaton;

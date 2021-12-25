@@ -1,5 +1,5 @@
 import React from "react";
-import {makeStyles, Theme} from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -10,12 +10,12 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
-import {FormHelperText} from "@material-ui/core";
+import { FormHelperText } from "@material-ui/core";
 import clsx from "clsx";
 import * as R from "ramda";
 import Transition from "../core/transition";
-import State, {createStateDisplayName, stateIdToStateIndex, stateIdToStateName} from "../core/state";
-import {TransitionsErrorState, TransitionsHelperText} from "../core/validation";
+import State, { createStateDisplayName, stateIdToStateIndex, stateIdToStateName } from "../core/state";
+import { TransitionsErrorState, TransitionsHelperText } from "../core/validation";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

@@ -1,10 +1,8 @@
 import React from 'react';
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import {makeStyles, Theme} from "@material-ui/core/styles";
-import Automaton, {accepts, computeRun, computeRunTree} from "../core/automaton";
-import {Run, RunTree} from "../core/run";
-import {TreeItem, TreeView} from "@material-ui/lab";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import { TreeItem, TreeView } from "@material-ui/lab";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import FormControl from "@material-ui/core/FormControl";
@@ -14,7 +12,9 @@ import Radio from "@material-ui/core/Radio";
 import Paper from "@material-ui/core/Paper";
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import {isSubset} from "../core/utilities";
+import { Run, RunTree } from "../core/run";
+import Automaton, { accepts, computeRun, computeRunTree } from "../core/automaton";
+import { isSubset } from "../core/utilities";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

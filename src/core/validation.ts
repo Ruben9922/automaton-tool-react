@@ -1,8 +1,8 @@
 import * as R from "ramda";
-import {NIL} from "uuid";
+import { NIL } from "uuid";
 import Transition from "./transition";
-import {isSubset, isUnique, isUniqueList} from "./utilities";
-import State, {stateIdToStateName} from "./state";
+import { isSubset, isUnique, isUniqueList } from "./utilities";
+import State, { stateIdToStateName } from "./state";
 
 interface Check<T> {
   isValid: T;

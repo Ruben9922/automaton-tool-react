@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 import { StyledFirebaseAuth } from "react-firebaseui";
 import Typography from "@material-ui/core/Typography";
-import firebase from '../firebase';
+import firebase from "../firebase";
 
 // Configure FirebaseUI
 const uiConfig = {
-  signInFlow: 'redirect',
+  signInFlow: "redirect",
   // Redirect to / after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: '/',
+  signInSuccessUrl: "/",
   signInOptions: [
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     // Disabled Facebook authentication as Facebook requires a privacy policy, which I don't have currently

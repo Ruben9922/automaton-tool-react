@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '25ch',
+      width: "25ch",
     },
   },
   formControl: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -10,17 +10,17 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import Paper from "@material-ui/core/Paper";
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
+import CheckIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
 import { Run, RunTree } from "../core/run";
 import Automaton, { accepts, computeRun, computeRunTree } from "../core/automaton";
 import { isSubset } from "../core/utilities";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '25ch',
+      width: "25ch",
     },
   },
   paper: {

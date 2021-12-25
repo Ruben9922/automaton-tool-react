@@ -17,16 +17,16 @@ import * as R from "ramda";
 import React from "react";
 import { Link, useRouteMatch } from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from "@material-ui/icons/Edit";
 import Automaton from "../core/automaton";
 import TransitionFunctionKey from "../core/transitionFunctionKey";
 import Diagram from "./Diagram";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    listStyle: 'none',
+    display: "flex",
+    flexWrap: "wrap",
+    listStyle: "none",
     padding: theme.spacing(0.5),
     margin: 0,
     // width: "50%",

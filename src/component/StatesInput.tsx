@@ -16,9 +16,9 @@ import State from "../core/state";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '25ch',
+      width: "25ch",
     },
   },
   formControl: {

@@ -1,7 +1,7 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
 import Fab from "@material-ui/core/Fab";
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from "@material-ui/icons/Add";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import List from "@material-ui/core/List";
@@ -19,7 +19,7 @@ import firebase from "../firebase";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
-    position: 'absolute',
+    position: "absolute",
     bottom: theme.spacing(4),
     right: theme.spacing(4),
   },

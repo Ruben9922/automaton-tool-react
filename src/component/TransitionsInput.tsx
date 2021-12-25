@@ -19,9 +19,9 @@ import { TransitionsErrorState, TransitionsHelperText } from "../core/validation
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '25ch',
+      width: "25ch",
     },
   },
   formControl: {
@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     minWidth: 120,
   },
   chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap",
   },
   chip: {
     margin: 2,

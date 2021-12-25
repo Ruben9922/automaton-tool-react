@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import { useHistory } from "react-router-dom";
@@ -13,8 +13,8 @@ import TransitionsInput from "./TransitionsInput";
 import StatesInput from "./StatesInput";
 import { validate } from "../core/validation";
 import Transition from "../core/transition";
-import { alphabetPresets } from '../core/alphabetPreset';
-import firebase from '../firebase';
+import { alphabetPresets } from "../core/alphabetPreset";
+import firebase from "../firebase";
 import Automaton, {
   automatonToDb,
   automatonToInputState,
@@ -26,7 +26,7 @@ import State from "../core/state";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    width: '100%',
+    width: "100%",
   },
   button: {
     marginRight: theme.spacing(1),
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(1),
   },
   completed: {
-    display: 'inline-block',
+    display: "inline-block",
   },
   instructions: {
     marginTop: theme.spacing(1),

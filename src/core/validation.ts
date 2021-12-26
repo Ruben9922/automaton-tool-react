@@ -164,8 +164,10 @@ function createHelperTextListMultiple(checks: Check<boolean[]>[]): (string | nul
 }
 
 function createAlertTextList(checks: Check<boolean>[]): string[] {
-  return R.filter((x: string | null) => x !== null,
-    R.map((c) => (c.isValid ? null : c.message), checks)) as string[];
+  return R.filter(
+    (x: string | null) => x !== null,
+    R.map((c) => (c.isValid ? null : c.message), checks),
+  ) as string[];
 }
 
 // export function allValid(checks: Record<string, Check<boolean>>): boolean {

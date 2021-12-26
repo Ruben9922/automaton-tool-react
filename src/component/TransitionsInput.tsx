@@ -74,110 +74,108 @@ export default function TransitionsInput({
   const symbols = R.prepend(null, alphabet);
 
   return (
-    <>
-      <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
-        {transitions.map((transition: Transition, transitionIndex: number) => (
-          <React.Fragment key={transition.id}>
-            <FormControl
-              className={classes.formControl}
-              error={errorState.currentState[transitionIndex]}
-              disabled={R.isEmpty(states)}
+    <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
+      {transitions.map((transition: Transition, transitionIndex: number) => (
+        <React.Fragment key={transition.id}>
+          <FormControl
+            className={classes.formControl}
+            error={errorState.currentState[transitionIndex]}
+            disabled={R.isEmpty(states)}
+          >
+            <InputLabel id={`transition-current-state-${transitionIndex + 1}-label`}>Current state</InputLabel>
+            <Select
+              labelId={`transition-current-state-${transitionIndex + 1}-label`}
+              id={`transition-current-state-${transitionIndex + 1}`}
+              value={transition.currentState}
+              onChange={(event) => (
+                onCurrentStateChange(transitionIndex, event.target.value as string)
+              )}
             >
-              <InputLabel id={`transition-current-state-${transitionIndex + 1}-label`}>Current state</InputLabel>
-              <Select
-                labelId={`transition-current-state-${transitionIndex + 1}-label`}
-                id={`transition-current-state-${transitionIndex + 1}`}
-                value={transition.currentState}
-                onChange={(event) => (
-                  onCurrentStateChange(transitionIndex, event.target.value as string)
-                )}
-              >
-                {states.map((state: State, stateIndex: number) => (
-                  <MenuItem
-                    key={state.id}
-                    value={state.id}
-                    className={clsx({ [classes.placeholderStateName]: state.name === "" })}
-                  >
-                    {createStateDisplayName(state.name, stateIndex)}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{helperText.currentState[transitionIndex]}</FormHelperText>
-            </FormControl>
-            <FormControl
-              className={classes.formControl}
-              error={errorState.symbol[transitionIndex]}
+              {states.map((state: State, stateIndex: number) => (
+                <MenuItem
+                  key={state.id}
+                  value={state.id}
+                  className={clsx({ [classes.placeholderStateName]: state.name === "" })}
+                >
+                  {createStateDisplayName(state.name, stateIndex)}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{helperText.currentState[transitionIndex]}</FormHelperText>
+          </FormControl>
+          <FormControl
+            className={classes.formControl}
+            error={errorState.symbol[transitionIndex]}
+          >
+            <InputLabel id={`transition-symbol-${transitionIndex + 1}-label`}>Symbol</InputLabel>
+            <Select
+              labelId={`transition-symbol-${transitionIndex + 1}-label`}
+              id={`transition-symbol-${transitionIndex + 1}`}
+              value={transition.symbol ?? "<<epsilon>>"}
+              onChange={(event) => onSymbolChange(transitionIndex, (event.target.value as string) === "<<epsilon>>" ? null : event.target.value as string)}
             >
-              <InputLabel id={`transition-symbol-${transitionIndex + 1}-label`}>Symbol</InputLabel>
-              <Select
-                labelId={`transition-symbol-${transitionIndex + 1}-label`}
-                id={`transition-symbol-${transitionIndex + 1}`}
-                value={transition.symbol ?? "<<epsilon>>"}
-                onChange={(event) => onSymbolChange(transitionIndex, (event.target.value as string) === "<<epsilon>>" ? null : event.target.value as string)}
-              >
-                {symbols.map((symbol: string | null, index: number) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <MenuItem key={index} value={symbol ?? "<<epsilon>>"}>{symbol ?? "ε"}</MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{helperText.symbol[transitionIndex]}</FormHelperText>
-            </FormControl>
-            <FormControl
-              className={classes.formControl}
-              error={errorState.nextStates[transitionIndex]}
-              disabled={R.isEmpty(states)}
-            >
-              <InputLabel id={`transition-next-states-${transitionIndex + 1}-label`}>Next states</InputLabel>
-              <Select
-                labelId={`transition-next-states-${transitionIndex + 1}-label`}
-                id={`transition-next-states-${transitionIndex + 1}`}
-                multiple
-                value={R.sortBy(R.curry(stateIdToStateIndex)(states), transition.nextStates)}
-                onChange={(event) => onNextStatesChange(transitionIndex, event.target.value as string[])}
-                input={<Input id="transition-next-states-select" />}
-                renderValue={(value: unknown) => {
-                  const nextStateIds = value as Array<string>;
-                  return (
-                    <div className={classes.chips}>
-                      {nextStateIds.map((nextStateId: string) => {
-                        const stateName = stateIdToStateName(nextStateId, states);
-                        const stateIndex = stateIdToStateIndex(states, nextStateId);
-                        return (
+              {symbols.map((symbol: string | null, index: number) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <MenuItem key={index} value={symbol ?? "<<epsilon>>"}>{symbol ?? "ε"}</MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{helperText.symbol[transitionIndex]}</FormHelperText>
+          </FormControl>
+          <FormControl
+            className={classes.formControl}
+            error={errorState.nextStates[transitionIndex]}
+            disabled={R.isEmpty(states)}
+          >
+            <InputLabel id={`transition-next-states-${transitionIndex + 1}-label`}>Next states</InputLabel>
+            <Select
+              labelId={`transition-next-states-${transitionIndex + 1}-label`}
+              id={`transition-next-states-${transitionIndex + 1}`}
+              multiple
+              value={R.sortBy(R.curry(stateIdToStateIndex)(states), transition.nextStates)}
+              onChange={(event) => onNextStatesChange(transitionIndex, event.target.value as string[])}
+              input={<Input id="transition-next-states-select" />}
+              renderValue={(value: unknown) => {
+                const nextStateIds = value as Array<string>;
+                return (
+                  <div className={classes.chips}>
+                    {nextStateIds.map((nextStateId: string) => {
+                      const stateName = stateIdToStateName(nextStateId, states);
+                      const stateIndex = stateIdToStateIndex(states, nextStateId);
+                      return (
                           <Chip
                             key={nextStateId}
                             label={createStateDisplayName(stateName, stateIndex)}
                             className={clsx(classes.chip, { [classes.placeholderStateName]: stateName === "" })}
                           />
-                        );
-                      })}
-                    </div>
-                  );
-                }}
-              >
-                {states.map((state: State, stateIndex: number) => (
-                  <MenuItem
-                    key={state.id}
-                    value={state.id}
-                    className={clsx({
-                      [classes.placeholderStateName]: state.name === "",
-                      [classes.selected]: transition.nextStates.includes(state.id),
+                      );
                     })}
-                  >
-                    {createStateDisplayName(state.name, stateIndex)}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{helperText.nextStates[transitionIndex]}</FormHelperText>
-            </FormControl>
-            <Tooltip title={`Delete Transition ${transitionIndex + 1}`}>
-              <IconButton onClick={() => onRemoveTransition(transitionIndex)} aria-label="delete">
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </React.Fragment>
-        ))}
-        <Button onClick={onAddTransition} variant="contained">Add transition</Button>
-      </form>
-    </>
+                  </div>
+                );
+              }}
+            >
+              {states.map((state: State, stateIndex: number) => (
+                <MenuItem
+                  key={state.id}
+                  value={state.id}
+                  className={clsx({
+                    [classes.placeholderStateName]: state.name === "",
+                    [classes.selected]: transition.nextStates.includes(state.id),
+                  })}
+                >
+                  {createStateDisplayName(state.name, stateIndex)}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{helperText.nextStates[transitionIndex]}</FormHelperText>
+          </FormControl>
+          <Tooltip title={`Delete Transition ${transitionIndex + 1}`}>
+            <IconButton onClick={() => onRemoveTransition(transitionIndex)} aria-label="delete">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </React.Fragment>
+      ))}
+      <Button onClick={onAddTransition} variant="contained">Add transition</Button>
+    </form>
   );
 }

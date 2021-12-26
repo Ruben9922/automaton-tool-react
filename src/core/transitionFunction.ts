@@ -4,7 +4,7 @@ import Transition from "./transition";
 import TransitionFunctionKey from "./transitionFunctionKey";
 import State, { stateIdToStateName, stateNameToStateId } from "./state";
 
-type TransitionFunction = Map<string, {currentState: string, symbol: string | null, nextStates: string[]}>;
+type TransitionFunction = Map<string, { currentState: string, symbol: string | null, nextStates: string[] }>;
 
 export function transitionsToTransitionFunction(transitions: Transition[], states: State[]): TransitionFunction {
   // Using type assertions to exclude undefined because state can never be undefined due to the

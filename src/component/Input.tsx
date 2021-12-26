@@ -231,8 +231,13 @@ export default function Input({
 
   const {
     errorState, helperText, errorAlertText, warningAlertText,
-  } = validate(state.alphabet, state.states, state.transitions, state.initialStateId,
-    state.finalStateIds);
+  } = validate(
+    state.alphabet,
+    state.states,
+    state.transitions,
+    state.initialStateId,
+    state.finalStateIds,
+  );
 
   const handleFinish = (): void => {
     const updatedAutomaton = inputStateToAutomaton(state, automatonIndex);

@@ -58,7 +58,7 @@ export default function StatesInput({
 }: StatesInputProps) {
   const classes = useStyles();
 
-  const [dialogInfo, setDialogInfo] = React.useState<{stateIndex: number, stateId: string} | null>(null);
+  const [dialogInfo, setDialogInfo] = React.useState<{ stateIndex: number, stateId: string } | null>(null);
 
   return (
     <>

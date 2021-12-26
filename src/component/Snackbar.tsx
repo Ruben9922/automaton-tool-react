@@ -39,8 +39,10 @@ export default function Snackbar({
     }
   }, [snackbarQueue, snackbar, snackbarOpen]);
 
-  const handleSnackbarClose = (event: object | React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    reason?: string): void => {
+  const handleSnackbarClose = (
+    event: object | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    reason?: string,
+  ): void => {
     if (reason === "clickaway") {
       return;
     }

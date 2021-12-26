@@ -4,17 +4,36 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    "plugin:react/recommended",
     "airbnb",
+    "airbnb/hooks",
   ],
-  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 12,
+    ecmaVersion: 13,
     sourceType: "module",
   },
+  overrides: [
+    {
+      extends: [
+        "airbnb-typescript",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      ],
+      files: ["*.ts", "*.tsx"], // Your TypeScript files extension
+      parserOptions: {
+        project: ["./tsconfig.json"], // Specify it only for TypeScript files
+      },
+      rules: {
+        quotes: "off",
+        "@typescript-eslint/quotes": ["error", "double"],
+        "lines-between-class-members": "off",
+        "@typescript-eslint/lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
+      },
+    },
+  ],
+  parser: "@typescript-eslint/parser",
   plugins: [
     "react",
     "@typescript-eslint",
@@ -32,21 +51,13 @@ module.exports = {
         tsx: "never",
       },
     ],
-    "no-param-reassign": "off",
-    "react/jsx-filename-extension": ["error", { extensions: [".jsx", ".tsx"] }],
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": "error",
-    "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": ["error"],
-    semi: "off",
-    "@typescript-eslint/semi": ["error"],
 
     // Custom stuff
-    "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
     quotes: ["error", "double"],
+    "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
     "react/jsx-one-expression-per-line": "off",
     "max-len": ["error", {
-      code: 120,
+      code: 100,
       ignoreTrailingComments: true,
       ignoreUrls: true,
       ignoreStrings: true,
@@ -55,6 +66,7 @@ module.exports = {
     }],
     "react/no-array-index-key": "off",
     "no-underscore-dangle": ["error", { allow: ["__"] }],
+    "no-param-reassign": "off",
   },
   settings: {
     "import/resolver": {

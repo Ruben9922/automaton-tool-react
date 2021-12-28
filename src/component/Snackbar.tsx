@@ -37,7 +37,7 @@ export default function Snackbar({
       // Close an active snack when a new one is added
       setSnackbarOpen(false);
     }
-  }, [snackbarQueue, snackbar, snackbarOpen]);
+  }, [snackbarQueue, snackbar, snackbarOpen, setSnackbarQueue]);
 
   const handleSnackbarClose = (
     event: object | React.MouseEvent<HTMLButtonElement, MouseEvent>,

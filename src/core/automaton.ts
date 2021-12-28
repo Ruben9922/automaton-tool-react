@@ -19,6 +19,10 @@ export default interface Automaton {
   finalStates: string[];
 }
 
+export function generatePlaceholderName(index: number): string {
+  return `Automaton ${index + 1}`;
+}
+
 export function inputStateToAutomaton(inputState: Omit<InputState, "alphabetPresetIndex">, index: number): Automaton {
   const automatonStates = R.map((state) => state.name, inputState.states);
 
@@ -81,10 +85,6 @@ export function dbToAutomaton(value: any): Automaton {
     initialState: value.initialState,
     finalStates: value.finalStates ?? [],
   };
-}
-
-export function generatePlaceholderName(index: number): string {
-  return `Automaton ${index + 1}`;
 }
 
 function computeEpsilonClosure(automaton: Automaton, states: string[]): string[] {

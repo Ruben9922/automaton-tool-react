@@ -17,7 +17,7 @@ export default function Diagram({ automaton }: DiagramProps) {
   // }, []);
 
   const finalStateNodes = R.join(" ", R.map((stateName) => `"${stateName}"`, automaton.finalStates));
-  const nonFinalStateNodes = R.join(" ", R.map((stateName) => `"${stateName}"`, R.difference(automaton.states, automaton.finalStates)));
+  const nonFinalStateNodes = R.join(" ", R.map((stateName: string) => `"${stateName}"`, R.difference(automaton.states, automaton.finalStates)));
   const edges = R.join("\n\t", R.map((value) => R.map((nextState) => `"${value.currentState}" -> "${nextState}" [label = "${value.symbol ?? "ε"}"];`, value.nextStates), Array.from(automaton.transitionFunction.values())));
 
   const dot = `digraph finite_state_machine {

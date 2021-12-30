@@ -132,7 +132,9 @@ export default function TransitionsInput({
               id={`transition-next-states-${transitionIndex + 1}`}
               multiple
               value={R.sortBy(R.curry(stateIdToStateIndex)(states), transition.nextStates)}
-              onChange={(event) => onNextStatesChange(transitionIndex, event.target.value as string[])}
+              onChange={(event) => (
+                onNextStatesChange(transitionIndex, event.target.value as string[])
+              )}
               input={<Input id="transition-next-states-select" />}
               renderValue={(value: unknown) => {
                 const nextStateIds = value as Array<string>;
@@ -142,11 +144,11 @@ export default function TransitionsInput({
                       const stateName = stateIdToStateName(nextStateId, states);
                       const stateIndex = stateIdToStateIndex(states, nextStateId);
                       return (
-                          <Chip
-                            key={nextStateId}
-                            label={createStateDisplayName(stateName, stateIndex)}
-                            className={clsx(classes.chip, { [classes.placeholderStateName]: stateName === "" })}
-                          />
+                        <Chip
+                          key={nextStateId}
+                          label={createStateDisplayName(stateName, stateIndex)}
+                          className={clsx(classes.chip, { [classes.placeholderStateName]: stateName === "" })}
+                        />
                       );
                     })}
                   </div>

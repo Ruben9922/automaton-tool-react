@@ -32,7 +32,10 @@ export function inputStateToAutomaton(inputState: Omit<InputState, "alphabetPres
     states: automatonStates,
     transitionFunction: transitionsToTransitionFunction(inputState.transitions, inputState.states),
     initialState: stateIdToStateName(inputState.initialStateId, inputState.states),
-    finalStates: R.map((finalStateId) => stateIdToStateName(finalStateId, inputState.states), inputState.finalStateIds),
+    finalStates: R.map(
+      (finalStateId) => stateIdToStateName(finalStateId, inputState.states),
+      inputState.finalStateIds,
+    ),
   };
 }
 
@@ -50,7 +53,10 @@ export function automatonToInputState(automaton: Automaton): Omit<InputState, "a
     states,
     transitions: transitionFunctionToTransitions(automaton.transitionFunction, states),
     initialStateId: stateNameToStateId(automaton.initialState, states),
-    finalStateIds: R.map((finalStateName) => stateNameToStateId(finalStateName, states), automaton.finalStates),
+    finalStateIds: R.map(
+      (finalStateName) => stateNameToStateId(finalStateName, states),
+      automaton.finalStates,
+    ),
   };
 }
 
@@ -94,7 +100,9 @@ function computeEpsilonClosure(automaton: Automaton, states: string[]): string[]
 
   do {
     newlyVisited = R.chain((state1) => (
-      automaton.transitionFunction.get(new TransitionFunctionKey(state1, null).toString())?.nextStates ?? []
+      automaton.transitionFunction
+        .get(new TransitionFunctionKey(state1, null).toString())
+        ?.nextStates ?? []
     ), newlyVisited);
     const updatedClosure = R.union(closure, newlyVisited);
     changed = !R.equals(closure, updatedClosure);
@@ -117,7 +125,9 @@ export function computeRun(automaton: Automaton, input: string): Run {
   // TODO: Maybe remove currentStates variable
   for (const symbol of input) {
     let nextStatesUnion = R.chain((state) => (
-      automaton.transitionFunction.get(new TransitionFunctionKey(state, symbol).toString())?.nextStates ?? []
+      automaton.transitionFunction
+        .get(new TransitionFunctionKey(state, symbol).toString())
+        ?.nextStates ?? []
     ), currentStates);
     nextStatesUnion = computeEpsilonClosure(automaton, nextStatesUnion);
 
@@ -139,13 +149,18 @@ export function computeRunTree(automaton: Automaton, input: string): RunTree {
     children: [],
   });
 
-  const roots = R.map(R.partialRight(createTree, [null]), computeEpsilonClosure(automaton, [automaton.initialState]));
+  const roots = R.map(
+    R.partialRight(createTree, [null]),
+    computeEpsilonClosure(automaton, [automaton.initialState]),
+  );
   let currentLevel = [...roots];
 
   for (const symbol of input) {
     let nextLevel: RunTreeNode[] = [];
     for (const node of currentLevel) {
-      let nextStates = automaton.transitionFunction.get(new TransitionFunctionKey(node.state, symbol).toString())?.nextStates ?? [];
+      let nextStates = automaton.transitionFunction
+        .get(new TransitionFunctionKey(node.state, symbol).toString())
+        ?.nextStates ?? [];
       nextStates = computeEpsilonClosure(automaton, nextStates);
 
       const newNodes = R.map(R.partialRight(createTree, [symbol]), nextStates);
@@ -187,7 +202,8 @@ export function determinize(automaton: Automaton): Automaton {
     // Add it to the expanded set
     expandedDfaStates = R.union(expandedDfaStates, [dfaCurrentState]);
 
-    // Note that flattening is done on-the-fly, therefore there is no full un-flattened version of the DFA
+    // Note that flattening is done on-the-fly, therefore there is no full un-flattened version of
+    // the DFA
     const dfaCurrentStateFlattened = flatten(dfaCurrentState);
     dfaStatesFlattened = R.union(dfaStatesFlattened, [dfaCurrentStateFlattened]);
 
@@ -200,7 +216,12 @@ export function determinize(automaton: Automaton): Automaton {
     }
 
     for (const symbol of automaton.alphabet) {
-      let dfaNextState = R.chain((nfaState) => automaton.transitionFunction.get(new TransitionFunctionKey(nfaState, symbol).toString())?.nextStates ?? [], dfaCurrentState);
+      let dfaNextState = R.chain(
+        (nfaState) => automaton.transitionFunction
+          .get(new TransitionFunctionKey(nfaState, symbol).toString())
+          ?.nextStates ?? [],
+        dfaCurrentState,
+      );
       dfaNextState = computeEpsilonClosure(automaton, dfaNextState);
 
       // Add DFA state (flattened version)
@@ -208,11 +229,14 @@ export function determinize(automaton: Automaton): Automaton {
       dfaStatesFlattened = R.union(dfaStatesFlattened, [dfaNextStateFlattened]);
 
       // Add DFA transition - note its current and next states are the flattened versions
-      dfaTransitionFunction.set(new TransitionFunctionKey(dfaCurrentStateFlattened, symbol).toString(), {
-        currentState: dfaCurrentStateFlattened,
-        symbol,
-        nextStates: [dfaNextStateFlattened],
-      });
+      dfaTransitionFunction.set(
+        new TransitionFunctionKey(dfaCurrentStateFlattened, symbol).toString(),
+        {
+          currentState: dfaCurrentStateFlattened,
+          symbol,
+          nextStates: [dfaNextStateFlattened],
+        },
+      );
 
       // Add next states ready to expanded in future iteration
       unexpandedDfaStates = R.union(unexpandedDfaStates, [dfaNextState]);
@@ -233,7 +257,8 @@ export function determinize(automaton: Automaton): Automaton {
   };
 }
 
-// This doesn't take into account epsilon transitions as I only intend this to be run as part of DFA minimization
+// This doesn't take into account epsilon transitions as I only intend this to be run as part of DFA
+// minimization
 function removeUnreachableStates(automaton: Automaton): Automaton {
   // TODO: Check if automaton is DFA / doesn't have epsilon transitions
   let reachableStates: string[] = [automaton.initialState];
@@ -246,15 +271,17 @@ function removeUnreachableStates(automaton: Automaton): Automaton {
     reachableStates = R.union(reachableStates, [currentState]);
 
     for (const symbol of automaton.alphabet) {
-      const nextStates = automaton.transitionFunction.get(new TransitionFunctionKey(currentState, symbol).toString())?.nextStates ?? [];
+      const nextStates = automaton.transitionFunction
+        .get(new TransitionFunctionKey(currentState, symbol).toString())
+        ?.nextStates ?? [];
       unexpandedStates = R.union(unexpandedStates, nextStates);
     }
 
     unexpandedStates = R.difference(unexpandedStates, reachableStates);
   }
 
-  // Only keep transitions involving only reachable states - i.e. its current state and next states are ALL reachable
-  // states
+  // Only keep transitions involving only reachable states - i.e. its current state and next states
+  // are ALL reachable states
   // Need to convert to/from an array to be able to filter the map's entries
   const updatedTransitionFunction = new Map(R.filter(([, v]) => (
     R.includes(v.currentState, reachableStates) && isSubset(v.nextStates, reachableStates)
@@ -274,7 +301,8 @@ function removeUnreachableStates(automaton: Automaton): Automaton {
 
 function mergeIndistinguishableStates(automaton: Automaton): Automaton {
   // TODO: Check if deterministic somehow
-  // Step 1: Partition the original DFA's states into groups of equivalent states, using Hopcroft's algorithm
+  // Step 1: Partition the original DFA's states into groups of equivalent states, using Hopcroft's
+  // algorithm
   // Implement partition as a set of sets of states - each inner set is a group of equivalent states
   let partition: string[][] = [];
 
@@ -296,17 +324,21 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
         continue;
       }
 
-      // For each symbol, check if all transitions from that symbol and each state in the group go to a state also in
-      // the group; if not create another group
-      // Set of states where all transitions from states in the current group lead to states also in current group
+      // For each symbol, check if all transitions from that symbol and each state in the group go
+      // to a state also in the group; if not create another group
+      // Set of states where all transitions from states in the current group lead to states also in
+      // current group
       let statesToThisGroup: string[] = [];
       // Set of states where the above is not the case
       let statesToOtherGroup: string[] = [];
       for (const state of group) {
         const toSameGroup: boolean = R.all((symbol) => {
-          const nextStates: string[] = automaton.transitionFunction.get(new TransitionFunctionKey(state, symbol).toString())?.nextStates ?? [];
+          const nextStates: string[] = automaton.transitionFunction
+            .get(new TransitionFunctionKey(state, symbol).toString())
+            ?.nextStates ?? [];
 
-          // TODO: Might be able to remove as would have already checked that this automaton is a DFA
+          // TODO: Might be able to remove as would have already checked that this automaton is a
+          // DFA
           if (R.length(nextStates) !== 1) {
             // TODO: Error
           }
@@ -332,14 +364,16 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
       }
     }
 
-    // If the partition has changed, overwrite `partition` with `newPartition` ready for the next iteration
+    // If the partition has changed, overwrite `partition` with `newPartition` ready for the next
+    // iteration
     changed = !R.equals(partition, newPartition);
     if (changed) {
       partition = newPartition;
     }
   } while (changed);
 
-  // Step 2: "Flatten" the groups of equivalent states into states and store in a map for use by Steps 2 and 4
+  // Step 2: "Flatten" the groups of equivalent states into states and store in a map for use by
+  // Steps 2 and 4
   // let groupsToFlattenedStatesMap = new Map(R.map((group) => [
   //   group,
   //   Automaton.flatten(group),
@@ -348,13 +382,16 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
   // Step 2: Obtain the minimised DFA's states
   const minimizedStates = R.map(flatten, partition);
 
-  // Step 3: Create a map with each of the original DFA's states mapped to its group in the partition, for use by Step 4
-  const statesToGroupsMap = new Map(R.chain((group) => R.map((state) => [state, group], group), partition));
+  // Step 3: Create a map with each of the original DFA's states mapped to its group in the
+  // partition, for use by Step 4
+  const statesToGroupsMap = new Map(
+    R.chain((group) => R.map((state) => [state, group], group), partition),
+  );
 
   // Step 4: Create transitions of minimised DFA
-  // For each transition t_o in the original DFA, create a transition t_m in the minimised DFA, where t_m's current
-  // state and next state are the flattened versions of the groups containing t_o's current state and next state
-  // respectively
+  // For each transition t_o in the original DFA, create a transition t_m in the minimised DFA,
+  // where t_m's current state and next state are the flattened versions of the groups containing
+  // t_o's current state and next state respectively
   // TODO: Maybe put converting transition function to/from an array into its own function
   const minimizedTransitionFunction = new Map(R.map(([k, v]) => [
     k,
@@ -365,7 +402,8 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
     }),
   ], Array.from(automaton.transitionFunction.entries())));
 
-  // The minimised DFA has the same alphabet as the original DFA, but has the merged states and transitions computed above
+  // The minimised DFA has the same alphabet as the original DFA, but has the merged states and
+  // transitions computed above
   return {
     name: automaton.name,
     alphabet: automaton.alphabet,

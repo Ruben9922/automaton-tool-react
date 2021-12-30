@@ -6,12 +6,13 @@ import firebase from "../firebase";
 // Configure FirebaseUI
 const uiConfig = {
   signInFlow: "redirect",
-  // Redirect to / after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
+  // Redirect to / after sign in is successful. Alternatively you can provide a
+  // callbacks.signInSuccess function.
   signInSuccessUrl: "/",
   signInOptions: [
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    // Disabled Facebook authentication as Facebook requires a privacy policy, which I don't have currently
-    // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+    // Disabled Facebook authentication as Facebook requires a privacy policy, which I don't have
+    // currently firebase.auth.FacebookAuthProvider.PROVIDER_ID,
     firebase.auth.GithubAuthProvider.PROVIDER_ID,
     firebase.auth.EmailAuthProvider.PROVIDER_ID,
   ],

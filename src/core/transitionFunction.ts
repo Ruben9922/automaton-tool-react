@@ -4,9 +4,16 @@ import Transition from "./transition";
 import TransitionFunctionKey from "./transitionFunctionKey";
 import State, { stateIdToStateName, stateNameToStateId } from "./state";
 
-type TransitionFunction = Map<string, { currentState: string, symbol: string | null, nextStates: string[] }>;
+type TransitionFunction = Map<string, {
+  currentState: string,
+  symbol: string | null,
+  nextStates: string[],
+}>;
 
-export function transitionsToTransitionFunction(transitions: Transition[], states: State[]): TransitionFunction {
+export function transitionsToTransitionFunction(
+  transitions: Transition[],
+  states: State[],
+): TransitionFunction {
   // Using type assertions to exclude undefined because state can never be undefined due to the
   // logic of the application
   return new Map(
@@ -21,7 +28,10 @@ export function transitionsToTransitionFunction(transitions: Transition[], state
   );
 }
 
-export function transitionFunctionToTransitions(transitionFunction: TransitionFunction, states: State[]): Transition[] {
+export function transitionFunctionToTransitions(
+  transitionFunction: TransitionFunction,
+  states: State[],
+): Transition[] {
   return R.map((o) => ({
     id: uuidv4(),
     currentState: stateNameToStateId(o.currentState, states),

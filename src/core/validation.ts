@@ -117,14 +117,26 @@ function createErrorStateList(checks: Check<boolean[]>[], disabled?: Check<boole
 
 function createSummaryCheck(check: Check<boolean>, dependencies: boolean[] = []): Check<boolean> {
   return {
-    isValid: R.reduceRight((dependency: boolean, acc: boolean) => !dependency || acc, check.isValid, dependencies),
+    isValid: R.reduceRight(
+      (dependency: boolean, acc: boolean) => !dependency || acc,
+      check.isValid,
+      dependencies,
+    ),
     message: check.message,
   };
 }
 
-function createSummaryCheckList(check: Check<boolean[]>, listPrefix: string, dependencies: boolean[][] = []): Check<boolean> {
+function createSummaryCheckList(
+  check: Check<boolean[]>,
+  listPrefix: string,
+  dependencies: boolean[][] = [],
+): Check<boolean> {
   const isValid = R.reduceRight((dependency: boolean[], acc: boolean[]) => (
-    R.zipWith((dependencyItem: boolean, accItem: boolean) => !dependencyItem || accItem, dependency, acc)
+    R.zipWith(
+      (dependencyItem: boolean, accItem: boolean) => !dependencyItem || accItem,
+      dependency,
+      acc,
+    )
   ), check.isValid, dependencies);
 
   return {
@@ -174,7 +186,13 @@ function createAlertTextList(checks: Check<boolean>[]): string[] {
 //   return R.all((e: Check<boolean>) => e.isValid, R.values(checks));
 // }
 
-export function validate(alphabet: string[], states: State[], transitions: Transition[], initialStateId: string, finalStateIds: string[]) {
+export function validate(
+  alphabet: string[],
+  states: State[],
+  transitions: Transition[],
+  initialStateId: string,
+  finalStateIds: string[],
+) {
   const stateIds = R.map((state) => state.id, states);
   const stateNames = R.map((state) => state.name, states);
 
@@ -221,7 +239,10 @@ export function validate(alphabet: string[], states: State[], transitions: Trans
         message: "Symbol cannot be left blank",
       },
       areSymbolsValid: {
-        isValid: R.map((transition) => transition.symbol === null || alphabet.includes(transition.symbol), transitions),
+        isValid: R.map(
+          (transition) => transition.symbol === null || alphabet.includes(transition.symbol),
+          transitions,
+        ),
         message: "Symbol does not exist in alphabet",
       },
       areNextStatesNonEmpty: {

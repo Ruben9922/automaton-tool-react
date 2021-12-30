@@ -42,6 +42,11 @@ type StatesInputProps = {
   onSetFinalStateIds: (id: string, isFinal: boolean) => void;
 };
 
+interface DialogInfo {
+  stateIndex: number,
+  stateId: string,
+}
+
 export default function StatesInput({
   states,
   transitions,
@@ -58,7 +63,7 @@ export default function StatesInput({
 }: StatesInputProps) {
   const classes = useStyles();
 
-  const [dialogInfo, setDialogInfo] = React.useState<{ stateIndex: number, stateId: string } | null>(null);
+  const [dialogInfo, setDialogInfo] = React.useState<DialogInfo | null>(null);
 
   return (
     <>

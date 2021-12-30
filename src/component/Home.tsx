@@ -55,7 +55,9 @@ export default function Home({
     setDialogOpen(false);
   };
 
-  const automaton = automatonDeleteId ? dbToAutomaton(automata.child(automatonDeleteId).val()) : null;
+  const automaton = automatonDeleteId
+    ? dbToAutomaton(automata.child(automatonDeleteId).val())
+    : null;
 
   // TODO: Replace "/automata" link with url variable
   return (

@@ -19,8 +19,8 @@ import { Link, useRouteMatch } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
 import Automaton from "../core/automaton";
-import TransitionFunctionKey from "../core/transitionFunctionKey";
 import Diagram from "./Diagram";
+import {createTransitionFunctionKey} from "../core/transition";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -216,16 +216,16 @@ export default function View({ automaton }: ViewProps) {
                         {symbols.map((symbol: string | null, index: number) => (
                           // eslint-disable-next-line react/no-array-index-key
                           <TableCell key={index}>
-                            {automaton.transitionFunction.get(new TransitionFunctionKey(
-                              currentState,
-                              symbol,
-                            ).toString())?.nextStates.map((nextState) => (
-                              <Chip
-                                key={nextState}
-                                label={nextState}
-                                className={classes.chip}
-                              />
-                            ))}
+                            {automaton.transitionFunction
+                              .get(createTransitionFunctionKey(currentState, symbol))
+                              ?.nextStates
+                              .map((nextState) => (
+                                <Chip
+                                  key={nextState}
+                                  label={nextState}
+                                  className={classes.chip}
+                                />
+                              ))}
                           </TableCell>
                         ))}
                       </TableRow>

@@ -1,7 +1,6 @@
 import * as R from "ramda";
 import { v4 as uuidv4 } from "uuid";
-import Transition from "./transition";
-import TransitionFunctionKey from "./transitionFunctionKey";
+import Transition, {createTransitionFunctionKey} from "./transition";
 import State, { stateIdToStateName, stateNameToStateId } from "./state";
 
 type TransitionFunction = Map<string, {
@@ -18,7 +17,7 @@ export function transitionsToTransitionFunction(
   // logic of the application
   return new Map(
     R.map((t: Transition) => [
-      new TransitionFunctionKey(stateIdToStateName(t.currentState, states), t.symbol).toString(),
+      createTransitionFunctionKey(stateIdToStateName(t.currentState, states), t.symbol),
       {
         currentState: stateIdToStateName(t.currentState, states),
         symbol: t.symbol,

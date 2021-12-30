@@ -5,10 +5,10 @@ import TransitionFunction, {
   transitionFunctionToTransitions,
   transitionsToTransitionFunction,
 } from "./transitionFunction";
-import TransitionFunctionKey from "./transitionFunctionKey";
 import { Run, RunTree, RunTreeNode } from "./run";
 import { isSubset } from "./utilities";
 import { stateIdToStateName, stateNameToStateId } from "./state";
+import {createTransitionFunctionKey} from "./transition";
 
 export default interface Automaton {
   name: string;
@@ -101,7 +101,7 @@ function computeEpsilonClosure(automaton: Automaton, states: string[]): string[]
   do {
     newlyVisited = R.chain((state1) => (
       automaton.transitionFunction
-        .get(new TransitionFunctionKey(state1, null).toString())
+        .get(createTransitionFunctionKey(state1, null))
         ?.nextStates ?? []
     ), newlyVisited);
     const updatedClosure = R.union(closure, newlyVisited);
@@ -126,7 +126,7 @@ export function computeRun(automaton: Automaton, input: string): Run {
   for (const symbol of input) {
     let nextStatesUnion = R.chain((state) => (
       automaton.transitionFunction
-        .get(new TransitionFunctionKey(state, symbol).toString())
+        .get(createTransitionFunctionKey(state, symbol))
         ?.nextStates ?? []
     ), currentStates);
     nextStatesUnion = computeEpsilonClosure(automaton, nextStatesUnion);
@@ -159,7 +159,7 @@ export function computeRunTree(automaton: Automaton, input: string): RunTree {
     let nextLevel: RunTreeNode[] = [];
     for (const node of currentLevel) {
       let nextStates = automaton.transitionFunction
-        .get(new TransitionFunctionKey(node.state, symbol).toString())
+        .get(createTransitionFunctionKey(node.state, symbol))
         ?.nextStates ?? [];
       nextStates = computeEpsilonClosure(automaton, nextStates);
 
@@ -218,7 +218,7 @@ export function determinize(automaton: Automaton): Automaton {
     for (const symbol of automaton.alphabet) {
       let dfaNextState = R.chain(
         (nfaState) => automaton.transitionFunction
-          .get(new TransitionFunctionKey(nfaState, symbol).toString())
+          .get(createTransitionFunctionKey(nfaState, symbol))
           ?.nextStates ?? [],
         dfaCurrentState,
       );
@@ -230,7 +230,7 @@ export function determinize(automaton: Automaton): Automaton {
 
       // Add DFA transition - note its current and next states are the flattened versions
       dfaTransitionFunction.set(
-        new TransitionFunctionKey(dfaCurrentStateFlattened, symbol).toString(),
+        createTransitionFunctionKey(dfaCurrentStateFlattened, symbol),
         {
           currentState: dfaCurrentStateFlattened,
           symbol,
@@ -272,7 +272,7 @@ function removeUnreachableStates(automaton: Automaton): Automaton {
 
     for (const symbol of automaton.alphabet) {
       const nextStates = automaton.transitionFunction
-        .get(new TransitionFunctionKey(currentState, symbol).toString())
+        .get(createTransitionFunctionKey(currentState, symbol))
         ?.nextStates ?? [];
       unexpandedStates = R.union(unexpandedStates, nextStates);
     }
@@ -334,7 +334,7 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
       for (const state of group) {
         const toSameGroup: boolean = R.all((symbol) => {
           const nextStates: string[] = automaton.transitionFunction
-            .get(new TransitionFunctionKey(state, symbol).toString())
+            .get(createTransitionFunctionKey(state, symbol))
             ?.nextStates ?? [];
 
           // TODO: Might be able to remove as would have already checked that this automaton is a

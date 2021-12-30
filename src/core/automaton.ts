@@ -338,7 +338,7 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
             ?.nextStates ?? [];
 
           // TODO: Might be able to remove as would have already checked that this automaton is a
-          // DFA
+          //  DFA
           if (R.length(nextStates) !== 1) {
             // TODO: Error
           }

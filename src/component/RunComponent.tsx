@@ -60,7 +60,7 @@ export default function RunComponent({ automaton }: RunProps) {
   const inputValid = isSubset(input.split(""), automaton.alphabet);
 
   // TODO: Maybe add options for epsilion closure - e.g. display effect of epsilon closure after
-  // each input symbol
+  //  each input symbol
   // TODO: Maybe rename "set view"
   // TODO: Add explanation
   // TODO: Expand all & collapse all buttons

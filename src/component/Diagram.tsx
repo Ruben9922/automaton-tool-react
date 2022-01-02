@@ -2,7 +2,6 @@ import React from "react";
 import { Graphviz } from "graphviz-react";
 import * as R from "ramda";
 import Automaton from "../core/automaton";
-import TransitionFunction from "../core/transitionFunction";
 
 type DiagramProps = {
   automaton: Automaton;
@@ -14,8 +13,8 @@ interface Edge {
   nextState: string;
 }
 
-function createEdges(transitionFunction: TransitionFunction): Edge[] {
-  const transitions = Array.from(transitionFunction.values());
+function createEdges(automaton: Automaton): Edge[] {
+  const transitions = Array.from(automaton.transitionFunction.values());
   const singleTransitions = R.chain((transition) => R.map((nextState) => ({
     currentState: transition.currentState,
     symbol: transition.symbol,
@@ -27,7 +26,10 @@ function createEdges(transitionFunction: TransitionFunction): Edge[] {
   );
   const edges = R.map((group) => ({
     currentState: group[0].currentState,
-    symbols: R.map((t) => t.symbol, group),
+    symbols: R.sortBy(
+      (symbol: string | null) => (symbol === null ? -1 : R.indexOf(symbol, automaton.alphabet)),
+      R.map((t) => t.symbol, group),
+    ),
     nextState: group[0].nextState,
   }), groupedTransitions);
 
@@ -46,7 +48,7 @@ export default function Diagram({ automaton }: DiagramProps) {
   const finalStateNodes = R.join(" ", R.map((stateName) => `"${stateName}"`, automaton.finalStates));
   const nonFinalStateNodes = R.join(" ", R.map((stateName: string) => `"${stateName}"`, R.difference(automaton.states, automaton.finalStates)));
 
-  const edges = createEdges(automaton.transitionFunction);
+  const edges = createEdges(automaton);
   const edgeString = R.join("\n\t", R.map((e) => `"${e.currentState}" -> "${e.nextState}" [label = "${R.join(", ", R.map((symbol) => symbol ?? "ε", e.symbols))}"];`, edges));
 
   const dot = `digraph finite_state_machine {

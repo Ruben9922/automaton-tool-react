@@ -68,8 +68,8 @@ export default function Diagram({ automaton }: DiagramProps) {
   const dot = `digraph finite_state_machine {
 \trankdir=LR;
 \tsize="8,5"
-\tnode [shape = doublecircle]; ${finalStateNodes};
-\tnode [shape = circle]; ${nonFinalStateNodes};
+${R.isEmpty(finalStateNodes) ? "" : `\tnode [shape = doublecircle]; ${finalStateNodes};`}
+${R.isEmpty(nonFinalStateNodes) ? "" : `\tnode [shape = circle]; ${nonFinalStateNodes};`}
 \t${edgeString}
 }`;
 

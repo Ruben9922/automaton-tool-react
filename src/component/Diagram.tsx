@@ -2,6 +2,8 @@ import React from "react";
 import { Graphviz } from "graphviz-react";
 import * as R from "ramda";
 import Automaton from "../core/automaton";
+import Transition from "../core/transition";
+import TransitionFunction from "../core/transitionFunction";
 
 type DiagramProps = {
   automaton: Automaton;
@@ -14,26 +16,26 @@ interface Edge {
 }
 
 function createEdges(automaton: Automaton): Edge[] {
-  const transitions = Array.from(automaton.transitionFunction.values());
-  const singleTransitions = R.chain((transition) => R.map((nextState) => ({
-    currentState: transition.currentState,
-    symbol: transition.symbol,
-    nextState,
-  }), transition.nextStates), transitions);
-  const groupedTransitions = R.groupWith(
-    (t1, t2) => t1.currentState === t2.currentState && t1.nextState === t2.nextState,
-    singleTransitions,
-  );
-  const edges = R.map((group) => ({
-    currentState: group[0].currentState,
-    symbols: R.sortBy(
-      (symbol: string | null) => (symbol === null ? -1 : R.indexOf(symbol, automaton.alphabet)),
-      R.map((t) => t.symbol, group),
+  return R.pipe(
+    (transitionFunction: TransitionFunction) => Array.from(transitionFunction.values()),
+    R.chain((transition) => R.map((nextState) => ({
+      currentState: transition.currentState,
+      symbol: transition.symbol,
+      nextState,
+    }), transition.nextStates)),
+    R.sortWith([R.ascend((t) => t.currentState), R.ascend((t) => t.nextState)]),
+    R.groupWith(
+      (t1, t2) => t1.currentState === t2.currentState && t1.nextState === t2.nextState,
     ),
-    nextState: group[0].nextState,
-  }), groupedTransitions);
-
-  return edges;
+    R.map((group) => ({
+      currentState: group[0].currentState,
+      symbols: R.sortBy(
+        (symbol: string | null) => (symbol === null ? -1 : R.indexOf(symbol, automaton.alphabet)),
+        R.map((t) => t.symbol, group),
+      ),
+      nextState: group[0].nextState,
+    })),
+  )(automaton.transitionFunction);
 }
 
 export default function Diagram({ automaton }: DiagramProps) {

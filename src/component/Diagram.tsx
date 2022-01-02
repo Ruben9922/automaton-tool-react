@@ -65,11 +65,14 @@ export default function Diagram({ automaton }: DiagramProps) {
   const edges = createEdges(automaton);
   const edgeString = R.join("\n\t", R.map((e) => `"${e.currentState}" -> "${e.nextState}" [label = "${R.join(", ", R.map((symbol) => symbol ?? "ε", e.symbols))}"];`, edges));
 
+  const finalStateNodesString = R.isEmpty(finalStateNodes) ? "" : `\tnode [shape = doublecircle]; ${finalStateNodes};`;
+  const nonFinalStateNodesString = R.isEmpty(nonFinalStateNodes) ? "" : `\tnode [shape = circle]; ${nonFinalStateNodes};`;
+
   const dot = `digraph finite_state_machine {
 \trankdir=LR;
 \tsize="8,5"
-${R.isEmpty(finalStateNodes) ? "" : `\tnode [shape = doublecircle]; ${finalStateNodes};`}
-${R.isEmpty(nonFinalStateNodes) ? "" : `\tnode [shape = circle]; ${nonFinalStateNodes};`}
+${finalStateNodesString}
+${nonFinalStateNodesString}
 \t${edgeString}
 }`;
 

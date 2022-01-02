@@ -6,6 +6,12 @@ export default interface AlphabetPreset {
   alphabet: string[];
 }
 
+export const customAlphabetPreset = {
+  id: uuidv4(),
+  name: "Custom",
+  alphabet: [],
+};
+
 export const alphabetPresets: AlphabetPreset[] = [
   {
     id: uuidv4(),
@@ -32,9 +38,5 @@ export const alphabetPresets: AlphabetPreset[] = [
     name: "Upper- & lower-case letters (A-Z, a-z)",
     alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split(""),
   },
-  {
-    id: uuidv4(),
-    name: "Custom",
-    alphabet: [],
-  },
+  customAlphabetPreset,
 ];

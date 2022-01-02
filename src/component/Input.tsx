@@ -13,7 +13,6 @@ import TransitionsInput from "./TransitionsInput";
 import StatesInput from "./StatesInput";
 import { validate } from "../core/validation";
 import Transition from "../core/transition";
-import { alphabetPresets } from "../core/alphabetPreset";
 import firebase from "../firebase";
 import Automaton, {
   automatonToDb,
@@ -56,7 +55,6 @@ type InputProps = {
 export type InputState = {
   name: string;
   alphabet: string[];
-  alphabetPresetIndex: number | "";
   states: State[];
   transitions: Transition[];
   initialStateId: string;
@@ -65,8 +63,7 @@ export type InputState = {
 
 type Action =
   | { type: "setName", name: string }
-  | { type: "setAlphabetPresetIndex", index: number | "" }
-  | { type: "setAlphabet", alphabetString: string }
+  | { type: "setAlphabet", alphabet: string[] }
   | { type: "addState" }
   | { type: "removeState", index: number }
   | { type: "setStateName", index: number, name: string }
@@ -78,23 +75,6 @@ type Action =
   | { type: "currentStateChange", index: number, stateId: string }
   | { type: "symbolChange", index: number, symbol: string | null }
   | { type: "nextStatesChange", index: number, stateIds: string[] };
-
-function alphabetToAlphabetPresetIndex(a: string[]): number {
-  // Check if the entered alphabet matches the alphabet of a preset
-  // If so, select this preset
-  // (Ignoring order and repeats, hence sorting and removing duplicates)
-  const likeSet = R.pipe(R.sortBy(R.identity), R.uniq);
-  let updatedAlphabetPresetIndex = R.findIndex((alphabetPreset) => (
-    R.equals(likeSet(alphabetPreset.alphabet), likeSet(a))
-  ), alphabetPresets);
-
-  // If it doesn't match a preset, then use the custom preset (whose index is 5)
-  if (updatedAlphabetPresetIndex === -1) {
-    updatedAlphabetPresetIndex = 5;
-  }
-
-  return updatedAlphabetPresetIndex;
-}
 
 function fixInitialStateId(initialStateId: string, states: State[]): string {
   return R.includes(initialStateId, R.map((state) => state.id, states)) ? initialStateId : NIL;
@@ -129,17 +109,9 @@ function reducer(draft: InputState, action: Action) {
       draft.name = action.name;
 
       return;
-    case "setAlphabetPresetIndex":
-      draft.alphabetPresetIndex = action.index;
-
-      if (draft.alphabetPresetIndex !== "") {
-        draft.alphabet = alphabetPresets[draft.alphabetPresetIndex].alphabet;
-      }
-      return;
     case "setAlphabet":
-      draft.alphabet = action.alphabetString.split("");
+      draft.alphabet = action.alphabet;
 
-      draft.alphabetPresetIndex = alphabetToAlphabetPresetIndex(draft.alphabet);
       draft.transitions = fixTransitionSymbols(draft.transitions, draft.alphabet);
       return;
     case "addState":
@@ -215,12 +187,9 @@ export default function Input({
 
   const history = useHistory();
 
-  const initialState: InputState = automaton ? R.mergeLeft(automatonToInputState(automaton), {
-    alphabetPresetIndex: alphabetToAlphabetPresetIndex(automatonToInputState(automaton).alphabet),
-  }) : {
+  const initialState: InputState = automaton ? automatonToInputState(automaton) : {
     name: "",
     alphabet: [],
-    alphabetPresetIndex: "",
     states: [],
     transitions: [],
     initialStateId: NIL,
@@ -280,11 +249,9 @@ export default function Input({
       </Typography>
       <AlphabetInput
         alphabet={state.alphabet}
-        alphabetPresetIndex={state.alphabetPresetIndex}
         errorState={errorState.alphabet}
         helperText={helperText.alphabet}
-        onSetAlphabetPresetIndex={(index) => dispatch({ type: "setAlphabetPresetIndex", index })}
-        onSetAlphabet={(alphabetString) => dispatch({ type: "setAlphabet", alphabetString })}
+        onSetAlphabet={(alphabet) => dispatch({ type: "setAlphabet", alphabet })}
       />
       <Typography variant="h6" component="h2" gutterBottom>
         States

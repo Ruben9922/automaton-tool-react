@@ -23,7 +23,7 @@ export function generatePlaceholderName(index: number): string {
   return `Automaton ${index + 1}`;
 }
 
-export function inputStateToAutomaton(inputState: Omit<InputState, "alphabetPresetIndex">, index: number): Automaton {
+export function inputStateToAutomaton(inputState: InputState, index: number): Automaton {
   const automatonStates = R.map((state) => state.name, inputState.states);
 
   return {
@@ -39,7 +39,7 @@ export function inputStateToAutomaton(inputState: Omit<InputState, "alphabetPres
   };
 }
 
-export function automatonToInputState(automaton: Automaton): Omit<InputState, "alphabetPresetIndex"> {
+export function automatonToInputState(automaton: Automaton): InputState {
   // Generate a UUID for each of the states
   // Store this as a list of objects
   const states = R.map((s: string) => ({

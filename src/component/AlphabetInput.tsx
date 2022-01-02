@@ -5,8 +5,9 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import * as R from "ramda";
 import { AlphabetErrorState, AlphabetHelperText } from "../core/validation";
-import { alphabetPresets } from "../core/alphabetPreset";
+import { alphabetPresets, customAlphabetPreset } from "../core/alphabetPreset";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -23,24 +24,39 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type AlphabetInputProps = {
   alphabet: string[];
-  alphabetPresetIndex: number | "";
   errorState: AlphabetErrorState;
   helperText: AlphabetHelperText;
-  onSetAlphabetPresetIndex: (index: number | "") => void;
-  onSetAlphabet: (alphabetString: string) => void;
+  onSetAlphabet: (alphabet: string[]) => void;
 };
+
+function alphabetPresetIdToAlphabet(alphabetPresetId: string): string[] {
+  return R.find(
+    (alphabetPreset) => alphabetPreset.id === alphabetPresetId,
+    alphabetPresets,
+  )?.alphabet ?? customAlphabetPreset.alphabet;
+}
+
+function alphabetToAlphabetPresetId(alphabet: string[]): string {
+  // Check if the entered alphabet matches the alphabet of a preset
+  // If so, select this preset
+  // (Ignoring order and repeats, hence sorting and removing duplicates)
+  const likeSet = R.pipe(R.sortBy(R.identity), R.uniq);
+  const alphabetPresetId = R.find(
+    (alphabetPreset) => R.equals(likeSet(alphabetPreset.alphabet), likeSet(alphabet)),
+    alphabetPresets,
+  )?.id ?? customAlphabetPreset.id;
+
+  return alphabetPresetId;
+}
 
 export default function AlphabetInput({
   alphabet,
-  alphabetPresetIndex,
   errorState,
   helperText,
-  onSetAlphabetPresetIndex,
   onSetAlphabet,
 }: AlphabetInputProps) {
   const classes = useStyles();
 
-  // TODO: Use alphabet preset ID instead of index
   return (
     <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
       <FormControl className={classes.formControl}>
@@ -48,11 +64,15 @@ export default function AlphabetInput({
         <Select
           labelId="alphabet-preset-label"
           id="alphabet-preset"
-          value={alphabetPresetIndex}
-          onChange={(event) => onSetAlphabetPresetIndex(event.target.value as number | "")}
+          value={alphabetToAlphabetPresetId(alphabet)}
+          onChange={(event) => (
+            onSetAlphabet(alphabetPresetIdToAlphabet(event.target.value as string))
+          )}
         >
-          {alphabetPresets.map((alphabetPreset, index) => (
-            <MenuItem key={alphabetPreset.id} value={index}>{alphabetPreset.name}</MenuItem>
+          {alphabetPresets.map((alphabetPreset) => (
+            <MenuItem key={alphabetPreset.id} value={alphabetPreset.id}>
+              {alphabetPreset.name}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
@@ -60,7 +80,7 @@ export default function AlphabetInput({
         id="alphabet"
         label="Alphabet"
         value={alphabet.join("")}
-        onChange={(event) => onSetAlphabet(event.target.value)}
+        onChange={(event) => onSetAlphabet(event.target.value.split(""))}
         error={errorState.alphabet}
         helperText={helperText.alphabet}
       />

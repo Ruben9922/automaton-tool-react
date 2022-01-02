@@ -325,7 +325,7 @@ export default function Input({
         onNextStatesChange={(index, stateIds) => dispatch({ type: "nextStatesChange", index, stateIds })}
       />
       <Button variant="contained" color="primary" onClick={handleFinish} disabled={!R.isEmpty(errorAlertText)}>
-        Create
+        Save
       </Button>
       <Button variant="contained" color="default" onClick={redirect}>
         Cancel

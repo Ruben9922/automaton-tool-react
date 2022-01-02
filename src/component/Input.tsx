@@ -239,6 +239,10 @@ export default function Input({
     state.finalStateIds,
   );
 
+  const redirect = (): void => {
+    history.push(automatonId === null ? "/" : `/automata/${automatonId}`);
+  };
+
   const handleFinish = (): void => {
     const updatedAutomaton = inputStateToAutomaton(state, automatonIndex);
     // addAutomaton(automaton);
@@ -258,7 +262,7 @@ export default function Input({
         .then(() => onSnackbarOpen("automatonAddedSuccess"), () => onSnackbarOpen("automatonAddedFailed"));
     }
 
-    history.push("/");
+    redirect();
   };
 
   return (
@@ -323,7 +327,7 @@ export default function Input({
       <Button variant="contained" color="primary" onClick={handleFinish} disabled={!R.isEmpty(errorAlertText)}>
         Create
       </Button>
-      <Button variant="contained" color="default" onClick={() => history.push("/")}>
+      <Button variant="contained" color="default" onClick={redirect}>
         Cancel
       </Button>
       {R.isEmpty(errorAlertText) || (

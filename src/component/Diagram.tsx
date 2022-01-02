@@ -2,7 +2,6 @@ import React from "react";
 import { Graphviz } from "graphviz-react";
 import * as R from "ramda";
 import Automaton from "../core/automaton";
-import Transition from "../core/transition";
 import TransitionFunction from "../core/transitionFunction";
 
 type DiagramProps = {
@@ -16,17 +15,30 @@ interface Edge {
 }
 
 function createEdges(automaton: Automaton): Edge[] {
+  // Idea is to convert from a transition function (transitions grouped by current state and symbol)
+  // to edges (transitions grouped by current state and next state)
   return R.pipe(
+    // Convert transition function to a list of transitions
     (transitionFunction: TransitionFunction) => Array.from(transitionFunction.values()),
+
+    // Originally each transition contains a current state, symbol and a *list* of next states
+    // Convert transitions so that each transition contains a current state, symbol and a *single*
+    // next state
     R.chain((transition) => R.map((nextState) => ({
       currentState: transition.currentState,
       symbol: transition.symbol,
       nextState,
     }), transition.nextStates)),
+
+    // Sort transitions by current states and next state so that the grouping works correctly
+    // (This is because R.groupWith only groups adjacent items)
     R.sortWith([R.ascend((t) => t.currentState), R.ascend((t) => t.nextState)]),
-    R.groupWith(
-      (t1, t2) => t1.currentState === t2.currentState && t1.nextState === t2.nextState,
-    ),
+
+    // Group transitions by current state and next state
+    R.groupWith((t1, t2) => t1.currentState === t2.currentState && t1.nextState === t2.nextState),
+
+    // Convert transitions so that each transition contains a current state, next state and a *list*
+    // of symbols
     R.map((group) => ({
       currentState: group[0].currentState,
       symbols: R.sortBy(

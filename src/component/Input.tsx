@@ -268,7 +268,7 @@ export default function Input({
   return (
     <div className={classes.root}>
       <Typography variant="h5" component="h1" gutterBottom>
-        Create Automaton
+        {automaton === null ? "Create Automaton" : "Edit Automaton"}
       </Typography>
       <AutomatonDetailsInput
         name={state.name}

@@ -50,6 +50,7 @@ type InputProps = {
   onSnackbarOpen: (key: string) => void;
   openStateDeletedSnackbar: () => void;
   openTransitionDeletedSnackbar: () => void;
+  user: firebase.User;
 };
 
 export type InputState = {
@@ -182,6 +183,7 @@ export default function Input({
   onSnackbarOpen,
   openStateDeletedSnackbar,
   openTransitionDeletedSnackbar,
+  user,
 }: InputProps) {
   const classes = useStyles();
 
@@ -217,7 +219,7 @@ export default function Input({
     // addAutomaton(automaton);
 
     // Add to database
-    const automataRef = firebase.database().ref("automata");
+    const automataRef = firebase.database().ref(`/users/${user?.uid}/automata`);
     if (automaton && automatonId) {
       automataRef.child(automatonId).update(R.mergeLeft(automatonToDb(updatedAutomaton), {
         timeUpdated: Date.now(),

@@ -30,8 +30,8 @@ const messages: Record<string, string> = {
 };
 
 export default function App() {
-  const [automata, databaseLoading, databaseError] = useObject(firebase.database().ref("automata").orderByChild("timeAdded"));
   const [user, authLoading, authError] = useAuthState(firebase.auth());
+  const [automata, databaseLoading, databaseError] = useObject(firebase.database().ref(`/users/${user?.uid}/automata`).orderByChild("timeAdded"));
   const [snackbarQueue, setSnackbarQueue] = React.useState<SnackbarMessage[]>([]);
 
   const authenticated = user !== null && user !== undefined;
@@ -71,12 +71,14 @@ export default function App() {
                 automata={automata}
                 // onAutomataChange={setAutomata}
                 openSnackbar={() => handleSnackbarOpen("automatonDeleted")}
+                user={user}
               />
             </PrivateRoute>
             <PrivateRoute authenticated={authenticated} path="/automata">
               <Automata
                 automata={automata}
                 onSnackbarOpen={handleSnackbarOpen}
+                user={user}
               />
             </PrivateRoute>
             <PublicRoute authenticated={authenticated} path="/login">

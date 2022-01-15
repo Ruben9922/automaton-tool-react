@@ -29,12 +29,14 @@ type HomeProps = {
   automata: any; // TODO: Fix this
   // onAutomataChange: Dispatch<SetStateAction<Automaton[]>>;
   openSnackbar: () => void;
+  user: firebase.User;
 };
 
 export default function Home({
   automata,
   // onAutomataChange,
   openSnackbar,
+  user,
 }: HomeProps) {
   const classes = useStyles();
 
@@ -47,7 +49,7 @@ export default function Home({
   };
 
   const handleDialogConfirmClick = (): void => {
-    const automataRef = firebase.database().ref("automata");
+    const automataRef = firebase.database().ref(`/users/${user?.uid}/automata`);
     automataRef.child(automatonDeleteId!).remove(); // TODO: Implement .then()
 
     setAutomatonDeleteId(null); // Put in .then()

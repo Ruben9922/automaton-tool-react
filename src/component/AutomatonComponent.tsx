@@ -8,6 +8,7 @@ import { dbToAutomaton, determinize, minimize } from "../core/automaton";
 import View from "./View";
 import Input from "./Input";
 import Run from "./RunComponent";
+import firebase from "../firebase";
 
 type AutomatonParams = {
   automatonId: string;
@@ -16,11 +17,13 @@ type AutomatonParams = {
 type AutomatonProps = {
   automata: any;
   onSnackbarOpen: (key: string) => void;
+  user: firebase.User;
 };
 
 export default function AutomatonComponent({
   automata,
   onSnackbarOpen,
+  user,
 }: AutomatonProps) {
   const { url } = useRouteMatch();
   const { automatonId } = useParams<AutomatonParams>();
@@ -51,6 +54,7 @@ export default function AutomatonComponent({
           onSnackbarOpen={onSnackbarOpen}
           openStateDeletedSnackbar={() => onSnackbarOpen("stateDeleted")}
           openTransitionDeletedSnackbar={() => onSnackbarOpen("transitionDeleted")}
+          user={user}
         />
       </Route>
       <Route path={`${url}/run`}>

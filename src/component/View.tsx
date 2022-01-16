@@ -20,7 +20,7 @@ import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
 import Automaton from "../core/automaton";
 import Diagram from "./Diagram";
-import {createTransitionFunctionKey} from "../core/transition";
+import { createTransitionFunctionKey } from "../core/transitionFunction";
 
 const useStyles = makeStyles((theme) => ({
   root: {

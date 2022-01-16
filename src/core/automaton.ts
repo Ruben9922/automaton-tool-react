@@ -4,11 +4,11 @@ import { InputState } from "../component/Input";
 import TransitionFunction, {
   transitionFunctionToTransitions,
   transitionsToTransitionFunction,
+  createTransitionFunctionKey,
 } from "./transitionFunction";
 import { Run, RunTree, RunTreeNode } from "./run";
 import { isSubset } from "./utilities";
 import { stateIdToStateName, stateNameToStateId } from "./state";
-import {createTransitionFunctionKey} from "./transition";
 
 export default interface Automaton {
   name: string;

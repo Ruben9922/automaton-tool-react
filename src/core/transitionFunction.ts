@@ -40,7 +40,7 @@ export function transitionFunctionToTransitions(
 }
 
 export function createTransitionFunctionKey(currentState: string, symbol: string | null) {
-  return `TransitionFunctionKey(currentStateId=${currentState}, symbol=${symbol})`;
+  return `currentState=${currentState}, symbol=${symbol ?? "null"}`;
 }
 
 export default TransitionFunction;

@@ -12,6 +12,7 @@ import Radio from "@material-ui/core/Radio";
 import Paper from "@material-ui/core/Paper";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
+import { Typography } from "@material-ui/core";
 import { Run, RunTree } from "../core/run";
 import Automaton, { accepts, computeRun, computeRunTree } from "../core/automaton";
 import { isSubset } from "../core/utilities";
@@ -67,6 +68,9 @@ export default function RunComponent({ automaton }: RunProps) {
   // TODO: Expand all & collapse all buttons
   return (
     <>
+      <Typography variant="h5" component="h1" gutterBottom>
+        Run {automaton.name}
+      </Typography>
       <Diagram automaton={automaton} />
       <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         <TextField

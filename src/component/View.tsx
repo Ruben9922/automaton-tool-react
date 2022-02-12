@@ -228,21 +228,25 @@ export default function View({ automaton }: ViewProps) {
           )}
         </>
       )}
-      <Typography variant="h6" component="h2" gutterBottom>
-        Actions
-      </Typography>
-      <Button component={Link} to={`${url}/edit`} variant="contained" className={classes.button} startIcon={<EditIcon />}>
-        Edit
-      </Button>
-      <Button component={Link} to={`${url}/run`} variant="contained" className={classes.button}>
-        Run
-      </Button>
-      <Button component={Link} to={`${url}/determinized`} variant="contained" className={classes.button}>
-        Determinise
-      </Button>
-      <Button component={Link} to={`${url}/minimized`} variant="contained" className={classes.button}>
-        Minimise
-      </Button>
+      {automaton.createdReason === undefined && (
+        <>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Actions
+          </Typography>
+          <Button component={Link} to={`${url}/edit`} variant="contained" className={classes.button} startIcon={<EditIcon />}>
+            Edit
+          </Button>
+          <Button component={Link} to={`${url}/run`} variant="contained" className={classes.button}>
+            Run
+          </Button>
+          <Button component={Link} to={`${url}/determinized`} variant="contained" className={classes.button}>
+            Determinise
+          </Button>
+          <Button component={Link} to={`${url}/minimized`} variant="contained" className={classes.button}>
+            Minimise
+          </Button>
+        </>
+      )}
     </>
   );
 }

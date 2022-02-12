@@ -18,10 +18,9 @@ import React from "react";
 import { Link, useRouteMatch } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
-import Automaton, { determinize, minimize } from "../core/automaton";
+import Automaton from "../core/automaton";
 import Diagram from "./Diagram";
 import { createTransitionFunctionKey } from "../core/transitionFunction";
-import RunComponent from "./RunComponent";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type TransitionsView = "transitions" | "transitionFunction";
-type ActionView = "run" | "determinize" | "minimize" | null;
 
 type ViewProps = {
   automaton: Automaton;
@@ -53,7 +51,6 @@ export default function View({ automaton }: ViewProps) {
   const { url } = useRouteMatch();
 
   const [transitionsView, setTransitionsView] = React.useState<TransitionsView>("transitions");
-  const [actionView, setActionView] = React.useState<ActionView>(null);
 
   const symbols = R.prepend(null, automaton.alphabet);
 
@@ -250,18 +247,15 @@ export default function View({ automaton }: ViewProps) {
       <Button component={Link} to={`${url}/edit`} variant="contained" className={classes.button} startIcon={<EditIcon />}>
         Edit
       </Button>
-      <Button onClick={() => setActionView("run")} variant="contained" className={classes.button}>
+      <Button component={Link} to={`${url}/run`} variant="contained" className={classes.button}>
         Run
       </Button>
-      <Button onClick={() => setActionView("determinize")} variant="contained" className={classes.button}>
+      <Button component={Link} to={`${url}/determinized`} variant="contained" className={classes.button}>
         Determinise
       </Button>
-      <Button onClick={() => setActionView("minimize")} variant="contained" className={classes.button}>
+      <Button component={Link} to={`${url}/minimized`} variant="contained" className={classes.button}>
         Minimise
       </Button>
-      {actionView === "run" && <RunComponent automaton={automaton} />}
-      {actionView === "determinize" && <View automaton={determinize(automaton)} />}
-      {actionView === "minimize" && <View automaton={minimize(automaton)} />}
     </>
   );
 }

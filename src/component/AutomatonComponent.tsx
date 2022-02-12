@@ -4,10 +4,9 @@ import {
 import Alert from "@material-ui/lab/Alert";
 import React from "react";
 import * as R from "ramda";
-import { dbToAutomaton, determinize, minimize } from "../core/automaton";
+import { dbToAutomaton } from "../core/automaton";
 import View from "./View";
 import Input from "./Input";
-import Run from "./RunComponent";
 import firebase from "../firebase";
 
 type AutomatonParams = {
@@ -56,15 +55,6 @@ export default function AutomatonComponent({
           openTransitionDeletedSnackbar={() => onSnackbarOpen("transitionDeleted")}
           user={user}
         />
-      </Route>
-      <Route path={`${url}/run`}>
-        <Run automaton={automaton} />
-      </Route>
-      <Route path={`${url}/determinized`}>
-        <View automaton={determinize(automaton)} />
-      </Route>
-      <Route path={`${url}/minimized`}>
-        <View automaton={minimize(automaton)} />
       </Route>
     </Switch>
   );

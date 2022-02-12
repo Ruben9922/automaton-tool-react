@@ -74,13 +74,7 @@ export default function View({ automaton }: ViewProps) {
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>
-        Automaton
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
         {automaton.name}
-      </Typography>
-      <Typography variant="h6" component="h2" gutterBottom>
-        State-transition diagram
       </Typography>
       <Diagram automaton={automaton} />
       <Typography variant="h6" component="h2" gutterBottom>

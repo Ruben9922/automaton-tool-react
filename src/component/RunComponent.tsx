@@ -15,6 +15,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { Run, RunTree } from "../core/run";
 import Automaton, { accepts, computeRun, computeRunTree } from "../core/automaton";
 import { isSubset } from "../core/utilities";
+import Diagram from "./Diagram";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -66,6 +67,7 @@ export default function RunComponent({ automaton }: RunProps) {
   // TODO: Expand all & collapse all buttons
   return (
     <>
+      <Diagram automaton={automaton} />
       <form className={classes.root} autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         <TextField
           id="input"

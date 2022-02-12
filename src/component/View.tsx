@@ -54,21 +54,6 @@ export default function View({ automaton }: ViewProps) {
 
   const symbols = R.prepend(null, automaton.alphabet);
 
-  // Processing parameters
-  // const parsedParams = { id: parseInt(params.id, 10) };
-  // const errors: Record<string, Check<boolean>> = {
-  //   // isIdValidInteger: {
-  //   //   isValid: !Number.isNaN(parsedParams.id),
-  //   //   message: "Automaton ID must be a valid integer",
-  //   // },
-  //   isIdValidIndex: {
-  //     isValid: automataRef.child(params.id).exis,
-  //     message: "Automaton ID does not refer to a valid automaton",
-  //   },
-  // };
-  // const valid = allValid(errors);
-  // const alertText = createHelperTextMultiple(R.values(errors));
-
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>

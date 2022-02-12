@@ -56,9 +56,19 @@ export default function View({ automaton }: ViewProps) {
 
   return (
     <>
-      <Typography variant="h5" component="h1" gutterBottom>
+      <Typography variant="h5" component="h1" gutterBottom={automaton.createdReason === undefined}>
         {automaton.name}
       </Typography>
+      {automaton.createdReason === "minimized" && (
+        <Typography variant="subtitle1" gutterBottom>
+          Minimised
+        </Typography>
+      )}
+      {automaton.createdReason === "determinized" && (
+        <Typography variant="subtitle1" gutterBottom>
+          Determinised
+        </Typography>
+      )}
       <Diagram automaton={automaton} />
       <Typography variant="h6" component="h2" gutterBottom>
         Alphabet

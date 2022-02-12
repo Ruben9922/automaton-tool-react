@@ -10,8 +10,11 @@ import { Run, RunTree, RunTreeNode } from "./run";
 import { isSubset } from "./utilities";
 import { stateIdToStateName, stateNameToStateId } from "./state";
 
+type CreatedReason = "determinized" | "minimized";
+
 export default interface Automaton {
   name: string;
+  createdReason?: CreatedReason;
   alphabet: string[];
   states: string[];
   transitionFunction: TransitionFunction;
@@ -248,7 +251,8 @@ export function determinize(automaton: Automaton): Automaton {
   }
 
   return {
-    name: `${automaton.name} [Determinised]`,
+    name: automaton.name,
+    createdReason: "determinized",
     alphabet: automaton.alphabet,
     states: dfaStatesFlattened,
     transitionFunction: dfaTransitionFunction,
@@ -415,5 +419,7 @@ function mergeIndistinguishableStates(automaton: Automaton): Automaton {
 }
 
 export function minimize(automaton: Automaton): Automaton {
-  return mergeIndistinguishableStates(removeUnreachableStates(automaton));
+  return R.mergeLeft(mergeIndistinguishableStates(removeUnreachableStates(automaton)), {
+    createdReason: "minimized" as CreatedReason,
+  });
 }

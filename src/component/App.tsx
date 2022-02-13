@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Switch } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import Container from "@material-ui/core/Container";
 import * as R from "ramda";
 import { v4 as uuidv4 } from "uuid";
@@ -8,15 +8,11 @@ import Alert from "@material-ui/lab/Alert";
 import Link from "@material-ui/core/Link";
 import { useAuthState } from "react-firebase-hooks/auth";
 import firebase from "../firebase";
-import Home from "./Home";
 import Header from "./Header";
 import Snackbar from "./Snackbar";
 import SnackbarMessage from "../core/snackbarMessage";
 import Loader from "./Loader";
-import Automata from "./Automata";
-import PrivateRoute from "./PrivateRoute";
-import PublicRoute from "./PublicRoute";
-import Login from "./Login";
+import Routes from "./Routes";
 
 // TODO: Maybe just remove this and hardcode the messages
 const messages: Record<string, string> = {
@@ -65,26 +61,12 @@ export default function App() {
         )}
         {(databaseLoading || authLoading) && <Loader />}
         {!databaseLoading && !authLoading && (
-          <Switch>
-            <PrivateRoute authenticated={authenticated} exact path="/">
-              <Home
-                automata={automata}
-                // onAutomataChange={setAutomata}
-                openSnackbar={() => handleSnackbarOpen("automatonDeleted")}
-                user={user}
-              />
-            </PrivateRoute>
-            <PrivateRoute authenticated={authenticated} path="/automata">
-              <Automata
-                automata={automata}
-                onSnackbarOpen={handleSnackbarOpen}
-                user={user}
-              />
-            </PrivateRoute>
-            <PublicRoute authenticated={authenticated} path="/login">
-              <Login />
-            </PublicRoute>
-          </Switch>
+          <Routes
+            automata={automata}
+            user={user}
+            authenticated={authenticated}
+            onSnackbarOpen={handleSnackbarOpen}
+          />
         )}
         <Snackbar
           snackbarQueue={snackbarQueue}

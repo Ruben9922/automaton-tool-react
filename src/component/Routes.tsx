@@ -204,8 +204,6 @@ export default function Routes({
   const applyPublic = (render: RouteRenderFunction) => (!authenticated ? render : () => <Redirect to="/" />);
   const applyPrivate = (render: RouteRenderFunction) => (authenticated ? render : () => <Redirect to="/login" />);
 
-console.log(flattenRoutes(buildPaths(routes)));
-
   return (
     <Switch>
       {flattenRoutes(buildPaths(routes)).map((route) => (

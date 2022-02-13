@@ -14,6 +14,7 @@ import RunComponent from "./RunComponent";
 import View from "./View";
 import Automaton, { dbToAutomaton, determinize, minimize } from "../core/automaton";
 import firebase from "../firebase";
+import Breadcrumbs from "./Breadcrumbs";
 
 type RoutesProps = {
   automata: any;
@@ -65,6 +66,13 @@ function buildPaths(routes: RouteData[], parentPath = ""): RouteData[] {
     });
   }, routes);
 }
+
+const withBreadcrumbs = (render: RouteRenderFunction) => (routeProps: RouteComponentProps<AutomatonParams>) => (
+  <>
+    <Breadcrumbs />
+    {render(routeProps)}
+  </>
+);
 
 export default function Routes({
   automata,
@@ -211,7 +219,7 @@ export default function Routes({
           key={route.path}
           authenticated={authenticated}
           path={route.path}
-          render={(route.isPrivate ? applyPrivate : applyPublic)(route.render)}
+          render={(route.isPrivate ? applyPrivate : applyPublic)(withBreadcrumbs(route.render))}
         />
       ))}
     </Switch>

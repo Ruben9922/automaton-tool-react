@@ -202,6 +202,7 @@ export default function Routes({
   const applyPublic = (render: RouteRenderFunction) => (!authenticated ? render : () => <Redirect to="/" />);
   const applyPrivate = (render: RouteRenderFunction) => (authenticated ? render : () => <Redirect to="/login" />);
 
+  // TODO: Fix no-unstable-nested-components ESLint warning
   const withBreadcrumbs = (render: RouteRenderFunction) => (routeProps: RouteComponentProps<AutomatonParams>) => (
     <>
       {/* TODO: Need to improve this! */}

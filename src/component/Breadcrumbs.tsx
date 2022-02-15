@@ -1,6 +1,6 @@
 import React from "react";
 import Link, { LinkProps } from "@material-ui/core/Link";
-import { Link as RouterLink, useRouteMatch } from "react-router-dom";
+import { Link as RouterLink, match as Match, useRouteMatch } from "react-router-dom";
 import MuiBreadcrumbs from "@material-ui/core/Breadcrumbs";
 import Typography from "@material-ui/core/Typography";
 import * as R from "ramda";
@@ -22,31 +22,61 @@ function LinkRouter(props: LinkProps<RouterLink>) {
   return <Link {...props} component={RouterLink} />;
 }
 
-export default function Breadcrumbs() {
-  const match = useRouteMatch<Record<string, string>>();
-  let pathNames = match.path.split("/");
-  if (R.isEmpty(R.head(pathNames))) {
-    pathNames = R.tail(pathNames);
+interface Breadcrumb {
+  path: string;
+  url: string;
+  name: string;
+}
+
+function createBreadcrumbs(match: Match<Record<string, string>>): Breadcrumb[] {
+  let pathSegments = match.path.split("/");
+  let urlSegments = match.url.split("/");
+
+  // Remove first segment if empty, to prevent 2 "Home" breadcrumbs
+  if (R.isEmpty(R.head(pathSegments))) {
+    pathSegments = R.tail(pathSegments);
   }
+  if (R.isEmpty(R.head(urlSegments))) {
+    urlSegments = R.tail(urlSegments);
+  }
+
+  const breadcrumbPaths = R.reduce((acc: string[], elem: string) => (R.isEmpty(acc) ? [`/${elem}`] : R.append(`${R.last(acc)!}/${elem}`, acc)), [], pathSegments);
+  const breadcrumbUrls = R.reduce((acc: string[], elem: string) => (R.isEmpty(acc) ? [`/${elem}`] : R.append(`${R.last(acc)!}/${elem}`, acc)), [], urlSegments);
+
+  const breadcrumbNames = R.map((path) => {
+    let name = breadcrumbNameMap[path];
+
+    if (R.includes(R.tail(name), R.keys(match.params))) {
+      name = match.params[R.tail(name)];
+    }
+
+    return name;
+  }, breadcrumbPaths);
+
+  // Zip the three arrays together into an array of Breadcrumb objects
+  const breadcrumbs = R.zipWith(
+    (name: string, [path, url]: [string, string]) => ({ path, url, name }),
+    breadcrumbNames,
+    R.zip(breadcrumbPaths, breadcrumbUrls),
+  );
+  return breadcrumbs;
+}
+
+export default function Breadcrumbs() {
+  const match = useRouteMatch();
+  const breadcrumbs = createBreadcrumbs(match);
 
   return (
     <MuiBreadcrumbs aria-label="breadcrumb">
-      {pathNames.map((_, index) => {
-        const isLast = index === pathNames.length - 1;
-        const fullPath = `/${pathNames.slice(0, index + 1).join("/")}`;
-
-        let name = breadcrumbNameMap[fullPath];
-        if (R.includes(R.tail(name), R.keys(match.params))) {
-          name = match.params[R.tail(name)];
-        }
-
+      {breadcrumbs.map((breadcrumb, index) => {
+        const isLast = index === R.length(breadcrumbs) - 1;
         return isLast ? (
-          <Typography color="textPrimary" key={fullPath}>
-            {name}
+          <Typography color="textPrimary" key={breadcrumb.path}>
+            {breadcrumb.name}
           </Typography>
         ) : (
-          <LinkRouter color="inherit" to={fullPath} key={fullPath}>
-            {name}
+          <LinkRouter color="inherit" to={breadcrumb.url} key={breadcrumb.path}>
+            {breadcrumb.name}
           </LinkRouter>
         );
       })}

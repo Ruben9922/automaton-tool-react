@@ -75,8 +75,7 @@ export default function Routes({
     routeProps: RouteComponentProps<AutomatonParams>,
   ) => {
     const { automatonId } = routeProps.match.params;
-    const automaton = dbToAutomaton(automata.child(automatonId).val());
-    const automatonIndex = R.indexOf(automatonId, R.keys(automata.val()));
+
     if (!automata.hasChild(automatonId)) {
       return (
         <Alert severity="error">
@@ -84,6 +83,9 @@ export default function Routes({
         </Alert>
       );
     }
+
+    const automaton = dbToAutomaton(automata.child(automatonId).val());
+    const automatonIndex = R.indexOf(automatonId, R.keys(automata.val()));
 
     return renderAutomatonComponent({
       automaton,

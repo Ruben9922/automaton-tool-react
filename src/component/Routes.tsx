@@ -208,7 +208,9 @@ export default function Routes({
   const withBreadcrumbs = (render: RouteRenderFunction) => (routeProps: RouteComponentProps<AutomatonParams>) => (
     <>
       {/* TODO: Need to improve this! */}
-      {withAutomaton(({ automaton }) => (
+      {routeProps.match.params.automatonId === undefined ? (
+        <Breadcrumbs automaton={null} />
+      ) : withAutomaton(({ automaton }) => (
         <Breadcrumbs automaton={automaton} />
       ), routeProps)}
       {render(routeProps)}

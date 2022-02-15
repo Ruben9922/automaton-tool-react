@@ -17,18 +17,23 @@ interface Breadcrumb {
   name: string;
 }
 
-function createBreadcrumbs(match: Match<AutomatonParams>, automatonName: string): Breadcrumb[] {
-  const breadcrumbNameMap: Record<string, string> = {
+function createBreadcrumbs(match: Match<AutomatonParams>, automatonName?: string): Breadcrumb[] {
+  let breadcrumbNameMap: Record<string, string> = {
     "/": "Home",
     "/automata": "Home",
     "/automata/new": "Create new automaton",
-    [`/automata/${match.params.automatonId}`]: automatonName,
-    [`/automata/${match.params.automatonId}/edit`]: "Edit Automaton",
-    [`/automata/${match.params.automatonId}/run`]: "Run Automaton",
-    [`/automata/${match.params.automatonId}/determinized`]: "Determinise Automaton",
-    [`/automata/${match.params.automatonId}/minimized`]: "Minimise Automaton",
     "/login": "Log In",
   };
+
+  if (match.params.automatonId !== undefined && automatonName !== undefined) {
+    breadcrumbNameMap = R.mergeRight(breadcrumbNameMap, {
+      [`/automata/${match.params.automatonId}`]: automatonName,
+      [`/automata/${match.params.automatonId}/edit`]: "Edit Automaton",
+      [`/automata/${match.params.automatonId}/run`]: "Run Automaton",
+      [`/automata/${match.params.automatonId}/determinized`]: "Determinise Automaton",
+      [`/automata/${match.params.automatonId}/minimized`]: "Minimise Automaton",
+    });
+  }
 
   let urlSegments = match.url.split("/");
 
@@ -50,12 +55,12 @@ function createBreadcrumbs(match: Match<AutomatonParams>, automatonName: string)
 }
 
 type BreadcrumbsProps = {
-  automaton: Automaton;
+  automaton: Automaton | null;
 };
 
 export default function Breadcrumbs({ automaton }: BreadcrumbsProps) {
   const match = useRouteMatch<AutomatonParams>();
-  const breadcrumbs = createBreadcrumbs(match, automaton.name);
+  const breadcrumbs = createBreadcrumbs(match, automaton?.name);
 
   return (
     <MuiBreadcrumbs aria-label="breadcrumb">

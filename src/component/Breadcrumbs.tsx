@@ -44,9 +44,10 @@ function createBreadcrumbs(match: Match<Record<string, string>>): Breadcrumb[] {
   const breadcrumbUrls = R.reduce((acc: string[], elem: string) => (R.isEmpty(acc) ? [`/${elem}`] : R.append(`${R.last(acc)!}/${elem}`, acc)), [], urlSegments);
 
   const objectContainsKey = <T,>(s: string, x: T): boolean => R.includes(s, R.keys(x));
-  const breadcrumbNames = R.map((path) => {
+  const breadcrumbNames = R.addIndex<string, string>(R.map)((path, index) => {
+    // If the path doesn't exist in `breadcrumbNameMap` then just use the path segment
     if (!objectContainsKey(path, breadcrumbNameMap)) {
-      return path;
+      return pathSegments[index];
     }
 
     let name = breadcrumbNameMap[path];

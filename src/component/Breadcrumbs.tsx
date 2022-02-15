@@ -24,16 +24,16 @@ function LinkRouter(props: LinkProps<RouterLink>) {
 
 export default function Breadcrumbs() {
   const match = useRouteMatch<Record<string, string>>();
-  let pathnames = match.path.split("/");
-  if (R.isEmpty(R.head(pathnames))) {
-    pathnames = R.tail(pathnames);
+  let pathNames = match.path.split("/");
+  if (R.isEmpty(R.head(pathNames))) {
+    pathNames = R.tail(pathNames);
   }
 
   return (
     <MuiBreadcrumbs aria-label="breadcrumb">
-      {pathnames.map((_, index) => {
-        const isLast = index === pathnames.length - 1;
-        const fullPath = `/${pathnames.slice(0, index + 1).join("/")}`;
+      {pathNames.map((_, index) => {
+        const isLast = index === pathNames.length - 1;
+        const fullPath = `/${pathNames.slice(0, index + 1).join("/")}`;
 
         let name = breadcrumbNameMap[fullPath];
         if (R.includes(R.tail(name), R.keys(match.params))) {

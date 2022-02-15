@@ -15,16 +15,13 @@ import View from "./View";
 import Automaton, { dbToAutomaton, determinize, minimize } from "../core/automaton";
 import firebase from "../firebase";
 import Breadcrumbs from "./Breadcrumbs";
+import AutomatonParams from "./AutomatonParams";
 
 type RoutesProps = {
   automata: any;
   user: firebase.User;
   authenticated: boolean;
   onSnackbarOpen: (key: string) => void;
-};
-
-type AutomatonParams = {
-  automatonId: string;
 };
 
 type RouteRenderFunction =
@@ -66,13 +63,6 @@ function buildPaths(routes: RouteData[], parentPath = ""): RouteData[] {
     });
   }, routes);
 }
-
-const withBreadcrumbs = (render: RouteRenderFunction) => (routeProps: RouteComponentProps<AutomatonParams>) => (
-  <>
-    <Breadcrumbs />
-    {render(routeProps)}
-  </>
-);
 
 export default function Routes({
   automata,
@@ -211,6 +201,16 @@ export default function Routes({
   // logged in
   const applyPublic = (render: RouteRenderFunction) => (!authenticated ? render : () => <Redirect to="/" />);
   const applyPrivate = (render: RouteRenderFunction) => (authenticated ? render : () => <Redirect to="/login" />);
+
+  const withBreadcrumbs = (render: RouteRenderFunction) => (routeProps: RouteComponentProps<AutomatonParams>) => (
+    <>
+      {/* TODO: Need to improve this! */}
+      {withAutomaton(({ automaton }) => (
+        <Breadcrumbs automaton={automaton} />
+      ), routeProps)}
+      {render(routeProps)}
+    </>
+  );
 
   return (
     <Switch>

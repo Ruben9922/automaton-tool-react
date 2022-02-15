@@ -43,10 +43,15 @@ function createBreadcrumbs(match: Match<Record<string, string>>): Breadcrumb[] {
   const breadcrumbPaths = R.reduce((acc: string[], elem: string) => (R.isEmpty(acc) ? [`/${elem}`] : R.append(`${R.last(acc)!}/${elem}`, acc)), [], pathSegments);
   const breadcrumbUrls = R.reduce((acc: string[], elem: string) => (R.isEmpty(acc) ? [`/${elem}`] : R.append(`${R.last(acc)!}/${elem}`, acc)), [], urlSegments);
 
+  const objectContainsKey = <T,>(s: string, x: T): boolean => R.includes(s, R.keys(x));
   const breadcrumbNames = R.map((path) => {
+    if (!objectContainsKey(path, breadcrumbNameMap)) {
+      return path;
+    }
+
     let name = breadcrumbNameMap[path];
 
-    if (R.includes(R.tail(name), R.keys(match.params))) {
+    if (objectContainsKey(R.tail(name), match.params)) {
       name = match.params[R.tail(name)];
     }
 

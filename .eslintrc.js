@@ -30,6 +30,21 @@ module.exports = {
         "@typescript-eslint/quotes": ["error", "double"],
         "lines-between-class-members": "off",
         "@typescript-eslint/lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
+
+        // Ignore trailing comma in generics, as it is required to avoid syntax errors in some
+        // contexts in .tsx files
+        // TODO: Only apply this to .tsx files (not .ts files)
+        "comma-dangle": "off",
+        "@typescript-eslint/comma-dangle": ["error", {
+          arrays: "always-multiline",
+          objects: "always-multiline",
+          imports: "always-multiline",
+          exports: "always-multiline",
+          functions: "always-multiline",
+          enums: "always-multiline",
+          generics: "ignore",
+          tuples: "always-multiline",
+        }],
       },
     },
   ],

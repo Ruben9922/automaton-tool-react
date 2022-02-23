@@ -17,7 +17,7 @@ export default function ConvertToRegex({ automaton }: ConvertToRegexProps) {
       <Diagram automaton={automaton} />
       <Paper>
         <p style={{ margin: 0 }}>
-          {convertNfaToRegex(automaton).source}
+          {convertNfaToRegex(automaton)}
         </p>
       </Paper>
     </>

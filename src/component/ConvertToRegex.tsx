@@ -3,6 +3,7 @@ import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import Diagram from "./Diagram";
 import Automaton, { convertNfaToRegex } from "../core/automaton";
+import { convertRegexToString } from "../core/regex";
 
 type ConvertToRegexProps = {
   automaton: Automaton;
@@ -17,7 +18,7 @@ export default function ConvertToRegex({ automaton }: ConvertToRegexProps) {
       <Diagram automaton={automaton} />
       <Paper>
         <p style={{ margin: 0 }}>
-          {convertNfaToRegex(automaton)}
+          {convertRegexToString(convertNfaToRegex(automaton))}
         </p>
       </Paper>
     </>

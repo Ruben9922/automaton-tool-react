@@ -9,6 +9,7 @@ import TransitionFunction, {
 import { Run, RunTree, RunTreeNode } from "./run";
 import { isSubset } from "./utilities";
 import { stateIdToStateName, stateNameToStateId } from "./state";
+import Regex from "./regex";
 
 type CreatedReason = "determinized" | "minimized";
 
@@ -25,7 +26,7 @@ export default interface Automaton {
 type GnfaTransition= {
   currentState: string;
   nextState: string;
-  regex: string;
+  regex: Regex;
 };
 
 type GnfaTransitionFunction = Map<string, GnfaTransition>;
@@ -553,7 +554,13 @@ function convertNfaTransitionFunctionToGnfaTransitionFunction(
   );
   const gnfaTransitions = R.map((t) => ({
     currentState: t.currentState,
-    regex: R.join("|", R.map((symbol) => symbol ?? "ε", t.symbols)),
+    regex: {
+      operator: "alternation" as const,
+      operands: R.map((symbol) => ({
+        operator: null,
+        value: symbol,
+      }), t.symbols),
+    },
     nextState: t.nextState,
   }), groupedTransitions);
   return new Map(R.map(
@@ -580,7 +587,7 @@ function convertNfaToGnfa(automaton: Automaton): Gnfa {
   };
 }
 
-function convertGnfaToRegex(gnfa: Gnfa): string {
+function convertGnfaToRegex(gnfa: Gnfa): Regex {
   let states = gnfa.states;
   let transitionFunction = new Map(gnfa.transitionFunction);
   while (R.length(states) > 2) {
@@ -602,16 +609,26 @@ function convertGnfaToRegex(gnfa: Gnfa): string {
 
     // All paths involving an incoming transition, self loop (if it exists) and outgoing transition
     const newTransitions = R.map(([incomingTransition, outgoingTransition]: [GnfaTransition, GnfaTransition]) => {
-      let regex = "";
-      if (!R.isEmpty(incomingTransition.regex)) {
-        regex += `(${incomingTransition.regex})`;
-      }
-      if (selfLoop !== undefined) {
-        regex += `((${selfLoop.regex})*)`;
-      }
-      if (!R.isEmpty(outgoingTransition.regex)) {
-        regex += `(${outgoingTransition.regex})`;
-      }
+      const regex: Regex = {
+        operator: "concatenation",
+        operands: [
+          {
+            operator: "grouping",
+            operand: incomingTransition.regex,
+          },
+          ...(selfLoop !== undefined ? [{
+            operator: "star" as const,
+            operand: {
+              operator: "grouping" as const,
+              operand: selfLoop.regex,
+            },
+          }] : []),
+          {
+            operator: "grouping",
+            operand: outgoingTransition.regex,
+          },
+        ],
+      };
 
       return {
         currentState: incomingTransition.currentState,
@@ -640,7 +657,19 @@ function convertGnfaToRegex(gnfa: Gnfa): string {
           const existingTransition = transitionFunction.get(transitionFunctionKey)!;
           transitionFunction.set(transitionFunctionKey, {
             ...newTransition,
-            regex: `${existingTransition.regex}|${newTransition.regex}`,
+            regex: {
+              operator: "alternation",
+              operands: [
+                {
+                  operator: "grouping",
+                  operand: existingTransition.regex,
+                },
+                {
+                  operator: "grouping",
+                  operand: newTransition.regex,
+                },
+              ],
+            },
           });
         } else {
           transitionFunction.set(transitionFunctionKey, newTransition);
@@ -650,9 +679,12 @@ function convertGnfaToRegex(gnfa: Gnfa): string {
     );
   }
 
-  return transitionFunction.get(createGnfaTransitionFunctionKey(gnfa.initialState, gnfa.finalState))?.regex ?? "";
+  return transitionFunction.get(createGnfaTransitionFunctionKey(gnfa.initialState, gnfa.finalState))?.regex ?? {
+    operator: null,
+    value: null,
+  };
 }
 // todo: create gnfa tf class that merges regex instead of overwriting
-export function convertNfaToRegex(automaton: Automaton): string {
+export function convertNfaToRegex(automaton: Automaton): Regex {
   return convertGnfaToRegex(convertNfaToGnfa(automaton));
 }

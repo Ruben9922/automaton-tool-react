@@ -32,6 +32,7 @@ function createBreadcrumbs(match: Match<AutomatonParams>, automatonName?: string
       [`/automata/${match.params.automatonId}/run`]: "Run Automaton",
       [`/automata/${match.params.automatonId}/determinized`]: "Determinise Automaton",
       [`/automata/${match.params.automatonId}/minimized`]: "Minimise Automaton",
+      [`/automata/${match.params.automatonId}/convert-to-regex`]: "Convert to Regex",
     });
   }
 

@@ -245,6 +245,9 @@ export default function View({ automaton }: ViewProps) {
           <Button component={Link} to={`${url}/minimized`} variant="contained" className={classes.button}>
             Minimise
           </Button>
+          <Button component={Link} to={`${url}/convert-to-regex`} variant="contained" className={classes.button}>
+            Convert to Regex
+          </Button>
         </>
       )}
     </>

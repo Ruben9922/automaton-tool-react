@@ -2,9 +2,9 @@ import * as R from "ramda";
 import { v4 as uuidv4 } from "uuid";
 import { InputState } from "../component/Input";
 import TransitionFunction, {
+  createTransitionFunctionKey,
   transitionFunctionToTransitions,
   transitionsToTransitionFunction,
-  createTransitionFunctionKey,
 } from "./transitionFunction";
 import { Run, RunTree, RunTreeNode } from "./run";
 import { isSubset } from "./utilities";
@@ -20,6 +20,26 @@ export default interface Automaton {
   transitionFunction: TransitionFunction;
   initialState: string;
   finalStates: string[];
+}
+
+type GnfaTransition= {
+  currentState: string;
+  nextState: string;
+  regex: RegExp;
+};
+
+type GnfaTransitionFunction = Map<string, GnfaTransition>;
+
+interface Gnfa {
+  alphabet: string[];
+  states: string[];
+  transitionFunction: GnfaTransitionFunction;
+  initialState: string;
+  finalState: string;
+}
+
+function createGnfaTransitionFunctionKey(currentState: string, nextState: string) {
+  return `currentState=${currentState}, nextState=${nextState}`;
 }
 
 export function generatePlaceholderName(index: number): string {
@@ -422,4 +442,220 @@ export function minimize(automaton: Automaton): Automaton {
   return R.mergeLeft(mergeIndistinguishableStates(removeUnreachableStates(automaton)), {
     createdReason: "minimized" as CreatedReason,
   });
+}
+
+function createGnfaInitialState(automaton: Automaton): Automaton {
+  // If initial state is a final state or has incoming transitions, add a new non-final initial
+  // state and add an epsilon-transition between the new initial state and former initial state
+  const initialStateIsFinal = R.includes(automaton.initialState, automaton.finalStates);
+  const initialStateHasIncomingTransitions = R.includes(
+    automaton.initialState,
+    R.chain((entry) => entry.nextStates, Array.from(automaton.transitionFunction.values())),
+  );
+  if (initialStateIsFinal || initialStateHasIncomingTransitions) {
+    const newState = uuidv4();
+
+    const states = R.append(newState, automaton.states);
+    const initialState = newState;
+    const transitionFunction = new Map(automaton.transitionFunction);
+    transitionFunction.set(createTransitionFunctionKey(newState, null), {
+      currentState: newState,
+      symbol: null,
+      nextStates: [automaton.initialState],
+    });
+
+    return R.mergeRight(automaton, { states, transitionFunction, initialState });
+  }
+
+  return automaton;
+}
+
+function createGnfaFinalState(automaton: Automaton): Automaton {
+  // If there is more than one final state or the single final state has outgoing transitions, add a
+  // new final state, make all other states non-final and add an epsilon-transition from each former
+  // final state to the new final state
+  const multipleFinalStates = R.length(automaton.finalStates) > 1;
+  const finalStatesHaveOutgoingTransitions = !R.isEmpty(R.intersection(
+    automaton.finalStates,
+    R.map((entry) => entry.currentState, Array.from(automaton.transitionFunction.values())),
+  ));
+  if (multipleFinalStates || finalStatesHaveOutgoingTransitions) {
+    const newFinalState = uuidv4();
+    const states = R.append(newFinalState, automaton.states);
+    const transitionFunction = new Map(automaton.transitionFunction);
+    R.forEach((finalState) => (
+      transitionFunction.set(createTransitionFunctionKey(finalState, null), {
+        currentState: finalState,
+        symbol: null,
+        nextStates: [newFinalState],
+      })
+    ), automaton.finalStates);
+    const finalStates = [newFinalState];
+
+    return R.mergeRight(automaton, { states, transitionFunction, finalStates });
+  }
+
+  return automaton;
+}
+
+interface Edge {
+  currentState: string;
+  symbols: (string | null)[];
+  nextState: string;
+}
+
+export function groupTransitionsByCurrentStateAndNextState(
+  transitionFunction: TransitionFunction,
+  alphabet: string[],
+): Edge[] {
+  // Idea is to convert from a transition function (transitions grouped by current state and symbol)
+  // to edges (transitions grouped by current state and next state)
+  return R.pipe(
+    // Convert transition function to a list of transitions
+    (transitionFunction: TransitionFunction) => Array.from(transitionFunction.values()),
+
+    // Originally each transition contains a current state, symbol and a *list* of next states
+    // Convert transitions so that each transition contains a current state, symbol and a *single*
+    // next state
+    R.chain((transition) => R.map((nextState) => ({
+      currentState: transition.currentState,
+      symbol: transition.symbol,
+      nextState,
+    }), transition.nextStates)),
+
+    // Sort transitions by current states and next state so that the grouping works correctly
+    // (This is because R.groupWith only groups adjacent items)
+    R.sortWith([R.ascend((t) => t.currentState), R.ascend((t) => t.nextState)]),
+
+    // Group transitions by current state and next state
+    R.groupWith((t1, t2) => t1.currentState === t2.currentState && t1.nextState === t2.nextState),
+
+    // Convert transitions so that each transition contains a current state, next state and a *list*
+    // of symbols
+    R.map((group) => ({
+      currentState: group[0].currentState,
+      symbols: R.sortBy(
+        (symbol: string | null) => (symbol === null ? -1 : R.indexOf(symbol, alphabet)),
+        R.map((t) => t.symbol, group),
+      ),
+      nextState: group[0].nextState,
+    })),
+  )(transitionFunction);
+}
+
+function convertNfaTransitionFunctionToGnfaTransitionFunction(
+  nfaTransitionFunction: TransitionFunction,
+  alphabet: string[],
+): GnfaTransitionFunction {
+  const groupedTransitions = groupTransitionsByCurrentStateAndNextState(
+    nfaTransitionFunction,
+    alphabet,
+  );
+  const gnfaTransitions = R.map((t) => ({
+    currentState: t.currentState,
+    regex: new RegExp(R.join("|", t.symbols)),
+    nextState: t.nextState,
+  }), groupedTransitions);
+  return new Map(R.map(
+    (t) => [createGnfaTransitionFunctionKey(t.currentState, t.nextState), t],
+    gnfaTransitions,
+  ));
+}
+
+function convertNfaToGnfa(automaton: Automaton): Gnfa {
+  // Uses state elimination method
+  // As described in: https://courses.cs.washington.edu/courses/cse311/14sp/kleene.pdf
+  let newAutomaton = createGnfaInitialState(automaton);
+  newAutomaton = createGnfaFinalState(newAutomaton);
+
+  return {
+    alphabet: newAutomaton.alphabet,
+    states: newAutomaton.states,
+    transitionFunction: convertNfaTransitionFunctionToGnfaTransitionFunction(
+      newAutomaton.transitionFunction,
+      newAutomaton.alphabet,
+    ),
+    initialState: newAutomaton.initialState,
+    finalState: R.head(newAutomaton.finalStates)!,
+  };
+}
+
+function convertGnfaToRegex(gnfa: Gnfa): RegExp {
+  // noinspection RegExpUnnecessaryNonCapturingGroup
+  const emptyRegex = /(?:)/;
+
+  let states = gnfa.states;
+  let transitionFunction = new Map(gnfa.transitionFunction);
+  while (R.length(states) > 2) {
+    const stateToRemove = R.head(R.reject(
+      (state) => state === gnfa.initialState || state === gnfa.finalState,
+      states,
+    ))!;
+    const incomingTransitions = R.filter(
+      (t) => t.nextState === stateToRemove && t.currentState !== stateToRemove,
+      Array.from(transitionFunction.values()),
+    );
+    const outgoingTransitions = R.filter(
+      (t) => t.currentState === stateToRemove && t.nextState !== stateToRemove,
+      Array.from(transitionFunction.values()),
+    );
+    // Because there may only be a single transition between a pair of states (obviously this
+    // includes self-loops) in a GNFA, a state will have at most one self-loop
+    const selfLoop = transitionFunction.get(createGnfaTransitionFunctionKey(stateToRemove, stateToRemove));
+
+    // All paths involving an incoming transition, self loop (if it exists) and outgoing transition
+    const newTransitions = R.map(([incomingTransition, outgoingTransition]: [GnfaTransition, GnfaTransition]) => {
+      let regexString = "";
+      if (incomingTransition.regex.source !== emptyRegex.source) {
+        regexString += `(${incomingTransition.regex.source})`;
+      }
+      if (selfLoop !== undefined) {
+        regexString += `((${selfLoop.regex.source})*)`;
+      }
+      if (outgoingTransition.regex.source !== emptyRegex.source) {
+        regexString += `(${outgoingTransition.regex.source})`;
+      }
+
+      return {
+        currentState: incomingTransition.currentState,
+        nextState: outgoingTransition.nextState,
+        regex: new RegExp(regexString),
+      };
+    }, R.xprod(incomingTransitions, outgoingTransitions));
+
+    // Remove old transitions
+    R.forEach((t) => transitionFunction.delete(createGnfaTransitionFunctionKey(t.currentState, t.nextState)), [
+      ...incomingTransitions,
+      ...outgoingTransitions,
+    ]);
+    if (selfLoop) {
+      transitionFunction.delete(createGnfaTransitionFunctionKey(selfLoop.currentState, selfLoop.nextState));
+    }
+
+    // Remove state
+    states = R.without([stateToRemove], states);
+
+    // Add new transitions
+    R.forEach(
+      (newTransition) => {
+        const transitionFunctionKey = createGnfaTransitionFunctionKey(newTransition.currentState, newTransition.nextState);
+        if (transitionFunction.has(transitionFunctionKey)) {
+          const existingTransition = transitionFunction.get(transitionFunctionKey)!;
+          transitionFunction.set(transitionFunctionKey, {
+            ...newTransition,
+            regex: new RegExp(`${existingTransition.regex.source}|${newTransition.regex.source}`),
+          });
+        } else {
+          transitionFunction.set(transitionFunctionKey, newTransition);
+        }
+      },
+      newTransitions,
+    );
+  }
+
+  return transitionFunction.get(createGnfaTransitionFunctionKey(gnfa.initialState, gnfa.finalState))?.regex ?? emptyRegex;
+}
+// todo: create gnfa tf class that merges regex instead of overwriting
+export function convertNfaToRegex(automaton: Automaton): RegExp {
+  return convertGnfaToRegex(convertNfaToGnfa(automaton));
 }

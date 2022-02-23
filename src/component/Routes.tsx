@@ -16,6 +16,7 @@ import Automaton, { dbToAutomaton, determinize, minimize } from "../core/automat
 import firebase from "../firebase";
 import Breadcrumbs from "./Breadcrumbs";
 import AutomatonParams from "./AutomatonParams";
+import ConvertToRegex from "./ConvertToRegex";
 
 type RoutesProps = {
   automata: any;
@@ -180,6 +181,13 @@ export default function Routes({
                   path: "/minimized",
                   render: (routeProps) => withAutomaton(({ automaton }) => (
                     <View automaton={minimize(automaton)} />
+                  ), routeProps),
+                  isPrivate: true,
+                },
+                {
+                  path: "/convert-to-regex",
+                  render: (routeProps) => withAutomaton(({ automaton }) => (
+                    <ConvertToRegex automaton={automaton} />
                   ), routeProps),
                   isPrivate: true,
                 },

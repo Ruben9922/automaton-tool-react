@@ -3,11 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 import State, { stateIdToStateName, stateNameToStateId } from "./state";
 import Transition from "./transition";
 
-type TransitionFunction = Map<string, {
+export interface NfaTransition {
   currentState: string,
   symbol: string | null,
   nextStates: string[],
-}>;
+}
+
+type TransitionFunction = Map<string, NfaTransition>;
 
 export function transitionsToTransitionFunction(
   transitions: Transition[],
